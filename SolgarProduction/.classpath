@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/ESIClient.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/java-mail-1.4.4.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/jgoodies-common.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/jgoodies-forms.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/jxl.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/mysql-connector-java-5.1.38-bin.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/xerces-xercesimpl-2.11.jar"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
