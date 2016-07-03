@@ -5,6 +5,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import main.ConnectToDb;
+
 public class LoginScreen extends JFrame {
 
     private PassWordDialog passDialog;
@@ -91,9 +93,14 @@ class PassWordDialog extends JDialog {
         jbtOk.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                
-            	if ("hakan".equals(jpfPassword.getText())
-                        && "hakan".equals(jtfUsername.getText())) {
+            	String employeee_name="";
+				try {
+					employeee_name = ConnectToDb.getAuthorization(jtfUsername.getText().toString(), jpfPassword.getText().toString());
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            	if (employeee_name.length()>0) {
                     parent.setVisible(true);
                 	setVisible(false);
                 } else {

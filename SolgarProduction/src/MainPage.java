@@ -3,6 +3,7 @@ package src;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
  
 /**
  * Written/modified by Hakan Kayakutlu
@@ -19,7 +20,7 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
 	private static final int FRAME_HEIGHT = 900;	
 
 	  private JFrame frame;
-	  private JMenuBar menuBar;
+	  private JMenuBar menuBar,menuBarUser;
 	  private JMenu fileMenu;
 	  private JMenu editMenu;
 	  private JMenuItem openMenuItem;
@@ -29,6 +30,7 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
 	  private JMenuItem cutMenuItem;
 	  private JMenuItem copyMenuItem;
 	  private JMenuItem pasteMenuItem;
+	  private JLabel lblImage,lblYouAreWelcome,lblUserName;
 	  
 	  
  
@@ -45,6 +47,7 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
   {
     frame = new JFrame("Main Page");
     menuBar = new JMenuBar();
+    menuBarUser = new JMenuBar();
     
     Toolkit toolkit;
 	Dimension dim;
@@ -62,8 +65,11 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
 	
 	frame.setBounds((screenWidth - FRAME_WIDTH) / 2, (screenHeight - FRAME_HEIGHT) / 2, FRAME_WIDTH, FRAME_HEIGHT);	
 	frame.getContentPane().setLayout(new BorderLayout());
+
     //frame.setContentPane(new JLabel(new ImageIcon("C:\\SolgarPic.png")));
-    frame.setContentPane(new JLabel(new ImageIcon("images/SolgarPic.png")));
+	lblImage =  new JLabel(new ImageIcon("images/SolgarPic.png"));
+    frame.setContentPane(lblImage);
+    //add(lblImage,BorderLayout.CENTER);
     
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setLocationRelativeTo(null);
@@ -103,18 +109,16 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
     // add menus to menubar
     menuBar.add(fileMenu);
     menuBar.add(editMenu);
+    
+    lblYouAreWelcome = new JLabel("You Are Welcome User: ");
+    lblUserName = new JLabel(" Guest ");
+    
+    menuBar.add(Box.createHorizontalGlue());
+    menuBar.add(lblYouAreWelcome).setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);    
+    menuBar.add(lblUserName);
  
     // put the menubar on the frame
     frame.setJMenuBar(menuBar);
- 
-    //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    //frame.setPreferredSize(new Dimension(400, 300));
-    //frame.pack();
-    //frame.setLocationRelativeTo(null);
-     //frame.setLayout(new BorderLayout());
-    //frame.setContentPane(new JLabel(new ImageIcon("C:\\Users\\U0626802\\Desktop\\SolgarPic.png")));
-    //frame.setLayout(new FlowLayout());
-    //frame.setVisible(true);
    
   }
  

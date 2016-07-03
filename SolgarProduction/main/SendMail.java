@@ -1,5 +1,6 @@
 package main;
 
+import java.io.FileInputStream;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -13,9 +14,18 @@ import javax.mail.internet.MimeMessage;
 
 public class SendMail {
 
-	private static final String username = "hakan.kayakutlu";
-	private static final String password = "3563755";
-	private static final String email_from = "hakan.kayakutlu@yandex.ru";
+	static final Properties prop = readConfFile();
+	
+	private static Properties readConfFile() {  	   
+		Properties prop = new Properties();		
+			try {			
+				//prop.load(new FileInputStream("conf/config.properties"));
+				prop.load(new FileInputStream("C:\\config.properties"));
+	       } catch (Exception e) {
+	           e.printStackTrace();
+	       }			
+			return prop;
+	  }
 	
     public static void main(String[] args) {    
 
@@ -29,14 +39,14 @@ public class SendMail {
           new javax.mail.Authenticator() {
             @Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
+                return new PasswordAuthentication(prop.getProperty("username"), prop.getProperty("password"));
             }
           });
 
         try {
 
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(email_from));
+            message.setFrom(new InternetAddress(prop.getProperty("email_from")));
             message.setRecipients(Message.RecipientType.TO,
                 InternetAddress.parse("hakan.kayakutlu@gmail.com"));
             message.setSubject("Testing Subject");
@@ -64,14 +74,14 @@ public class SendMail {
           new javax.mail.Authenticator() {
             @Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
+                return new PasswordAuthentication(prop.getProperty("username"), prop.getProperty("password"));
             }
           });
 
         try {
 
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(email_from));
+            message.setFrom(new InternetAddress(prop.getProperty("email_from")));
             message.setRecipients(Message.RecipientType.TO,
                 InternetAddress.parse(receiver));
             message.setSubject(Subject);

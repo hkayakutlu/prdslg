@@ -18,20 +18,13 @@ import cb.esi.esiclient.util.ESIBag;
 
 public class ConnectToDb {
 
-	// JDBC driver name and database URL
-	   //static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	   //static final String DB_URL = "jdbc:mysql://localhost:3306/?useSSL=true";//"jdbc:mysql://127.0.0.1:3306";
-	  // static final String DB_URL_UPDATE = "jdbc:mysql://127.0.0.1:3306?useSSL=true";
-
-	   //  Database credentials
-	   //private static final String USER = "root";
-	   //private static final String PASS = "admin";
 	static final Properties prop = readConfFile();
 	 
 	private static Properties readConfFile() {  	   
 		Properties prop = new Properties();		
 			try {			
-				prop.load(new FileInputStream("conf/config.properties"));
+				//prop.load(new FileInputStream("conf/config.properties"));
+				prop.load(new FileInputStream("C:\\config.properties"));
 	       } catch (Exception e) {
 	           e.printStackTrace();
 	       }			
@@ -208,6 +201,47 @@ public class ConnectToDb {
 			}
         }
         return queryScript;
+    }
+	
+	public static String getAuthorization(String user,String pass) throws Exception {
+
+		String url = prop.getProperty("DB_URL");
+		PreparedStatement preparedStatement=null;
+        Connection conn =null;
+        String employee_name = "";
+        
+        try{
+            Class.forName(prop.getProperty("JDBC_DRIVER"));
+        }
+        catch(java.lang.ClassNotFoundException cnfe){
+            System.out.println("Class Not Found - " + cnfe.getMessage());
+        }       
+
+        try{
+            conn = (Connection) DriverManager.getConnection(url, prop.getProperty("USER"), prop.getProperty("PASS"));            
+            String sorgu  = "select * from solgar_org.employees where EMPLOYEE_EMAIL = ? and EMPLOYEE_PASSWORD=?;";
+            preparedStatement = (PreparedStatement)conn.prepareStatement(sorgu);
+        	preparedStatement.setString(1, user);
+        	preparedStatement.setString(2, pass);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()){
+            	employee_name = rs.getString("EMPLOYEE_NAME");
+            }
+ 
+        }
+        catch(SQLException sqle){       	
+            System.out.println("SQL Exception: " + sqle.getMessage());
+        }finally{
+        	if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+
+			if (conn != null) {
+				conn.close();
+			}
+        }
+        return employee_name;
     }
 	
 	public static void setSaleDataToDB(JTable resultTable) throws Exception {
