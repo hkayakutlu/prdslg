@@ -97,11 +97,11 @@ class PassWordDialog extends JDialog {
 				try {
 					employeee_name = ConnectToDb.getAuthorization(jtfUsername.getText().toString(), jpfPassword.getText().toString());
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
             	if (employeee_name.length()>0) {
                     parent.setVisible(true);
+                    parent.setTitle(employeee_name);
                 	setVisible(false);
                 } else {
                     jlblStatus.setText("Invalid username or password");

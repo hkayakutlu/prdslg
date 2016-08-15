@@ -32,12 +32,12 @@ public class ExcelUpload extends JFrame implements ActionListener {
     private static final String CELL_BREAK = "\t";
 
 	private JTextArea textArea;
-	private JTextField fileName,txtTotalAmount,txtTotalCount,txtProductType;
+	private JTextField fileName,txtTotalAmountSolgar,txtTotalCountSolgar,txtTotalAmountBounty,txtTotalCountBounty,txtProductType;
 	private JScrollPane jScroll;
 	private final JFileChooser fc = new JFileChooser();
 	private File file;
-	private JLabel lblFileName,lblTotalAmount,lblTotalCount,lblProductType;
-	private JPanel paramPanel,paramPanel1,paramPanel2, pnlInsertInst,pnlErrorMsg;
+	private JLabel lblFileName,lblTotalAmountSolgar,lblTotalCountSolgar,lblTotalAmountBounty,lblTotalCountBounty,lblProductType;
+	private JPanel paramPanel,paramPanel1,paramPanel2,paramPanel3, pnlInsertInst,pnlErrorMsg;
 	public JButton butClear, butOpen,butExceltoScreen,btnSave,btnExit;
 	private ExcelActionHandler excelActionHandler;
 	private JTable resultTable;
@@ -87,12 +87,16 @@ public class ExcelUpload extends JFrame implements ActionListener {
 		
 		// add parameter panel
 		paramPanel = new JPanel(new GridLayout(0, 3, 5, 5));
-		
+		paramPanel1 = new JPanel(new GridLayout(0, 4, 5, 5));
+		paramPanel2 = new JPanel(new GridLayout(0, 4, 5, 5));
+		paramPanel3 = new JPanel(new GridLayout(0, 2, 5, 5));
 		
 		//labels
 		lblFileName = new JLabel("File name please fill up with only xls type Excel");
-		lblTotalAmount = new JLabel("Total Amount");
-		lblTotalCount = new JLabel("Total Count");
+		lblTotalAmountSolgar = new JLabel("Total Amount Solgar");
+		lblTotalCountSolgar = new JLabel("Total Count Solgar");
+		lblTotalAmountBounty = new JLabel("Total Amount Bounty");
+		lblTotalCountBounty = new JLabel("Total Count Bounty");
 		lblProductType = new JLabel("Product Type");
 		//lblEmpty = new JLabel("");
 		cmbBoxCompanies = new JComboBox( new String[]{});		
@@ -108,14 +112,12 @@ public class ExcelUpload extends JFrame implements ActionListener {
 		
 		//text fields
 		fileName = new JTextField(20);		
-		txtTotalAmount = new JTextField(20);
-		txtTotalCount = new JTextField(20);
+		txtTotalAmountSolgar = new JTextField(20);
+		txtTotalCountSolgar = new JTextField(20);
+		txtTotalAmountBounty = new JTextField(20);
+		txtTotalCountBounty = new JTextField(20);
 		txtProductType = new JTextField(20);
 		
-		//Panels
-		//pnlInsertInst = new JPanel(new GridLayout(0, 6, 5, 5));
-		paramPanel1 = new JPanel(new GridLayout(0, 4, 5, 5));
-		paramPanel2 = new JPanel(new GridLayout(0, 2, 5, 5));
 		
 		// buttons		
 		butClear = new JButton("Clear");
@@ -157,21 +159,27 @@ public class ExcelUpload extends JFrame implements ActionListener {
 		//paramPanel.add(pnlInsertInst);	
 		
 		
-		paramPanel1.add(lblTotalAmount);
-		paramPanel1.add(txtTotalAmount);
-		paramPanel1.add(lblTotalCount);		
-		paramPanel1.add(txtTotalCount);		
+		paramPanel1.add(lblTotalAmountSolgar);
+		paramPanel1.add(txtTotalAmountSolgar);
+		paramPanel1.add(lblTotalCountSolgar);		
+		paramPanel1.add(txtTotalCountSolgar);
 		paramPanel.add(paramPanel1);
 		
-		txtTotalAmount.setEnabled(false);
-		txtTotalCount.setEnabled(false);
-		
-		
-		paramPanel2.add(lblProductType);		
-		paramPanel2.add(txtProductType);		
+		paramPanel2.add(lblTotalAmountBounty);
+		paramPanel2.add(txtTotalAmountBounty);
+		paramPanel2.add(lblTotalCountBounty);		
+		paramPanel2.add(txtTotalCountBounty);
 		paramPanel.add(paramPanel2);
 		
+		paramPanel3.add(lblProductType);		
+		paramPanel3.add(txtProductType);		
+		paramPanel.add(paramPanel3);
+		
 		txtProductType.setEnabled(false);
+		txtTotalAmountSolgar.setEnabled(false);
+		txtTotalCountSolgar.setEnabled(false);
+		txtTotalAmountBounty.setEnabled(false);
+		txtTotalCountBounty.setEnabled(false);
 		
 		//
 		paramPanel.setBorder(new EmptyBorder(10, 15, 5, 15));
@@ -266,8 +274,14 @@ public class ExcelUpload extends JFrame implements ActionListener {
 				selectedDate = selectedDate.substring(5, 7) +"_"+selectedDate.substring(0, 4);
 				int totalCount = 0;
 				double totalAmount = 0;
+				int totalCountSolgar = 0;
+				double totalAmountSolgar = 0;
+				int totalCountBounty = 0;
+				double totalAmountBounty = 0;
 				String product ="";
 				DecimalFormat df = new DecimalFormat("#.00");
+				boolean solgar = false;
+				boolean bounty = false;
 				
 				if(fileName.indexOf(selectedItem)<0||fileName.indexOf(selectedDate)<0){//Show error message
 					parent.butClear.setEnabled(true);
@@ -377,8 +391,7 @@ public class ExcelUpload extends JFrame implements ActionListener {
 						    if(countStr.indexOf(",")>0){
 						    	countStr = countStr.substring(0, countStr.indexOf(","));
 							}
-						    int intCount =  Integer.parseInt(countStr);
-						    totalCount = totalCount + intCount;
+						    int intCount =  Integer.parseInt(countStr);					    
 						    
 						    if(amountStr != null && amountStr.trim().length()>0){
 							    amountStr = amountStr.replaceAll("\\s+", "");	
@@ -390,23 +403,39 @@ public class ExcelUpload extends JFrame implements ActionListener {
 							    if(amountStr.indexOf(",")>=0){
 							    	amountStr = amountStr.replaceAll(",", ".");
 								}
-							    totalAmount = totalAmount + Double.parseDouble(amountStr);
+							    totalAmount = Double.parseDouble(amountStr);
 						    }else{
-						    	totalAmount = totalAmount + Double.parseDouble("0.00");
+						    	totalAmount = Double.parseDouble("0.00");
 						    }
+						    
+						    if(product.toUpperCase().indexOf("аюсмрх")>=0 || product.toUpperCase().indexOf("BOUNTY")>=0){
+						    	totalAmountBounty =totalAmountBounty + totalAmount;
+						    	totalCountBounty = totalCountBounty + intCount;
+								bounty = true;
+							}else{
+								totalAmountSolgar =totalAmountSolgar + totalAmount;		
+								totalCountSolgar = totalCountSolgar + intCount;
+								solgar = true;
+							}
 							        
-					 }
-					txtTotalAmount.setText(String.valueOf(df.format(totalAmount)));
-					txtTotalCount.setText(String.valueOf(totalCount));
-					
-					if(product.toUpperCase().indexOf("аюсмрх")>=0 || product.toUpperCase().indexOf("BOUNTY")>=0){
+					 }				
+				
+					if(bounty){
+						txtTotalAmountBounty.setText(String.valueOf(df.format(totalAmountBounty)));
+						txtTotalCountBounty.setText(String.valueOf(totalCountBounty));
 						txtProductType.setText("NATURES BOUNTY");
-					}else{
+					}
+					if(solgar){
+						txtTotalAmountSolgar.setText(String.valueOf(df.format(totalAmountSolgar)));
+						txtTotalCountSolgar.setText(String.valueOf(totalCountSolgar));
 						txtProductType.setText("SOLGAR");
+					}	
+					if(bounty&&solgar){
+						txtProductType.setText("SOLGAR & NATURES BOUNTY");
 					}
 					
 				}
-	
+
 				//tableCopyToClipboard(true);
 				parent.butClear.setEnabled(true);
 				parent.butExceltoScreen.setEnabled(false);
@@ -443,17 +472,19 @@ public class ExcelUpload extends JFrame implements ActionListener {
 					String emailText = "Dear reciepents,\n\n"+
 					cmbBoxCompanies.getSelectedItem().toString() +" "+txtProductType.getText()
 					+" upload to system for "+
-					cmbBoxDates.getSelectedItem().toString()+".\n\nTotal Count:"+
-					txtTotalCount.getText()+".\n\nTotal Amount:"+ txtTotalAmount.getText();
+					cmbBoxDates.getSelectedItem().toString()+".\n\nTotal Count Solgar:"+
+					txtTotalCountSolgar.getText()+".\n\nTotal Amount Solgar:"+ txtTotalAmountSolgar.getText()+
+					"\n\nTotal Count Bounty:"+ txtTotalCountBounty.getText()+".\n\nTotal Amount Bounty:"+ txtTotalAmountBounty.getText();
 					
 					SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","hgokmen@solgarvitamin.ru","", "Auto mail sale report", emailText);
 					
 					for( int i = dtm.getRowCount() - 1; i >= 0; i-- ) {
 						dtm.removeRow(i);
 					}
-					txtTotalAmount.setText("");
-					txtTotalCount.setText("");
-				
+					txtTotalAmountSolgar.setText("");
+					txtTotalCountSolgar.setText("");
+					txtTotalAmountBounty.setText("");
+					txtTotalCountBounty.setText("");
 				}
 				
 				
@@ -485,8 +516,10 @@ public class ExcelUpload extends JFrame implements ActionListener {
 				parent.butExceltoScreen.setEnabled(false);
 				parent.butClear.setEnabled(false);
 				
-				txtTotalAmount.setText("");
-				txtTotalCount.setText("");			
+				txtTotalAmountSolgar.setText("");
+				txtTotalCountSolgar.setText("");	
+				txtTotalAmountBounty.setText("");
+				txtTotalCountBounty.setText("");		
 				
 			} catch (Exception ex) {
 				throw ex;

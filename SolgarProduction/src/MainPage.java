@@ -3,7 +3,8 @@ package src;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+
+import cb.esi.esiclient.util.ESIBag;
  
 /**
  * Written/modified by Hakan Kayakutlu
@@ -21,15 +22,10 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
 
 	  private JFrame frame;
 	  private JMenuBar menuBar,menuBarUser;
-	  private JMenu fileMenu;
+	  private JMenu fileMenu,salesReportsMenu,marketingExpensesMenu;
 	  private JMenu editMenu;
-	  private JMenuItem openMenuItem;
-	  private JMenuItem excelLoadMenuItem;
-	  private JMenuItem reportObservation;
-	  private JMenuItem exitMenuItem;
-	  private JMenuItem cutMenuItem;
-	  private JMenuItem copyMenuItem;
-	  private JMenuItem pasteMenuItem;
+	  private JMenuItem openMenuItem,excelLoadMenuItem,reportObservation,exitMenuItem,cutMenuItem,copyMenuItem,pasteMenuItem,
+	  marketingExpenseEntry,marketingExpenseApprove,marketingExpenseObservation,marketingExpenseUpdate;
 	  private JLabel lblImage,lblYouAreWelcome,lblUserName;
 	  
 	  
@@ -37,7 +33,7 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
   public static void main(String[] args)
   {
     // needed on mac os x
-    System.setProperty("apple.laf.useScreenMenuBar", "true");
+    System.setProperty("apple.laf.useScreenMenuBar", "true");   
  
     // the proper way to show a jframe (invokeLater)
     SwingUtilities.invokeLater(new MainPage());
@@ -67,7 +63,8 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
 	frame.getContentPane().setLayout(new BorderLayout());
 
     //frame.setContentPane(new JLabel(new ImageIcon("C:\\SolgarPic.png")));
-	lblImage =  new JLabel(new ImageIcon("images/SolgarPic.png"));
+	//lblImage =  new JLabel(new ImageIcon("images/SolgarPic.png"));
+	lblImage =  new JLabel(new ImageIcon("C:\\SolgarPic.png"));
     frame.setContentPane(lblImage);
     //add(lblImage,BorderLayout.CENTER);
     
@@ -82,16 +79,41 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
     openMenuItem = new JMenuItem("LogIn");
     openMenuItem.addActionListener(this);
     fileMenu.add(openMenuItem);
+
+    salesReportsMenu = new JMenu("Sales Reports");
+    fileMenu.add(salesReportsMenu);  
+    salesReportsMenu.setVisible(false);    
     
     excelLoadMenuItem = new JMenuItem("Excel Load");
     excelLoadMenuItem.addActionListener(this);
-    fileMenu.add(excelLoadMenuItem);
-    excelLoadMenuItem.setVisible(false);
+    salesReportsMenu.add(excelLoadMenuItem);
+    //excelLoadMenuItem.setVisible(false);
     
     reportObservation = new JMenuItem("Report Observation");
     reportObservation.addActionListener(this);
-    fileMenu.add(reportObservation);
-    reportObservation.setVisible(false);
+    salesReportsMenu.add(reportObservation);
+    //reportObservation.setVisible(false);
+    
+    marketingExpensesMenu = new JMenu("Marketing Expenses");
+    fileMenu.add(marketingExpensesMenu);  
+    marketingExpensesMenu.setVisible(false); 
+    
+    marketingExpenseEntry = new JMenuItem("Marketing Expense Entry");
+    marketingExpenseEntry.addActionListener(this);
+    marketingExpensesMenu.add(marketingExpenseEntry);
+    
+    marketingExpenseUpdate = new JMenuItem("Marketing Expense Update");
+    marketingExpenseUpdate.addActionListener(this);
+    marketingExpensesMenu.add(marketingExpenseUpdate);
+    
+    marketingExpenseApprove = new JMenuItem("Marketing Expense Approve");
+    marketingExpenseApprove.addActionListener(this);
+    marketingExpensesMenu.add(marketingExpenseApprove);
+    
+    marketingExpenseObservation = new JMenuItem("Marketing Expense Observation");
+    marketingExpenseObservation.addActionListener(this);
+    marketingExpensesMenu.add(marketingExpenseObservation);
+  
     
     exitMenuItem = new JMenuItem("Exit");
     exitMenuItem.addActionListener(this);
@@ -130,20 +152,45 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
   @Override
 public void actionPerformed(ActionEvent ev) 
   {
-	 if(ev.getActionCommand().equals("LogIn")){	  
+	 ESIBag inBag = new ESIBag();
+	  
+	  if(ev.getActionCommand().equals("LogIn")){	  
 	    /*SampleDialog dialog = new SampleDialog();
 	    dialog.setModal(true);
 	    dialog.setVisible(true);*/
 		 LoginScreen login = new LoginScreen();
 		 login.setVisible(false);
-		 excelLoadMenuItem.setVisible(true);
-		 reportObservation.setVisible(true);
+		 String loginName = login.getTitle();
+		 lblUserName.setText(loginName);
+		 salesReportsMenu.setVisible(true);
+		 marketingExpensesMenu.setVisible(true);
+		 if(loginName.matches("Hakan KAYAKUTLU|Halit Gokmen|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){
+			 marketingExpenseApprove.setVisible(true);
+		 }else{
+			 marketingExpenseApprove.setVisible(false);
+		 }
 		 openMenuItem.setVisible(false);
 	 }else if(ev.getActionCommand().equals("Excel Load")){
 		 ExcelUpload excelUpload = new ExcelUpload();
 		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Report Observation")){
 		 ReportObservation reportObservation = new ReportObservation();
+		 frame.validate();
+	 }else if(ev.getActionCommand().equals("Marketing Expense Entry")){
+		 inBag.put("LOGINNAME",lblUserName.getText());
+		 ExpenseEntryScreen marketingExpenseEntry = new ExpenseEntryScreen(inBag);
+		 frame.validate();
+	 }else if(ev.getActionCommand().equals("Marketing Expense Update")){
+		 inBag.put("LOGINNAME",lblUserName.getText());
+		 ExpenseUpdateScreen marketingExpenseUpdate = new ExpenseUpdateScreen(inBag);
+		 frame.validate();
+	 }else if(ev.getActionCommand().equals("Marketing Expense Approve")){
+		 inBag.put("LOGINNAME",lblUserName.getText());
+		 ExpenseApproveScreen marketingExpenseApprove = new ExpenseApproveScreen(inBag);
+		 frame.validate();
+	 }else if(ev.getActionCommand().equals("Marketing Expense Observation")){
+		 inBag.put("LOGINNAME",lblUserName.getText());
+		 ExpenseObservationScreen marketingExpenseObservation = new ExpenseObservationScreen(inBag);
 		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Exit")){
 		 System.exit(0);
