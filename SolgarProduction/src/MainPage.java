@@ -164,7 +164,7 @@ public void actionPerformed(ActionEvent ev)
 		 lblUserName.setText(loginName);
 		 salesReportsMenu.setVisible(true);
 		 marketingExpensesMenu.setVisible(true);
-		 if(loginName.matches("Hakan KAYAKUTLU|Halit Gokmen|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){
+		 if(loginName.matches("Hakan KAYAKUTLU|Халит Гекмен|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){
 			 marketingExpenseApprove.setVisible(true);
 		 }else{
 			 marketingExpenseApprove.setVisible(false);
@@ -186,7 +186,7 @@ public void actionPerformed(ActionEvent ev)
 		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Marketing Expense Approve")){
 		 inBag.put("LOGINNAME",lblUserName.getText());
-		 ExpenseApproveScreen marketingExpenseApprove = new ExpenseApproveScreen(inBag);
+		 ExpenseApprove marketingExpenseApprove = new ExpenseApprove(inBag);
 		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Marketing Expense Observation")){
 		 inBag.put("LOGINNAME",lblUserName.getText());

@@ -35,10 +35,11 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import sun.misc.Cleaner;
 import main.ConnectToDb;
 import main.SendMail;
 
-public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemListener,MouseListener{
+public class ExpenseApprove extends JFrame implements ActionListener,ItemListener,MouseListener{
 	private static final int FRAME_WIDTH = 1100;
 	private static final int FRAME_HEIGHT = 900;
 	
@@ -51,23 +52,23 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 	lblExpMerLecture,lblExpMerOrganizator,lblExpMerTema,lblExpMerUcastnik,
     lblExpRekUsloviya,lblExpRekProduct,lblExpRekChain,
 	lblExpPosProduct,lblExpPosParyadk,lblExpPosStatus,
-	lblCount,lblAmount,lblComment,lblId,lblCompanyCode,
-	lblAmount1,lblAmount2,lblAmount3,lblAmount4,lblAmount5;
+	lblCount,lblAmount,lblComment,lblId,lblStatus,lblCompanyCode,
+	lblAmount1,lblAmount2,lblAmount3,lblAmount4,lblAmount5,
+	lblSearchEventDate,lblSearchEntryDate,lblEmpty,lblEmpty1;
 	private JPanel paramPanelMain,paramPanelAddress,paramPanelDates,paramPanelResult,paramPanelExpTypes,paramPanelExpParMer,
-	paramPanelExpParRek,paramPanelExpParPos,paramPanelBtn,paramPanelBtn1,paramPanelAmounts,pnlInfoMsg;
+	paramPanelExpParRek,paramPanelExpParPos,paramPanelBtn,paramPanelBtn1,paramPanelAmounts,pnlInfoMsg,paramPanelSearchDates;
 	private JScrollPane jScroll;
 	private JTable resultTable;
 	private JComboBox cmbBoxCountry,cmbBoxRegion,cmbBoxCity,cmbBoxCityRegion,
-	cmbBoxExpMain,cmbBoxExpLevel1,cmbBoxExpLevel2,cmbBoxCompanyCode;
+	cmbBoxExpMain,cmbBoxExpLevel1,cmbBoxExpLevel2,cmbBoxCompanyCode,
+	cmbBoxsearchEventDateSmall,cmbBoxsearchEventDateBig,cmbBoxsearchEntryDateSmall,cmbBoxsearchEntryDateBig;
 	private JFormattedTextField startDate,endDate;
 	private JTextField txtExpMerLecture,txtExpMerOrganizator,txtExpMerTema,txtExpMerUcastnik,
 	txtExpRekUsloviya,txtExpRekProduct,txtExpRekChain,
-	txtExpPosProduct,txtExpPosParyadk,txtExpPosStatus,txtId;
-	public JButton btnApprove,btnReject,btnUpdate,btnSave,btnExit;
+	txtExpPosProduct,txtExpPosParyadk,txtExpPosStatus,txtId,txtStatus;
+	public JButton btnSearch,btnReject,btnApprove,btnSave,btnExit;
 	public JTextArea textAreaComment;
 	public JFormattedTextField txtCountFormat,txtAmountFormat,txtAmount1,txtAmount2,txtAmount3,txtAmount4,txtAmount5;
-	//final DefaultTableModel model = new DefaultTableModel();
-	//DefaultTableModel dtm = new DefaultTableModel(0, 0);
 	DefaultTableModel model = new DefaultTableModel(null, new String [] {"id","approve_status","company_code","entry_date","entry_user","approve_date",
 			"approve_user","Country","Region","City","City_Region","Start_Date","End_Date","First_Stage","Second_Stage",
 			"Third_Stage","Exp1","Exp2","Exp3","Exp4","Exp_Count","Exp_Amount","comments","amount1","amount2","amount3","amount4","amount5","selecTable"}) {
@@ -77,7 +78,6 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
             default: return String.class;
           }   
         } };
-	//String header[] = new String[] { "Row Number","Column1","Column2"};
 	/**
 	 * Launch the application.
 	 */
@@ -86,7 +86,7 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 			public void run() {
 				try {
 					ESIBag inBag = new ESIBag();
-					ExpenseApproveScreen window = new ExpenseApproveScreen(inBag);
+					ExpenseApprove window = new ExpenseApprove(inBag);
 					//window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -105,7 +105,7 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	public ExpenseApproveScreen(ESIBag inBag) {
+	public ExpenseApprove(ESIBag inBag) {
 		super("Expense Approve");
 		Toolkit toolkit;
 		Dimension dim;
@@ -119,28 +119,31 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		screenHeight = dim.height;
 		screenWidth = dim.width;
 		setBounds((screenWidth - FRAME_WIDTH) / 2, (screenHeight - FRAME_HEIGHT) / 2, FRAME_WIDTH, FRAME_HEIGHT);
+		
+		
 		//Set Parameters from Main Page
-		try {	
+			try {	
 
-			if(inBag.existsBagKey("LOGINNAME")){
-				userName = inBag.get("LOGINNAME").toString();
-			}				
-			
-		} catch (Exception e) {
-			// simdilik yoksa yok
-		}
+				if(inBag.existsBagKey("LOGINNAME")){
+					userName = inBag.get("LOGINNAME").toString();
+				}				
+				
+			} catch (Exception e) {
+				// simdilik yoksa yok
+			}
 		
 		// add parameter panel
-		paramPanelMain = new JPanel(new GridLayout(3, 3, 5, 5));
+		paramPanelMain = new JPanel(new GridLayout(4, 3, 5, 5));
 		paramPanelAddress = new JPanel(new GridLayout(4, 2, 5, 5));
 		paramPanelDates = new JPanel(new GridLayout(4, 2, 5, 5));
-		paramPanelExpTypes = new JPanel(new GridLayout(4, 4, 5, 5));
+		paramPanelExpTypes = new JPanel(new GridLayout(4, 2, 5, 5));
 		paramPanelExpParMer = new JPanel(new GridLayout(4, 2, 5, 5));
 		paramPanelExpParRek = new JPanel(new GridLayout(4, 2, 5, 5));
 		paramPanelExpParPos = new JPanel(new GridLayout(4, 2, 5, 5));
 		paramPanelBtn = new JPanel(new GridLayout(3, 2, 5, 5));
 		paramPanelBtn1 = new JPanel(new GridLayout(2, 1, 5, 5));
 		paramPanelAmounts = new JPanel(new GridLayout(5, 2, 5, 5));
+		paramPanelSearchDates = new JPanel(new GridLayout(4, 2, 5, 5));
 		
 		paramPanelResult = new JPanel(new GridLayout(0, 1, 5, 5));
 		
@@ -157,18 +160,22 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 	    decimalFormat.setGroupingUsed(false);
 		
 		//Table
-		resultTable = new JTable(model);		
+	    resultTable = new JTable(model);		
 		//dtm.setColumnIdentifiers(header);
 		//resultTable.setModel(dtm);
 		
 		// scroll pane
-		jScroll = new JScrollPane(resultTable);		
+		jScroll = new JScrollPane(resultTable,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);		
 		jScroll.setViewportView(resultTable);
 		jScroll.setBorder(new EmptyBorder(10, 10, 10, 10));
 		getContentPane().add(jScroll, BorderLayout.CENTER);
 		
 		
 		//labels
+		
+		lblEmpty= new JLabel("");		
+		lblEmpty1= new JLabel("");
+		
 		lblAdrCountry = new JLabel("Country");		
 		lblAdrRegion = new JLabel("Region");
 		lblAdrCity = new JLabel("City");
@@ -193,6 +200,7 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		lblExpRekProduct = new JLabel("Product");
 		lblExpRekChain = new JLabel("Chain");
 		lblId = new JLabel("Id Record");
+		lblStatus = new JLabel("Status Record");
 		
 		lblExpPosProduct = new JLabel("Product");
 		lblExpPosParyadk = new JLabel("Contracter");
@@ -206,14 +214,44 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		lblAmount4 = new JLabel("Гонорар");
 		lblAmount5 = new JLabel("Другое");
 		
-		cmbBoxCountry = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMDataGroupBy("country", "solgar_prm.prm_address_group",cmbBoxCountry,"","");	
-		cmbBoxCountry.setMaximumRowCount(50);
-		cmbBoxCountry.setEnabled(false);
+		lblSearchEventDate = new JLabel("Event Date Between");
+		lblSearchEntryDate = new JLabel("Entry Date Between");
+		
+		cmbBoxCountry = new JComboBox( new String[]{});
 		
 		cmbBoxRegion = new JComboBox( new String[]{});		
-		cmbBoxRegion.setEnabled(false);
+		cmbBoxRegion.setEditable(true);	
 		
+		if(userName.matches("Hakan KAYAKUTLU|Халит Гекмен|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){					
+			ConnectToDb.getPRMDataGroupBy("country", "solgar_prm.prm_address_group",cmbBoxCountry,"","");	
+			cmbBoxCountry.setMaximumRowCount(50);
+			cmbBoxCountry.setEditable(true);
+			cmbBoxCountry.setSelectedIndex(-1);
+		}else if(userName.matches("Шарыпова Сюзанна Николаевна")){
+			cmbBoxCountry.addItem("Moscow");
+			cmbBoxCountry.setEnabled(false);
+			cmbBoxCountry.setEditable(false);
+			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+		}else if(userName.matches("Копрова Ксения Олеговна")){
+			cmbBoxCountry.addItem("Saint Petersburg");
+			cmbBoxCountry.setEnabled(false);
+			cmbBoxCountry.setEditable(false);
+			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+		}else if(userName.matches("Зайцева Дарья Андреевна")){
+			cmbBoxCountry.addItem("Region");
+			cmbBoxCountry.setEnabled(false);
+			cmbBoxCountry.setEditable(false);
+			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+		}else if(userName.matches("Ekateryna Shevtsova")){
+			cmbBoxCountry.addItem("Ukraine");
+			cmbBoxCountry.setEnabled(false);
+			cmbBoxCountry.setEditable(false);
+			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+		}else{
+			cmbBoxCountry.addItem("No Authorization");
+			cmbBoxCountry.setEnabled(false);
+			cmbBoxCountry.setEditable(false);
+		}			
 		
 		cmbBoxCity = new JComboBox( new String[]{});		
 		cmbBoxCity.setEnabled(false);
@@ -224,28 +262,55 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		cmbBoxExpMain = new JComboBox( new String[]{});		
 		ConnectToDb.getPRMDataGroupBy("main_name", "solgar_prm.prm_exps_types",cmbBoxExpMain,"","");	
 		cmbBoxExpMain.setMaximumRowCount(50);
-		cmbBoxExpMain.setEnabled(false);
+		cmbBoxExpMain.setEditable(true);
+		cmbBoxExpMain.setSelectedIndex(-1);
 		
 		cmbBoxExpLevel1 = new JComboBox( new String[]{});		
-		cmbBoxExpLevel1.setEnabled(false);
+		cmbBoxExpLevel1.setEditable(true);
 		
 		cmbBoxExpLevel2 = new JComboBox( new String[]{});		
-		cmbBoxExpLevel2.setEnabled(false);
+		cmbBoxExpLevel2.setEditable(true);
 		
-		cmbBoxCompanyCode = new JComboBox( new String[]{});	
+		cmbBoxCompanyCode = new JComboBox( new String[]{});		
 		cmbBoxCompanyCode.addItem("SOLGAR");
 		cmbBoxCompanyCode.addItem("NATURES BOUNTY");
+		cmbBoxCompanyCode.setEditable(true);
 		cmbBoxCompanyCode.setSelectedIndex(-1);
-		cmbBoxCompanyCode.setEnabled(false);
 		
 		//Date Field
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		
 		startDate = new JFormattedTextField(df);
 		startDate.setValue(new java.util.Date());
 		startDate.setEnabled(false);
+		
 		endDate = new JFormattedTextField(df);
 		endDate.setValue(new java.util.Date());
 		endDate.setEnabled(false);
+		
+		cmbBoxsearchEventDateSmall = new JComboBox( new String[]{});		
+		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEventDateSmall);				
+		cmbBoxsearchEventDateSmall.setMaximumRowCount(50);
+		cmbBoxsearchEventDateSmall.setEditable(true);
+		cmbBoxsearchEventDateSmall.setSelectedIndex(-1);
+		
+		cmbBoxsearchEventDateBig = new JComboBox( new String[]{});		
+		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEventDateBig);				
+		cmbBoxsearchEventDateBig.setMaximumRowCount(50);
+		cmbBoxsearchEventDateBig.setEditable(true);
+		cmbBoxsearchEventDateBig.setSelectedIndex(-1);
+		
+		cmbBoxsearchEntryDateSmall = new JComboBox( new String[]{});		
+		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEntryDateSmall);				
+		cmbBoxsearchEntryDateSmall.setMaximumRowCount(50);
+		cmbBoxsearchEntryDateSmall.setEditable(true);
+		cmbBoxsearchEntryDateSmall.setSelectedIndex(-1);
+		
+		cmbBoxsearchEntryDateBig = new JComboBox( new String[]{});		
+		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEntryDateBig);				
+		cmbBoxsearchEntryDateBig.setMaximumRowCount(50);
+		cmbBoxsearchEntryDateBig.setEditable(true);
+		cmbBoxsearchEntryDateBig.setSelectedIndex(-1);
 		
 		//Text Fields
 		txtExpMerLecture = new JTextField();
@@ -281,6 +346,9 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		txtExpPosStatus = new JTextField();
 		txtExpPosStatus.setEnabled(false);
 		
+		txtStatus = new JTextField();
+		txtStatus.setEnabled(false);
+		
 		txtCountFormat = new JFormattedTextField(numberFormatter);
 		txtCountFormat.setEnabled(false);
 		
@@ -299,12 +367,13 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		txtAmount5.setEnabled(false);
 		
 		//Buttons
+		btnSearch = new JButton("Search");
+		btnReject = new JButton("Reject");
 		btnApprove = new JButton("Approve");
 		btnApprove.setEnabled(false);
-		btnReject = new JButton("Reject");
 		btnReject.setEnabled(false);
 		
-		btnUpdate = new JButton("Update");		
+				
 		btnExit = new JButton("Exit");
 		btnSave = new JButton("Save");
 		btnSave.setEnabled(false);
@@ -321,7 +390,7 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		textAreaComment = new JTextArea(2, 5);
 		textAreaComment.setLineWrap(true);
 		JScrollPane scrollPaneTxtArea = new JScrollPane(textAreaComment,
-	            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+	            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 	            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); 
 		textAreaComment.setEditable(false);
 
@@ -336,9 +405,9 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		cmbBoxExpLevel1.addItemListener(this);
 		cmbBoxExpLevel2.addItemListener(this);
 		
-		btnApprove.addActionListener(this);	
+		btnSearch.addActionListener(this);	
 		btnReject.addActionListener(this);
-		btnUpdate.addActionListener(this);
+		btnApprove.addActionListener(this);
 		btnSave.addActionListener(this);
 		btnExit.addActionListener(this);
 
@@ -407,6 +476,8 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		paramPanelExpParPos.add(txtExpPosParyadk);
 		paramPanelExpParPos.add(lblExpPosStatus);
 		paramPanelExpParPos.add(txtExpPosStatus);
+		paramPanelExpParPos.add(lblStatus);
+		paramPanelExpParPos.add(txtStatus);
 		//paramPanelExpParPos.setVisible(false);
 		
 		//Button group
@@ -424,8 +495,18 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		paramPanelAmounts.add(lblAmount5);
 		paramPanelAmounts.add(txtAmount5);
 		
+		paramPanelSearchDates.add(lblSearchEventDate);
+		paramPanelSearchDates.add(cmbBoxsearchEventDateSmall);
+		paramPanelSearchDates.add(lblEmpty);
+		paramPanelSearchDates.add(cmbBoxsearchEventDateBig);
+		
+		paramPanelSearchDates.add(lblSearchEntryDate);
+		paramPanelSearchDates.add(cmbBoxsearchEntryDateSmall);
+		paramPanelSearchDates.add(lblEmpty1);
+		paramPanelSearchDates.add(cmbBoxsearchEntryDateBig);
+		
+		paramPanelBtn.add(btnSearch);
 		paramPanelBtn.add(btnApprove);
-		//paramPanelBtn.add(btnUpdate);
 		paramPanelBtn.add(btnReject);
 		//paramPanelBtn.add(btnSave);
 		paramPanelBtn.add(btnExit);
@@ -438,32 +519,32 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		paramPanelMain.add(paramPanelExpParPos);
 		paramPanelMain.add(paramPanelBtn1);
 		paramPanelMain.add(paramPanelAmounts);
+		paramPanelMain.add(paramPanelSearchDates);
 		paramPanelMain.add(paramPanelBtn);
+		
 		
 		
 		paramPanelMain.setBorder(new EmptyBorder(10, 15, 5, 15));
 		getContentPane().add(paramPanelMain, BorderLayout.NORTH);
 		
-		/*dtm = ConnectToDb.getExpensesForApprove();
-		resultTable.setModel(dtm);*/
-
-		paramPanelResult.add(jScroll);
 		
-		createModel();
-		    
+		paramPanelResult.add(jScroll);
+		ESIBag tempBag = ConnectToDb.getExpensesForApprove();
+		createModel(tempBag);
 		//Last Changes
 		paramPanelResult.setBorder(new EmptyBorder(10, 15, 5, 15));
 		getContentPane().add(paramPanelResult, BorderLayout.CENTER);
-
+		
+		//ConnectToDb.getAllExpenses(resultTable);
+		
 		// Put the final touches to the JFrame object
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		validate();
 		setVisible(true);
 	}
-
-	private void createModel() {
-		ESIBag tempBag = ConnectToDb.getExpensesForApprove();
-		    try{
+	
+	private void createModel(ESIBag tempBag) {		
+		  try{
 			for (int j = 0; j < tempBag.getSize("TABLE"); j++){
 				model.addRow(new Object [] 
 		        		{tempBag.get("TABLE",j,"id"),
@@ -505,42 +586,82 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-			if (e.getActionCommand().equals("Approve")) {
-
+			if (e.getActionCommand().equals("Search")) {
+				
+				//Clean all table
+				for( int i = model.getRowCount() - 1; i >= 0; i-- ) {
+					model.removeRow(i);
+				}				
+				//Search Parametrelerini ekle
+				ESIBag tempBag= ConnectToDb.getExpensesForApproveWithPar(resultTable,cmbBoxCountry,cmbBoxRegion,cmbBoxCompanyCode,cmbBoxExpMain,cmbBoxExpLevel1,cmbBoxExpLevel2,
+						cmbBoxsearchEventDateSmall,cmbBoxsearchEventDateBig,cmbBoxsearchEntryDateSmall,cmbBoxsearchEntryDateBig);	
+				createModel(tempBag);
+			}else if (e.getActionCommand().equals("Reject")) {
+				
 				for (int j = 0; j < model.getRowCount(); j++){
 					if(resultTable.getValueAt(j, 28).toString().equalsIgnoreCase("true")){					
-						ConnectToDb.updateExpenseStatus(resultTable.getValueAt(j, 0).toString(),"2",userName);	
+						ConnectToDb.updateExpenseStatus(resultTable.getValueAt(j, 0).toString(),"3",userName);							
+					}
+				}
+				for( int i = model.getRowCount() - 1; i >= 0; i-- ) {
+					model.removeRow(i);
+				}
+				ESIBag tempBag = ConnectToDb.getExpensesForApprove();
+				createModel(tempBag);				
+				String emailText = "Dear reciepents,\n\n"+"Below id's expense rejected by necessary user\n\n" + txtId.getText();						
+				//SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","hgokmen@solgarvitamin.ru","mkamaeva@solgarvitamin.ru", "Auto mail reject expense", emailText);
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Expense rejected", "Information", JOptionPane.INFORMATION_MESSAGE);
+				btnApprove.setEnabled(false);
+				btnReject.setEnabled(false);
+				
+			}else if (e.getActionCommand().equals("Delete")) {
+				
+			}else if (e.getActionCommand().equals("Approve")) {			
+				double totalAmount = 0;
+				for (int j = 0; j < model.getRowCount(); j++){
+					if(resultTable.getValueAt(j, 28).toString().equalsIgnoreCase("true")){					
+						ConnectToDb.updateExpenseStatus(resultTable.getValueAt(j, 0).toString(),"2",userName);
+						totalAmount = totalAmount + Double.parseDouble(resultTable.getValueAt(j, 21).toString());					
 					}
 				}				
 				
 				for( int i = model.getRowCount() - 1; i >= 0; i-- ) {
 					model.removeRow(i);
 				}
-				createModel();
-				String emailText = "Dear reciepents,\n\n"+"Below id's expense approved by necessary user\n\n" + txtId.getText();						
-				//SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","","", "Auto mail approve expense", emailText);
+				ESIBag tempBag = ConnectToDb.getExpensesForApprove();
+				createModel(tempBag);
+				
+				String CompanyCode="",Country="",Region="",ExpMain="",ExpLevel1="";
+				
+				if(cmbBoxCompanyCode.getSelectedItem() != null &&
+						cmbBoxCompanyCode.getSelectedItem().toString().length()>0){
+					CompanyCode= cmbBoxCompanyCode.getSelectedItem().toString();
+				}
+				if(cmbBoxCountry.getSelectedItem() != null &&
+						cmbBoxCountry.getSelectedItem().toString().length()>0){
+					Country= cmbBoxCountry.getSelectedItem().toString();
+				}
+				if(cmbBoxRegion.getSelectedItem() != null &&
+						cmbBoxRegion.getSelectedItem().toString().length()>0){
+					Region= cmbBoxRegion.getSelectedItem().toString();
+				}
+				if(cmbBoxExpMain.getSelectedItem() != null &&
+						cmbBoxExpMain.getSelectedItem().toString().length()>0){
+					ExpMain= cmbBoxExpMain.getSelectedItem().toString();
+				}
+				if(cmbBoxExpLevel1.getSelectedItem() != null &&
+						cmbBoxExpLevel1.getSelectedItem().toString().length()>0){
+					ExpLevel1= cmbBoxExpLevel1.getSelectedItem().toString();
+				}
+				
+				String emailText = "Dear reciepents,\n\n"+"Below expenses approved by necessary user\n\n" + 
+				"Company : "+CompanyCode+"\n\n" +"Country : "+Country+"\n\n" + "Region : "+Region+"\n\n" +
+				"Main Expense Group : "+ExpMain+"\n\n" + "First Level Expense : "+ExpLevel1+"\n\n" + "Total Amount : "+String.valueOf(totalAmount);		
+				SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","hgokmen@solgarvitamin.ru","", "Auto mail approve expense", emailText);/*hgokmen@solgarvitamin.ru*/
 				JOptionPane.showMessageDialog(pnlInfoMsg, "Expense approved", "Information", JOptionPane.INFORMATION_MESSAGE);
 				
-			}else if (e.getActionCommand().equals("Reject")) {
-				//ConnectToDb.updateExpenseStatus(txtId.getText(),"3",user);		
-				for (int j = 0; j < model.getRowCount(); j++){
-					if(resultTable.getValueAt(j, 28).toString().equalsIgnoreCase("true")){					
-						ConnectToDb.updateExpenseStatus(resultTable.getValueAt(j, 0).toString(),"3",userName);	
-					}
-				}
-				for( int i = model.getRowCount() - 1; i >= 0; i-- ) {
-					model.removeRow(i);
-				}
-				createModel();				
-				String emailText = "Dear reciepents,\n\n"+"Below id's expense rejected by necessary user\n\n" + txtId.getText();						
-				//SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","hgokmen@solgarvitamin.ru","mkamaeva@solgarvitamin.ru", "Auto mail reject expense", emailText);
-				JOptionPane.showMessageDialog(pnlInfoMsg, "Expense rejected", "Information", JOptionPane.INFORMATION_MESSAGE);
-				
-			}else if (e.getActionCommand().equals("Delete")) {
-				
-			}else if (e.getActionCommand().equals("Save")) {				
-				
-						
+				btnApprove.setEnabled(false);
+				btnReject.setEnabled(false);
 				
 			}else if (e.getActionCommand().equals("Exit")) {
 				setVisible(false);
@@ -554,7 +675,6 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		
 	}
       public void itemStateChanged(ItemEvent itemEvent) {
-
     	  JComboBox cmbBox = (JComboBox)itemEvent.getSource();
     	  String name = cmbBox.getName();
     	  if(cmbBox.getSelectedItem() != null &&cmbBox.getSelectedItem().toString().length()>0){
@@ -563,13 +683,18 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 	    		  cmbBoxCity.removeAllItems();
 	    		  cmbBoxCityRegion.removeAllItems();
 	    		  ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+	    		  cmbBoxCity.setSelectedIndex(-1);
+	    		  cmbBoxCityRegion.setSelectedIndex(-1);
 	    	  }else if(name.equalsIgnoreCase("Region")){
 	    		  cmbBoxCity.removeAllItems();
 	    		  cmbBoxCityRegion.removeAllItems();
 	    		  ConnectToDb.getPRMDataGroupBy("city", "solgar_prm.prm_address_group",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+	    		  cmbBoxCity.setSelectedIndex(-1);
+	    		  cmbBoxCityRegion.setSelectedIndex(-1);
 	    	  }else if(name.equalsIgnoreCase("City")){
 	    		  cmbBoxCityRegion.removeAllItems();
 	    		  ConnectToDb.getPRMDataGroupBy("city_region", "solgar_prm.prm_address_group",cmbBoxCityRegion,"city",cmbBoxCity.getSelectedItem().toString());
+	    		  cmbBoxCityRegion.setSelectedIndex(-1);
 	    	  }else if(name.equalsIgnoreCase("CityRegion")){
 	    		 //enson
 	    	  }else if(name.equalsIgnoreCase("ExpMain")){
@@ -589,22 +714,23 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 	    		  cmbBoxExpLevel1.removeAllItems();
 	    		  cmbBoxExpLevel2.removeAllItems();
 	    		  ConnectToDb.getPRMDataGroupBy("level1", "solgar_prm.prm_exps_types",cmbBoxExpLevel1,"main_name",cmbBoxExpMain.getSelectedItem().toString());
+	    		  cmbBoxExpLevel1.setSelectedIndex(-1);
+	    		  cmbBoxExpLevel2.setSelectedIndex(-1);
 	    	  }else if(name.equalsIgnoreCase("Level1")){
 	    		  cmbBoxExpLevel2.removeAllItems();
 	    		  ConnectToDb.getPRMDataGroupBy("level2", "solgar_prm.prm_exps_types",cmbBoxExpLevel2,"level1",cmbBoxExpLevel1.getSelectedItem().toString());
+	    		  cmbBoxExpLevel2.setSelectedIndex(-1);
 	    	  }else if(name.equalsIgnoreCase("Level2")){
 	    		  //enson
 	    	  }
     	  }	  
     	  
-                 
       }   
       
 
 	  public void mouseClicked(MouseEvent e) {
 		  	cleanAllScreen();
 		  	int i = resultTable.getSelectedRow();
-		  	txtId.setText(resultTable.getValueAt(i, 0).toString());
 		  	cmbBoxCompanyCode.setSelectedItem(resultTable.getValueAt(i, 2).toString());
 		  	cmbBoxCountry.setSelectedItem(resultTable.getValueAt(i, 7).toString());
 			cmbBoxRegion.setSelectedItem(resultTable.getValueAt(i, 8).toString());
@@ -731,9 +857,8 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 			  }else{
 				  txtAmount5.setText("");
 			  }
-			
-			btnApprove.setEnabled(true);
-			btnReject.setEnabled(true);
+				btnApprove.setEnabled(true);
+				btnReject.setEnabled(true);
 			
 		}
 	  @Override
@@ -768,9 +893,7 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 		}
 
 		public class Utils {
-			/*
-			 * Get the extension of a file.
-			 */
+			  
 		}
 		private void cleanAllScreen() {
 			
@@ -804,6 +927,5 @@ public class ExpenseApproveScreen extends JFrame implements ActionListener,ItemL
 			txtAmount5.setText("");
 
 		}
-	
 	
 }

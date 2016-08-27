@@ -200,11 +200,11 @@ public class ExpenseObservationScreen extends JFrame implements ActionListener,I
 		
 		lblComment = new JLabel("Comment");
 		
-		lblAmount1 = new JLabel("Amount1");
-		lblAmount2 = new JLabel("Amount2");
-		lblAmount3 = new JLabel("Amount3");
-		lblAmount4 = new JLabel("Amount4");
-		lblAmount5 = new JLabel("Amount5");
+		lblAmount1 = new JLabel("Конференц-зал и питание");
+		lblAmount2 = new JLabel("Орг.взнос");
+		lblAmount3 = new JLabel("Транспортные расходы и проживание");
+		lblAmount4 = new JLabel("Гонорар");
+		lblAmount5 = new JLabel("Другое");
 		
 		lblSearchEventDate = new JLabel("Event Date Between");
 		lblSearchEntryDate = new JLabel("Entry Date Between");
@@ -214,7 +214,7 @@ public class ExpenseObservationScreen extends JFrame implements ActionListener,I
 		cmbBoxRegion = new JComboBox( new String[]{});		
 		cmbBoxRegion.setEditable(true);	
 		
-		if(userName.matches("Hakan KAYAKUTLU|Halit Gokmen|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){					
+		if(userName.matches("Hakan KAYAKUTLU|Халит Гекмен|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){					
 			ConnectToDb.getPRMDataGroupBy("country", "solgar_prm.prm_address_group",cmbBoxCountry,"","");	
 			cmbBoxCountry.setMaximumRowCount(50);
 			cmbBoxCountry.setEditable(true);
@@ -231,6 +231,11 @@ public class ExpenseObservationScreen extends JFrame implements ActionListener,I
 			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
 		}else if(userName.matches("Зайцева Дарья Андреевна")){
 			cmbBoxCountry.addItem("Region");
+			cmbBoxCountry.setEnabled(false);
+			cmbBoxCountry.setEditable(false);
+			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+		}else if(userName.matches("Ekateryna Shevtsova")){
+			cmbBoxCountry.addItem("Ukraine");
 			cmbBoxCountry.setEnabled(false);
 			cmbBoxCountry.setEditable(false);
 			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());

@@ -9,6 +9,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -41,7 +43,7 @@ import cb.esi.esiclient.util.ESIBag;
 import main.ConnectToDb;
 import main.SendMail;
 
-public class ExpenseEntryScreen extends JFrame implements ActionListener,ItemListener,MouseListener{
+public class ExpenseEntryScreen extends JFrame implements ActionListener,ItemListener,MouseListener,FocusListener{
 	private static final int FRAME_WIDTH = 1100;
 	private static final int FRAME_HEIGHT = 900;
 
@@ -193,11 +195,11 @@ public class ExpenseEntryScreen extends JFrame implements ActionListener,ItemLis
 		
 		lblComment = new JLabel("Comment");
 		
-		lblAmount1 = new JLabel("Meeting and Catering");
-		lblAmount2 = new JLabel("Registration Fee");
-		lblAmount3 = new JLabel("Transportation&Accommodation Expense");
-		lblAmount4 = new JLabel("Payment Fee");
-		lblAmount5 = new JLabel("Other Payment");
+		lblAmount1 = new JLabel("Конференц-зал и питание");
+		lblAmount2 = new JLabel("Орг.взнос");
+		lblAmount3 = new JLabel("Транспортные расходы и проживание");
+		lblAmount4 = new JLabel("Гонорар");
+		lblAmount5 = new JLabel("Другое");
 		
 		cmbBoxCountry = new JComboBox( new String[]{});		
 		/*ConnectToDb.getPRMDataGroupBy("country", "solgar_prm.prm_address_group",cmbBoxCountry,"","");	
@@ -208,34 +210,51 @@ public class ExpenseEntryScreen extends JFrame implements ActionListener,ItemLis
 		cmbBoxRegion = new JComboBox( new String[]{});		
 		cmbBoxRegion.setEditable(true);
 		
-		if(userName.matches("Hakan KAYAKUTLU|Halit Gokmen|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){					
+		cmbBoxCity = new JComboBox( new String[]{});
+		cmbBoxCity.setEditable(true);
+		
+		if(userName.matches("Hakan KAYAKUTLU|Халит Гекмен|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){					
 			ConnectToDb.getPRMDataGroupBy("country", "solgar_prm.prm_address_group",cmbBoxCountry,"","");	
 			cmbBoxCountry.setMaximumRowCount(50);
 			cmbBoxCountry.setEditable(true);
-			cmbBoxCountry.setSelectedIndex(1);
+			cmbBoxCountry.setSelectedIndex(-1);
 		}else if(userName.matches("Шарыпова Сюзанна Николаевна")){
 			cmbBoxCountry.addItem("Moscow");
 			cmbBoxCountry.setEnabled(false);
 			cmbBoxCountry.setEditable(false);
 			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+			cmbBoxRegion.setSelectedIndex(0);
+			ConnectToDb.getPRMDataGroupBy("city", "solgar_prm.prm_address_group",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+			cmbBoxCity.setSelectedIndex(-1);
 		}else if(userName.matches("Копрова Ксения Олеговна")){
 			cmbBoxCountry.addItem("Saint Petersburg");
 			cmbBoxCountry.setEnabled(false);
 			cmbBoxCountry.setEditable(false);
 			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+			cmbBoxRegion.setSelectedIndex(0);
+			ConnectToDb.getPRMDataGroupBy("city", "solgar_prm.prm_address_group",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+			cmbBoxCity.setSelectedIndex(-1);
 		}else if(userName.matches("Зайцева Дарья Андреевна")){
 			cmbBoxCountry.addItem("Region");
 			cmbBoxCountry.setEnabled(false);
 			cmbBoxCountry.setEditable(false);
 			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+			cmbBoxRegion.setSelectedIndex(0);
+			ConnectToDb.getPRMDataGroupBy("city", "solgar_prm.prm_address_group",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+			cmbBoxCity.setSelectedIndex(-1);
+		}else if(userName.matches("Ekateryna Shevtsova")){
+			cmbBoxCountry.addItem("Ukraine");
+			cmbBoxCountry.setEnabled(false);
+			cmbBoxCountry.setEditable(false);
+			ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+			cmbBoxRegion.setSelectedIndex(0);
+			ConnectToDb.getPRMDataGroupBy("city", "solgar_prm.prm_address_group",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+			cmbBoxCity.setSelectedIndex(-1);
 		}else{
 			cmbBoxCountry.addItem("No Authorization");
 			cmbBoxCountry.setEnabled(false);
 			cmbBoxCountry.setEditable(false);
 		}
-		
-		cmbBoxCity = new JComboBox( new String[]{});		
-		cmbBoxCity.setEditable(true);
 		
 		cmbBoxCityRegion = new JComboBox( new String[]{});		
 		cmbBoxCityRegion.setEditable(true);
@@ -244,19 +263,25 @@ public class ExpenseEntryScreen extends JFrame implements ActionListener,ItemLis
 		ConnectToDb.getPRMDataGroupBy("main_name", "solgar_prm.prm_exps_types",cmbBoxExpMain,"","");	
 		cmbBoxExpMain.setMaximumRowCount(50);
 		cmbBoxExpMain.setEditable(true);
-		cmbBoxExpMain.setSelectedIndex(-1);
+		cmbBoxExpMain.setSelectedIndex(0);
 		
 		cmbBoxExpLevel1 = new JComboBox( new String[]{});		
+		ConnectToDb.getPRMDataGroupBy("level1", "solgar_prm.prm_exps_types",cmbBoxExpLevel1,"main_name",cmbBoxExpMain.getSelectedItem().toString());
+		cmbBoxExpLevel1.setMaximumRowCount(50);
 		cmbBoxExpLevel1.setEditable(true);
+		cmbBoxExpLevel1.setSelectedIndex(-1);
 		
-		cmbBoxExpLevel2 = new JComboBox( new String[]{});		
+		cmbBoxExpLevel2 = new JComboBox( new String[]{});	
+		//ConnectToDb.getPRMDataGroupBy("level2", "solgar_prm.prm_exps_types",cmbBoxExpLevel2,"level1",cmbBoxExpLevel1.getSelectedItem().toString());		
+		//cmbBoxExpLevel2.setMaximumRowCount(50);
 		cmbBoxExpLevel2.setEditable(true);
+		//cmbBoxExpLevel2.setSelectedIndex(-1);
 		
 		cmbBoxCompanyCode = new JComboBox( new String[]{});		
 		cmbBoxCompanyCode.addItem("SOLGAR");
 		cmbBoxCompanyCode.addItem("NATURES BOUNTY");
 		cmbBoxCompanyCode.setEditable(true);
-		cmbBoxExpMain.setSelectedIndex(1);
+		cmbBoxCompanyCode.setSelectedIndex(0);
 		
 		
 		cmbBoxExpMerLecture = new JComboBox( new String[]{});		
@@ -299,7 +324,11 @@ public class ExpenseEntryScreen extends JFrame implements ActionListener,ItemLis
 		txtAmount3.setText("0");
 		txtAmount4.setText("0");
 		txtAmount5.setText("0");
-		
+		txtAmount1.setName("amount1");
+		txtAmount2.setName("amount2");
+		txtAmount3.setName("amount3");
+		txtAmount4.setName("amount4");
+		txtAmount5.setName("amount5");
 		
 		//Buttons
 		btnAdd = new JButton("Add");
@@ -343,6 +372,12 @@ public class ExpenseEntryScreen extends JFrame implements ActionListener,ItemLis
 		btnUpdate.addActionListener(this);
 		btnSave.addActionListener(this);
 		btnExit.addActionListener(this);
+		
+		txtAmount1.addFocusListener(this);
+		txtAmount2.addFocusListener(this);
+		txtAmount3.addFocusListener(this);
+		txtAmount4.addFocusListener(this);
+		txtAmount5.addFocusListener(this);
 
 		//address parameters
 		paramPanelAddress.add(lblAdrCountry);
@@ -407,7 +442,7 @@ public class ExpenseEntryScreen extends JFrame implements ActionListener,ItemLis
 		paramPanelExpParPos.add(txtExpPosParyadk);
 		paramPanelExpParPos.add(lblExpPosStatus);
 		paramPanelExpParPos.add(txtExpPosStatus);
-		paramPanelExpParPos.setVisible(false);
+		//paramPanelExpParPos.setVisible(false);
 		
 		//Button group
 		paramPanelBtn1.add(lblComment);
@@ -876,6 +911,49 @@ public class ExpenseEntryScreen extends JFrame implements ActionListener,ItemLis
 		    	  
 				
 			}
+
+		@Override
+		public void focusGained(FocusEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			
+			if (e.getComponent().getName().equals("amount1")) {
+				sumOfExpensens(); 
+			}else if (e.getComponent().getName().equals("amount2")) {
+				sumOfExpensens();
+			}else if (e.getComponent().getName().equals("amount3")) {
+				sumOfExpensens();
+			}else if (e.getComponent().getName().equals("amount4")) {
+				sumOfExpensens();
+			}else if (e.getComponent().getName().equals("amount5")) {
+				sumOfExpensens();
+			}
+			
+		}
+		
+		private void sumOfExpensens() {
+			double totalAmountExpenses = 0;
+			if(txtAmount1.getText() != null && txtAmount1.getText().length()>0){
+				totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount1.getText());
+			}
+			if(txtAmount2.getText() != null && txtAmount2.getText().length()>0){
+				totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount2.getText());
+			}
+			if(txtAmount3.getText() != null && txtAmount3.getText().length()>0){
+				totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount3.getText());
+			}
+			if(txtAmount4.getText() != null && txtAmount4.getText().length()>0){
+				totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount4.getText());
+			}
+			if(txtAmount5.getText() != null && txtAmount5.getText().length()>0){
+				totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount5.getText());
+			}		
+			 txtAmountFormat.setText(String.valueOf(totalAmountExpenses));
+		}
 	
 	
 }

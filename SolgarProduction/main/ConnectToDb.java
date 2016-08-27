@@ -449,7 +449,7 @@ public class ConnectToDb {
         try{
             conn = (Connection) DriverManager.getConnection(url, prop.getProperty("USER"), prop.getProperty("PASS"));
             
-           /* selectSQL = getQueryScript(reportName);
+            /*selectSQL = getQueryScript(reportName);
             
             if(selectedCompany.length()>0 && selectedDate.length()>0){           	            	
             	preparedStatement = (PreparedStatement)conn.prepareStatement(selectSQL);
@@ -495,34 +495,62 @@ public class ConnectToDb {
             	whereCondition = whereCondition+" and x.product_name='"+selectedProduct+"'";
             }
             if(selectedMedRep.length()>0){
-            	
+            	sqlFrom = sqlFrom+",x.marketing_staff" ;
+            	groupby =groupby+",x.marketing_staff";  
+            	whereCondition = whereCondition+" and x.marketing_staff='"+selectedMedRep+"'";
             }
             sqlFrom = sqlFrom+",sum(x.sales_count) as total_sales_count " ;
             selectSQL = sqlFrom;
          
             if(selectedCompany.equalsIgnoreCase("SOLGAR")){
-            	selectSQL  =selectSQL + "from( SELECT a.sales_date,a.product_type,a.main_group,a.sub_group, "+
+            	
+            	if(selectedMedRep.length()>0){
+            		selectSQL  =selectSQL + "from( SELECT a.sales_date,a.product_type,a.main_group,a.sub_group, "+
+                			"(select country from solgar_tst.solgar_address_group m where m.administrative_area_name = b.administrative_area_name "+
+                			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as country,"+
+                			"(select region from solgar_tst.solgar_address_group m where m.administrative_area_name = b.administrative_area_name "+
+                			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as  region, "+
+                			"(select city from solgar_tst.solgar_address_group m where m.administrative_area_name = b.administrative_area_name "+
+                			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as  city, "+
+                			"(select product_official_name from solgar_tst.sales_product_group where product_type = 'SL' and product_sales_name = a.product_Name) as product_Name,a.sales_count,c.marketing_staff "+
+                			"FROM solgar_tst.general_sales_table a , solgar_tst.sales_address_group b, solgar_tst.pharmacy_data_solgar c "+
+                			"where  a.sales_reader = b.sales_reader and b.point_x = c.point_x and b.point_y = c.point_y "; 
+            	}else{            	
+            		selectSQL  =selectSQL + "from( SELECT a.sales_date,a.product_type,a.main_group,a.sub_group, "+
             			"(select country from solgar_tst.solgar_address_group m where m.administrative_area_name = b.administrative_area_name "+
             			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as country,"+
             			"(select region from solgar_tst.solgar_address_group m where m.administrative_area_name = b.administrative_area_name "+
             			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as  region, "+
             			"(select city from solgar_tst.solgar_address_group m where m.administrative_area_name = b.administrative_area_name "+
             			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as  city, "+
-            			"(select product_official_name from solgar_tst.sales_product_group where product_sales_name = a.product_Name) as product_Name,a.sales_count "+
+            			"(select product_official_name from solgar_tst.sales_product_group where product_type = 'SL' and product_sales_name = a.product_Name) as product_Name,a.sales_count "+
             			"FROM solgar_tst.general_sales_table a , solgar_tst.sales_address_group b where  a.sales_reader = b.sales_reader ";  
-            
+            		
+            	}           
             	selectSQL = selectSQL+"and a.sales_date >='" +beginDate+"' and a.sales_date <='"+endDate+"' and a.product_type = 'SL' and length (b.full_address)>0)x ";
             }else{
-            	selectSQL  =selectSQL + "from( SELECT  a.sales_date,a.product_type,a.main_group,a.sub_group,"+
+            	if(selectedMedRep.length()>0){
+            		selectSQL  =selectSQL + "from( SELECT  a.sales_date,a.product_type,a.main_group,a.sub_group,"+
+                			"(select country from solgar_tst.bounty_address_group m where m.administrative_area_name = b.administrative_area_name "+
+                			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as country,"+
+                			"(select region from solgar_tst.bounty_address_group m where m.administrative_area_name = b.administrative_area_name "+
+                			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as  region,"+
+                			"(select city from solgar_tst.bounty_address_group m where m.administrative_area_name = b.administrative_area_name "+
+                			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as  city,"+
+                			"(select product_official_name from solgar_tst.sales_product_group where product_type = 'BN' and product_sales_name = a.product_Name) as product_Name,a.sales_count,c.marketing_staff "+
+                			"FROM solgar_tst.general_sales_table a , solgar_tst.sales_address_group b, solgar_tst.pharmacy_data_bounty c "+
+                			"where  a.sales_reader = b.sales_reader and b.point_x = c.point_x and b.point_y = c.point_y ";
+            	}else{
+            		selectSQL  =selectSQL + "from( SELECT  a.sales_date,a.product_type,a.main_group,a.sub_group,"+
             			"(select country from solgar_tst.bounty_address_group m where m.administrative_area_name = b.administrative_area_name "+
             			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as country,"+
             			"(select region from solgar_tst.bounty_address_group m where m.administrative_area_name = b.administrative_area_name "+
             			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as  region,"+
             			"(select city from solgar_tst.bounty_address_group m where m.administrative_area_name = b.administrative_area_name "+
             			"and m.sub_administrative_area_name = b.sub_administrative_area_name) as  city,"+
-            			"(select product_official_name from solgar_tst.sales_product_group where product_sales_name = a.product_Name) as product_Name,a.sales_count "+
+            			"(select product_official_name from solgar_tst.sales_product_group where product_type = 'BN' and product_sales_name = a.product_Name) as product_Name,a.sales_count "+
             			"FROM solgar_tst.general_sales_table a , solgar_tst.sales_address_group b where  a.sales_reader = b.sales_reader ";  
-            
+            	}            
             	selectSQL = selectSQL+"and a.sales_date >='" +beginDate+"' and a.sales_date <='"+endDate+"' and a.product_type = 'BN' and length (b.full_address)>0)x ";
             }
             selectSQL  =selectSQL + whereCondition + groupby;
@@ -711,8 +739,12 @@ public class ConnectToDb {
 					   }
 					   stmt.setDate(9,Date.valueOf(resultTable.getValueAt(j, 7).toString()));//Startd date
 					   stmt.setDate(10,Date.valueOf(resultTable.getValueAt(j, 8).toString()));//End date
-					   stmt.setString(11,resultTable.getValueAt(j, 9).toString());
-					   stmt.setString(12,resultTable.getValueAt(j, 10).toString());
+					   stmt.setString(11,resultTable.getValueAt(j, 9).toString());					   
+					   if(resultTable.getValueAt(j, 10).toString() != null){
+						   stmt.setString(12,resultTable.getValueAt(j, 10).toString());
+					   }else{
+						   stmt.setString(12,"");
+					   }
 					   if(resultTable.getValueAt(j, 11) != null){
 						   stmt.setString(13,resultTable.getValueAt(j, 11).toString());
 					   }else{
@@ -1033,6 +1065,96 @@ public class ConnectToDb {
             
             //Now add that table model to your table and you are done :D
             //resultTable.setModel(tableModel);   
+            
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException sqle){
+            System.out.println("SQL Exception: " + sqle.getMessage());
+        }finally{
+  	      //finally block used to close resources
+  	      try{
+  	         if(stmt!=null)
+  	            conn.close();
+  	      }catch(SQLException se){
+  	      }// do nothing
+  	      try{
+  	         if(conn!=null)
+  	            conn.close();
+  	      }catch(SQLException se){
+  	         se.printStackTrace();
+  	      }//end finally try
+  	   }
+        
+        return outBag;
+	}
+	
+	public static ESIBag getExpensesForApproveWithPar(JTable resultTable,JComboBox country,JComboBox region,JComboBox companyName,JComboBox expMain,
+			JComboBox expLevel1,JComboBox expLevel2,JComboBox eventDateStart,JComboBox eventDateEnd,JComboBox entryDateStart,JComboBox entryDateEnd) {
+
+		String url = prop.getProperty("DB_URL");
+        Connection conn = null;
+        Statement stmt =null;
+        ESIBag outBag = new ESIBag();
+        
+        try{
+            Class.forName(prop.getProperty("JDBC_DRIVER"));
+        }
+        catch(java.lang.ClassNotFoundException cnfe){
+            System.out.println("Class Not Found - " + cnfe.getMessage());
+        }       
+
+        try{        
+            conn = (Connection) DriverManager.getConnection(url, prop.getProperty("USER"),prop.getProperty("PASS"));            
+            String sorgu  = "select * from solgar_mcs.marketing_exp_main_info where approve_status = 1 ";   
+            if(country.getSelectedItem() != null && country.getSelectedItem().toString().length()>0){sorgu = sorgu + "and country=" +"'"+country.getSelectedItem().toString()+"' ";}
+            if(region.getSelectedItem()  != null && region.getSelectedItem().toString().length()>0){sorgu = sorgu + "and region=" +"'"+region.getSelectedItem().toString()+"' ";}
+            if(companyName.getSelectedItem() != null && companyName.getSelectedItem().toString().length()>0){sorgu = sorgu + "and company_code=" +"'"+companyName.getSelectedItem().toString()+"' ";}
+            if(expMain.getSelectedItem() != null && expMain.getSelectedItem().toString().length()>0){sorgu = sorgu + "and first_stage=" +"'"+expMain.getSelectedItem().toString()+"' ";}
+            if(expLevel1.getSelectedItem() != null && expLevel1.getSelectedItem().toString().length()>0){sorgu = sorgu + "and second_stage=" +"'"+expLevel1.getSelectedItem().toString()+"' ";}
+            if(expLevel2.getSelectedItem() != null && expLevel2.getSelectedItem().toString().length()>0){sorgu = sorgu + "and third_stage=" +"'"+expLevel2.getSelectedItem().toString()+"' ";}
+            if(eventDateStart.getSelectedItem() != null && eventDateStart.getSelectedItem().toString().length()>0){sorgu = sorgu + "and start_date >= " +"'"+eventDateStart.getSelectedItem().toString()+"' ";}
+            if(eventDateEnd.getSelectedItem() != null && eventDateEnd.getSelectedItem().toString().length()>0){sorgu = sorgu + "and start_date <= " +"'"+eventDateEnd.getSelectedItem().toString()+"' ";}
+            if(entryDateStart.getSelectedItem() != null && entryDateStart.getSelectedItem().toString().length()>0){sorgu = sorgu + "and entry_date >= " +"'"+entryDateStart.getSelectedItem().toString()+"' ";}
+            if(entryDateEnd.getSelectedItem() != null && entryDateEnd.getSelectedItem().toString().length()>0){sorgu = sorgu + "and entry_date <= " +"'"+entryDateEnd.getSelectedItem().toString()+"' ";}           
+            sorgu = sorgu + "order by id desc";
+            stmt = (Statement) conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sorgu);
+
+            int j =0;
+            while (rs.next()){
+            	outBag.put("TABLE",j,"id", rs.getString("id"));
+            	outBag.put("TABLE",j,"approve_status", rs.getString("approve_status"));
+            	outBag.put("TABLE",j,"company_code", rs.getString("company_code"));
+            	outBag.put("TABLE",j,"entry_date", rs.getString("entry_date"));
+            	outBag.put("TABLE",j,"entry_user", rs.getString("entry_user"));
+            	outBag.put("TABLE",j,"approve_date", rs.getString("approve_date"));
+            	outBag.put("TABLE",j,"approve_user", rs.getString("approve_user"));
+            	outBag.put("TABLE",j,"Country", rs.getString("Country"));
+            	outBag.put("TABLE",j,"Region", rs.getString("Region"));
+            	outBag.put("TABLE",j,"City", rs.getString("City"));
+            	outBag.put("TABLE",j,"City_Region", rs.getString("City_Region"));
+            	outBag.put("TABLE",j,"Start_Date", rs.getString("Start_Date"));
+            	outBag.put("TABLE",j,"End_Date", rs.getString("End_Date"));
+            	outBag.put("TABLE",j,"First_Stage", rs.getString("First_Stage"));
+            	
+            	outBag.put("TABLE",j,"Second_Stage", rs.getString("Second_Stage"));
+            	outBag.put("TABLE",j,"Third_Stage", rs.getString("Third_Stage"));
+            	outBag.put("TABLE",j,"Exp1", rs.getString("Exp1"));
+            	outBag.put("TABLE",j,"Exp2", rs.getString("Exp2"));
+            	outBag.put("TABLE",j,"Exp3", rs.getString("Exp3"));
+            	outBag.put("TABLE",j,"Exp4", rs.getString("Exp4"));
+            	outBag.put("TABLE",j,"Exp_Count", rs.getString("Exp_Count"));
+            	outBag.put("TABLE",j,"Exp_Amount", rs.getString("Exp_Amount"));
+            	outBag.put("TABLE",j,"comments", rs.getString("comments"));
+            	outBag.put("TABLE",j,"amount1", rs.getString("amount1"));
+            	outBag.put("TABLE",j,"amount2", rs.getString("amount2"));
+            	outBag.put("TABLE",j,"amount3", rs.getString("amount3"));
+            	outBag.put("TABLE",j,"amount4", rs.getString("amount4"));
+            	outBag.put("TABLE",j,"amount5", rs.getString("amount5"));
+            	outBag.put("TABLE",j,"SELECT", "");
+            	j++;
+            }
             
             stmt.close();
             conn.close();

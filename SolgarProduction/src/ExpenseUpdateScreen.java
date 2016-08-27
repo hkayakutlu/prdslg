@@ -9,6 +9,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -38,7 +40,7 @@ import javax.swing.JTextField;
 	import cb.esi.esiclient.util.ESIBag;
 import main.ConnectToDb;
 
-	public class ExpenseUpdateScreen extends JFrame implements ActionListener,ItemListener,MouseListener{
+	public class ExpenseUpdateScreen extends JFrame implements ActionListener,ItemListener,MouseListener,FocusListener{
 		private static final int FRAME_WIDTH = 1100;
 		private static final int FRAME_HEIGHT = 900;
 		private String userName="Hakan KAYAKUTLU";
@@ -192,17 +194,17 @@ import main.ConnectToDb;
 			
 			lblComment = new JLabel("Comment");
 			
-			lblAmount1 = new JLabel("Amount1");
-			lblAmount2 = new JLabel("Amount2");
-			lblAmount3 = new JLabel("Amount3");
-			lblAmount4 = new JLabel("Amount4");
-			lblAmount5 = new JLabel("Amount5");
+			lblAmount1 = new JLabel("Конференц-зал и питание");
+			lblAmount2 = new JLabel("Орг.взнос");
+			lblAmount3 = new JLabel("Транспортные расходы и проживание");
+			lblAmount4 = new JLabel("Гонорар");
+			lblAmount5 = new JLabel("Другое");
 			
 			cmbBoxCountry = new JComboBox( new String[]{});				
 			cmbBoxRegion = new JComboBox( new String[]{});		
 			cmbBoxRegion.setEditable(true);
 			
-			if(userName.matches("Hakan KAYAKUTLU|Halit Gokmen|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){					
+			if(userName.matches("Hakan KAYAKUTLU|Халит Гекмен|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){					
 				ConnectToDb.getPRMDataGroupBy("country", "solgar_prm.prm_address_group",cmbBoxCountry,"","");	
 				cmbBoxCountry.setMaximumRowCount(50);
 				cmbBoxCountry.setEditable(true);
@@ -226,6 +228,11 @@ import main.ConnectToDb;
 				cmbBoxCountry.setEditable(false);
 				ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
 				ConnectToDb.getAllExpenses(resultTable,1,"Region");
+			}else if(userName.matches("Ekateryna Shevtsova")){
+				cmbBoxCountry.addItem("Ukraine");
+				cmbBoxCountry.setEnabled(false);
+				cmbBoxCountry.setEditable(false);
+				ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
 			}else{
 				cmbBoxCountry.addItem("No Authorization");
 				cmbBoxCountry.setEnabled(false);
@@ -298,6 +305,11 @@ import main.ConnectToDb;
 			txtAmount3.setText("0");
 			txtAmount4.setText("0");
 			txtAmount5.setText("0");
+			txtAmount1.setName("amount1");
+			txtAmount2.setName("amount2");
+			txtAmount3.setName("amount3");
+			txtAmount4.setName("amount4");
+			txtAmount5.setName("amount5");
 			
 			
 			//Buttons
@@ -345,6 +357,12 @@ import main.ConnectToDb;
 			btnUpdate.addActionListener(this);
 			btnSave.addActionListener(this);
 			btnExit.addActionListener(this);
+			
+			txtAmount1.addFocusListener(this);
+			txtAmount2.addFocusListener(this);
+			txtAmount3.addFocusListener(this);
+			txtAmount4.addFocusListener(this);
+			txtAmount5.addFocusListener(this);
 
 			//address parameters
 			paramPanelAddress.add(lblAdrCountry);
@@ -537,7 +555,7 @@ import main.ConnectToDb;
 					btnSave.setEnabled(false);
 					JOptionPane.showMessageDialog(pnlInfoMsg, "Expenses sent to approve", "Information", JOptionPane.INFORMATION_MESSAGE);			
 					
-					if(userName.matches("Hakan KAYAKUTLU|Halit Gokmen|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){					
+					if(userName.matches("Hakan KAYAKUTLU|Халит Гекмен|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){					
 						ConnectToDb.getAllExpenses(resultTable,1,"");
 					}else if(userName.matches("Шарыпова Сюзанна Николаевна")){
 						ConnectToDb.getAllExpenses(resultTable,1,"Moscow");
@@ -545,6 +563,8 @@ import main.ConnectToDb;
 						ConnectToDb.getAllExpenses(resultTable,1,"Saint Petersburg");
 					}else if(userName.matches("Зайцева Дарья Андреевна")){
 						ConnectToDb.getAllExpenses(resultTable,1,"Region");
+					}else if(userName.matches("Ekateryna Shevtsova")){
+						ConnectToDb.getAllExpenses(resultTable,1,"Ukraine");
 					}else{
 						cmbBoxCountry.addItem("No Authorization");
 					}
@@ -829,6 +849,47 @@ import main.ConnectToDb;
 			    	  
 					
 				}
-		
+			 @Override
+				public void focusGained(FocusEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void focusLost(FocusEvent e) {
+					
+					if (e.getComponent().getName().equals("amount1")) {
+						sumOfExpensens(); 
+					}else if (e.getComponent().getName().equals("amount2")) {
+						sumOfExpensens();
+					}else if (e.getComponent().getName().equals("amount3")) {
+						sumOfExpensens();
+					}else if (e.getComponent().getName().equals("amount4")) {
+						sumOfExpensens();
+					}else if (e.getComponent().getName().equals("amount5")) {
+						sumOfExpensens();
+					}
+					
+				}
+				
+				private void sumOfExpensens() {
+					double totalAmountExpenses = 0;
+					if(txtAmount1.getText() != null && txtAmount1.getText().length()>0){
+						totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount1.getText());
+					}
+					if(txtAmount2.getText() != null && txtAmount2.getText().length()>0){
+						totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount2.getText());
+					}
+					if(txtAmount3.getText() != null && txtAmount3.getText().length()>0){
+						totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount3.getText());
+					}
+					if(txtAmount4.getText() != null && txtAmount4.getText().length()>0){
+						totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount4.getText());
+					}
+					if(txtAmount5.getText() != null && txtAmount5.getText().length()>0){
+						totalAmountExpenses = totalAmountExpenses+Double.parseDouble(txtAmount5.getText());
+					}		
+					 txtAmountFormat.setText(String.valueOf(totalAmountExpenses));
+				}
 		
 	}
