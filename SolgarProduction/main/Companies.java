@@ -1348,7 +1348,13 @@ public class Companies {
 					Cell c4 = sheet.getCell(startOfColumn+1, i);
 					String count = c4.getContents();
 					if(c4.getContents() != null && c4.getContents().length() >0){ //Count
-						outBag.put("TABLE",tableindex,"COUNT", count.substring(0,count.indexOf(".")).trim());						
+						if(count.indexOf(".") > 0){
+							outBag.put("TABLE",tableindex,"COUNT", count.substring(0,count.indexOf(".")).trim());	
+						}else if(count.indexOf(",") > 0){
+							outBag.put("TABLE",tableindex,"COUNT", count.substring(0,count.indexOf(",")).trim());
+						}else{
+							outBag.put("TABLE",tableindex,"COUNT", count.trim());
+						}
 					}else{
 						outBag.put("TABLE",tableindex,"COUNT", "0");
 					}
@@ -2289,6 +2295,25 @@ public class Companies {
 					pharmacyRow = rowNo;
 					aptekaRow=rowNo-1;				
 				}
+				
+				if (c1.getContents().indexOf("MED_DESCR") >= 0 ) {
+					startOfColumn = columNo + 1;
+					startOfRow = rowNo + 1;	
+					aptekaColumn = columNo-1;
+					productColumn = columNo;
+					pharmacyRow = rowNo;
+					aptekaRow=rowNo-1;				
+				}
+				
+				if (c1.getContents().indexOf("AP_DESCR") >= 0 ) {
+					startOfColumn = columNo + 1;
+					startOfRow = rowNo + 1;	
+					aptekaColumn = columNo-1;
+					productColumn = columNo;
+					pharmacyRow = rowNo;
+					aptekaRow=rowNo-1;				
+				}
+				
 				
 
 			}

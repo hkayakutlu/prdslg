@@ -62,7 +62,7 @@ public class SendMail {
         }
     }
     
-    public static void sendEmailToReceipents(String receiver,String receiver1,String receiver2,String Subject,String emailText) throws Exception { 
+    public static void sendEmailToReceipents(String receiver,String receiver1,String receiver2,String receiver3,String Subject,String emailText) throws Exception { 
 
         Properties props = new Properties();
         props.put("mail.smtp.starttls.enable", "true");
@@ -96,6 +96,11 @@ public class SendMail {
             if(receiver2.length()>0){
             	message.setRecipients(Message.RecipientType.TO,
                         InternetAddress.parse(receiver2));
+            	Transport.send(message);
+            }
+            if(receiver3.length()>0){
+            	message.setRecipients(Message.RecipientType.TO,
+                        InternetAddress.parse(receiver3));
             	Transport.send(message);
             }
 

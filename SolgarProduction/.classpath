@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/jxl.jar"/>
 	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/mysql-connector-java-5.1.38-bin.jar"/>
 	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/xerces-xercesimpl-2.11.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/jcalendar-1.4.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

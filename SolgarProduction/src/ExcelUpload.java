@@ -36,9 +36,11 @@ public class ExcelUpload extends JFrame implements ActionListener {
 	private JScrollPane jScroll;
 	private final JFileChooser fc = new JFileChooser();
 	private File file;
-	private JLabel lblFileName,lblTotalAmountSolgar,lblTotalCountSolgar,lblTotalAmountBounty,lblTotalCountBounty,lblProductType;
-	private JPanel paramPanel,paramPanel1,paramPanel2,paramPanel3, pnlInsertInst,pnlErrorMsg;
-	public JButton butClear, butOpen,butExceltoScreen,btnSave,btnExit;
+	private JLabel lblFileName,lblTotalAmountSolgar,lblTotalCountSolgar,lblTotalAmountBounty,lblTotalCountBounty,lblProductType,
+	lblSheetName,lblFileDate,lblChainName,lblEmpty1,lblEmpty2,lblEmpty3,lblEmpty4,lblEmpty5,lblEmpty6,lblEmpty7,lblEmpty8;
+	private JPanel pnlInsertInst,pnlErrorMsg,
+	paramPanelMain,paramPanelExcel,paramPanelPar,paramPanelBtn,paramPanelObs,paramPanelResult;
+	public JButton butClear, butOpen,butExceltoScreen,btnSave,btnExit,butNextSheet;
 	private ExcelActionHandler excelActionHandler;
 	private JTable resultTable;
 	private JComboBox cmbBoxCompanies,cmbBoxDates;
@@ -73,23 +75,27 @@ public class ExcelUpload extends JFrame implements ActionListener {
 		setBounds((screenWidth - FRAME_WIDTH) / 2, (screenHeight - FRAME_HEIGHT) / 2, FRAME_WIDTH, FRAME_HEIGHT);
 
 		excelActionHandler = new ExcelActionHandler(this);
-		// scroll pane
-		jScroll = new JScrollPane();
 		
 		resultTable = new JTable(20, 8);		
 		dtm.setColumnIdentifiers(header);
 		resultTable.setModel(dtm);
+		resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
+		// scroll pane
+		jScroll = new JScrollPane(resultTable,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);		
 		jScroll.setViewportView(resultTable);
 		jScroll.setBorder(new EmptyBorder(10, 10, 10, 10));
 		getContentPane().add(jScroll, BorderLayout.CENTER);
-		
-		
+
+
 		// add parameter panel
-		paramPanel = new JPanel(new GridLayout(0, 3, 5, 5));
-		paramPanel1 = new JPanel(new GridLayout(0, 4, 5, 5));
-		paramPanel2 = new JPanel(new GridLayout(0, 4, 5, 5));
-		paramPanel3 = new JPanel(new GridLayout(0, 2, 5, 5));
+		paramPanelMain = new JPanel(new GridLayout(1, 3, 5, 5));
+		
+		paramPanelExcel = new JPanel(new GridLayout(4, 2, 5, 5));
+		paramPanelPar = new JPanel(new GridLayout(4, 2, 5, 5));
+		paramPanelObs = new JPanel(new GridLayout(5, 2, 5, 5));
+		paramPanelBtn = new JPanel(new GridLayout(1, 5, 5, 5));
+		paramPanelResult = new JPanel(new GridLayout(0, 1, 5, 5));
 		
 		//labels
 		lblFileName = new JLabel("File name please fill up with only xls type Excel");
@@ -98,6 +104,18 @@ public class ExcelUpload extends JFrame implements ActionListener {
 		lblTotalAmountBounty = new JLabel("Total Amount Bounty");
 		lblTotalCountBounty = new JLabel("Total Count Bounty");
 		lblProductType = new JLabel("Product Type");
+		lblSheetName = new JLabel("");
+		lblFileDate = new JLabel("Report Date");
+		lblChainName = new JLabel("Chain Name");
+		lblEmpty1 = new JLabel("Select file");
+		lblEmpty2 = new JLabel("");
+		lblEmpty3 = new JLabel("");
+		lblEmpty4 = new JLabel("");
+		lblEmpty5 = new JLabel("");
+		lblEmpty6 = new JLabel("");
+		lblEmpty7 = new JLabel("");
+		lblEmpty8 = new JLabel("");
+		
 		//lblEmpty = new JLabel("");
 		cmbBoxCompanies = new JComboBox( new String[]{});		
 		ConnectToDb.getPRMData("group_company", "solgar_prm.prm_russia_chains",cmbBoxCompanies);				
@@ -126,6 +144,7 @@ public class ExcelUpload extends JFrame implements ActionListener {
 		
 		btnSave = new JButton("Save");
 		btnExit = new JButton("Exit");
+		butNextSheet = new JButton("Next Sheet");
 		
 		butClear.addActionListener(excelActionHandler);
 		butOpen.addActionListener(excelActionHandler);
@@ -133,57 +152,69 @@ public class ExcelUpload extends JFrame implements ActionListener {
 		btnSave.addActionListener(excelActionHandler);	
 		btnExit.addActionListener(excelActionHandler);	
 		cmbBoxCompanies.addActionListener(excelActionHandler);
+		butNextSheet.addActionListener(excelActionHandler);
 		
 		btnSave.setEnabled(false);
 		butOpen.setEnabled(true);	
 		butClear.setEnabled(false);
 		butExceltoScreen.setEnabled(false);
-		
-		
-		// filename
-		paramPanel.add(lblFileName);
-		paramPanel.add(fileName);
-		paramPanel.add(butOpen);		
-		paramPanel.add(cmbBoxDates);
-		
-		// buttons
-		paramPanel.add(butClear);
-		paramPanel.add(butExceltoScreen);
-		paramPanel.add(cmbBoxCompanies);
-		paramPanel.add(btnSave);
-		paramPanel.add(btnExit);
-		
-		//paramPanel.add(resultTable);
-
-		//paramPanel.add(new JLabel(""));
-		//paramPanel.add(pnlInsertInst);	
-		
-		
-		paramPanel1.add(lblTotalAmountSolgar);
-		paramPanel1.add(txtTotalAmountSolgar);
-		paramPanel1.add(lblTotalCountSolgar);		
-		paramPanel1.add(txtTotalCountSolgar);
-		paramPanel.add(paramPanel1);
-		
-		paramPanel2.add(lblTotalAmountBounty);
-		paramPanel2.add(txtTotalAmountBounty);
-		paramPanel2.add(lblTotalCountBounty);		
-		paramPanel2.add(txtTotalCountBounty);
-		paramPanel.add(paramPanel2);
-		
-		paramPanel3.add(lblProductType);		
-		paramPanel3.add(txtProductType);		
-		paramPanel.add(paramPanel3);
+		butNextSheet.setEnabled(false);
 		
 		txtProductType.setEnabled(false);
 		txtTotalAmountSolgar.setEnabled(false);
 		txtTotalCountSolgar.setEnabled(false);
 		txtTotalAmountBounty.setEnabled(false);
 		txtTotalCountBounty.setEnabled(false);
+
+		paramPanelExcel.add(lblFileName);
+		paramPanelExcel.add(fileName);
+		paramPanelExcel.add(lblEmpty1);
+		paramPanelExcel.add(butOpen);
+		paramPanelExcel.add(butNextSheet);
+		paramPanelExcel.add(lblSheetName);		
+		paramPanelExcel.add(lblEmpty3);	
+		paramPanelExcel.add(lblEmpty4);	
 		
-		//
-		paramPanel.setBorder(new EmptyBorder(10, 15, 5, 15));
-		getContentPane().add(paramPanel, BorderLayout.NORTH);
+		paramPanelPar.add(lblFileDate);
+		paramPanelPar.add(cmbBoxDates);
+		paramPanelPar.add(lblChainName);
+		paramPanelPar.add(cmbBoxCompanies);
+		paramPanelPar.add(lblEmpty5);	
+		paramPanelPar.add(lblEmpty6);	
+		paramPanelPar.add(lblEmpty7);	
+		paramPanelPar.add(lblEmpty8);	
+		
+		paramPanelObs.add(lblTotalAmountSolgar);
+		paramPanelObs.add(txtTotalAmountSolgar);
+		paramPanelObs.add(lblTotalCountSolgar);		
+		paramPanelObs.add(txtTotalCountSolgar);
+		paramPanelObs.add(lblTotalAmountBounty);
+		paramPanelObs.add(txtTotalAmountBounty);
+		paramPanelObs.add(lblTotalCountBounty);		
+		paramPanelObs.add(txtTotalCountBounty);
+		paramPanelObs.add(lblProductType);		
+		paramPanelObs.add(txtProductType);
+		
+		// buttons
+		paramPanelBtn.add(butClear);
+		paramPanelBtn.add(butExceltoScreen);
+		paramPanelBtn.add(btnSave);
+		paramPanelBtn.add(btnExit);	
+		
+		paramPanelMain.add(paramPanelExcel);
+		paramPanelMain.add(paramPanelPar);
+		paramPanelMain.add(paramPanelObs);
+		
+		paramPanelMain.setBorder(new EmptyBorder(10, 15, 5, 15));
+		getContentPane().add(paramPanelMain, BorderLayout.NORTH);		
+		
+		paramPanelBtn.setBorder(new EmptyBorder(10, 15, 5, 15));
+		getContentPane().add(paramPanelBtn, BorderLayout.SOUTH);	
+		
+		paramPanelResult.add(jScroll);			
+		//Last Changes
+		paramPanelResult.setBorder(new EmptyBorder(10, 15, 5, 15));
+		getContentPane().add(paramPanelResult, BorderLayout.CENTER);
 		
 		fc.addChoosableFileFilter(new ExcelFilter());
 
@@ -226,6 +257,9 @@ public class ExcelUpload extends JFrame implements ActionListener {
 				if (ae.getActionCommand().equals("Exit")) {
 					setVisible(false);
 				}
+				if (ae.getActionCommand().equals("Next Sheet")) {
+					nextSheet(false);
+				}
 				
 			} catch (Exception ex) {
 				String message = ex.getMessage();
@@ -233,6 +267,7 @@ public class ExcelUpload extends JFrame implements ActionListener {
 						"Error Message", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+
 		public void openExcelFile() {
 			try {
 				//
@@ -244,19 +279,49 @@ public class ExcelUpload extends JFrame implements ActionListener {
 					fileName.setText(file.getName());
 					workbook = Workbook.getWorkbook(file);
 					
-					if(file.getName().indexOf("A5_")>=0){ 
+					/*if(file.getName().indexOf("A5_")>=0){ 
 						currentSheet = 1;
 					}else{
 						currentSheet = 0;
-					}				
-					
+					}		*/
+					currentSheet = 0;
 					sheetCount = workbook.getSheets().length;					
+					sheet = workbook.getSheet(currentSheet);
+					
+					setSheetName(sheet);
+					
+					parent.butOpen.setEnabled(false);
+					parent.butNextSheet.setEnabled(true);
+					
+					
 					sheet = workbook.getSheet(currentSheet);
 					parent.butExceltoScreen.setEnabled(true);
 				}
 			} catch (Exception ex) {
 				System.out.println(ex);
 			}
+		}
+		
+		private void setSheetName(Sheet sheet){
+			
+			String sheetName = (currentSheet + 1) + " / " + sheetCount + " : " + sheet.getName();
+			//parent.setTitle(sheetName);
+			parent.lblSheetName.setText(sheetName);
+			
+		}
+		public void nextSheet(boolean b) {
+			try {
+				currentSheet++;
+				if(currentSheet == sheetCount) currentSheet = 0;				
+				sheet = workbook.getSheet(currentSheet);
+				setSheetName(sheet);				
+				parent.butOpen.setEnabled(false);
+				parent.butNextSheet.setEnabled(true);
+
+			} catch (Exception ex) {
+				System.out.println(ex);
+			}
+			
 		}
 		
 		public void runExcelSetDataToScreen() {
@@ -365,9 +430,10 @@ public class ExcelUpload extends JFrame implements ActionListener {
 						outBag = Companies.othersParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
 					}
 					
-					
-					// add row dynamically into the table      
-					for (int i = 0; i < outBag.getSize("TABLE"); i++){
+					int i = 0;
+					// add row dynamically into the table     
+					try{
+					for (i = 0; i < outBag.getSize("TABLE"); i++){
 					    String countStr = outBag.get("TABLE",i,"COUNT");   
 					    String amountStr = outBag.get("TABLE",i,"AMOUNT");
 					    product = outBag.get("TABLE",i,"PRODUCT");
@@ -378,8 +444,8 @@ public class ExcelUpload extends JFrame implements ActionListener {
 					        		outBag.get("TABLE",i,"PHARMACY"), 
 					        		product, 
 					        		outBag.get("TABLE",i,"APTEKNO"),
-					        		countStr,
-					        		amountStr,
+					        		countStr.trim(),
+					        		amountStr.trim(),
 					        		cmbBoxDates.getSelectedItem().toString(),
 					        		outBag.get("TABLE",i,"SALESREADER"),
 					        		outBag.get("TABLE",i,"CITY")
@@ -391,6 +457,8 @@ public class ExcelUpload extends JFrame implements ActionListener {
 						    if(countStr.indexOf(",")>0){
 						    	countStr = countStr.substring(0, countStr.indexOf(","));
 							}
+						    countStr =  countStr.replaceAll("^\\s+","");
+						    countStr = countStr.replaceAll("\\s+$","");
 						    int intCount =  Integer.parseInt(countStr);					    
 						    
 						    if(amountStr != null && amountStr.trim().length()>0){
@@ -418,7 +486,13 @@ public class ExcelUpload extends JFrame implements ActionListener {
 								solgar = true;
 							}
 							        
-					 }				
+					 }		
+					}catch(Exception ex) {
+						String message = ex.getMessage();
+						//ex.printStackTrace();
+						JOptionPane.showMessageDialog(pnlErrorMsg, message +" Excel format incorrect please check row: " +String.valueOf(i) , "Error Message", JOptionPane.ERROR_MESSAGE);
+						throw ex;
+					}
 				
 					if(bounty){
 						txtTotalAmountBounty.setText(String.valueOf(df.format(totalAmountBounty)));
@@ -476,7 +550,8 @@ public class ExcelUpload extends JFrame implements ActionListener {
 					txtTotalCountSolgar.getText()+".\n\nTotal Amount Solgar:"+ txtTotalAmountSolgar.getText()+
 					"\n\nTotal Count Bounty:"+ txtTotalCountBounty.getText()+".\n\nTotal Amount Bounty:"+ txtTotalAmountBounty.getText();
 					
-					SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","hgokmen@solgarvitamin.ru","", "Auto mail sale report", emailText);
+					//SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","hgokmen@solgarvitamin.ru","herturk@solgarvitamin.ru","", "Auto mail sale report", emailText);
+					SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","","","", "Auto mail sale report", emailText);
 					
 					for( int i = dtm.getRowCount() - 1; i >= 0; i-- ) {
 						dtm.removeRow(i);
@@ -515,6 +590,7 @@ public class ExcelUpload extends JFrame implements ActionListener {
 				parent.btnSave.setEnabled(false);
 				parent.butExceltoScreen.setEnabled(false);
 				parent.butClear.setEnabled(false);
+				parent.butNextSheet.setEnabled(false);
 				
 				txtTotalAmountSolgar.setText("");
 				txtTotalCountSolgar.setText("");	

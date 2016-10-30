@@ -5,6 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import cb.esi.esiclient.util.ESIBag;
+import main.ConnectToDb;
  
 /**
  * Written/modified by Hakan Kayakutlu
@@ -24,7 +25,7 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
 	  private JMenuBar menuBar,menuBarUser;
 	  private JMenu fileMenu,salesReportsMenu,marketingExpensesMenu;
 	  private JMenu editMenu;
-	  private JMenuItem openMenuItem,excelLoadMenuItem,reportObservation,exitMenuItem,cutMenuItem,copyMenuItem,pasteMenuItem,
+	  private JMenuItem openMenuItem,excelLoadMenuItem,reportObservation,exitMenuItem,cutMenuItem,copyMenuItem,pasteMenuItem,passChangeMenuItem,
 	  marketingExpenseEntry,marketingExpenseApprove,marketingExpenseObservation,marketingExpenseUpdate;
 	  private JLabel lblImage,lblYouAreWelcome,lblUserName;
 	  
@@ -124,9 +125,13 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
     cutMenuItem = new JMenuItem("Cut");
     copyMenuItem = new JMenuItem("Copy");
     pasteMenuItem = new JMenuItem("Paste");
+    passChangeMenuItem = new JMenuItem("Password Change");
+    editMenu.add(passChangeMenuItem);
     editMenu.add(cutMenuItem);
     editMenu.add(copyMenuItem);
     editMenu.add(pasteMenuItem);
+    
+    passChangeMenuItem.addActionListener(this);
  
     // add menus to menubar
     menuBar.add(fileMenu);
@@ -164,12 +169,12 @@ public void actionPerformed(ActionEvent ev)
 		 lblUserName.setText(loginName);
 		 salesReportsMenu.setVisible(true);
 		 marketingExpensesMenu.setVisible(true);
-		 if(loginName.matches("Hakan KAYAKUTLU|Халит Гекмен|Камаева Марина Сергеевна|Эртюрк Мурат Хакан")){
-			 marketingExpenseApprove.setVisible(true);
-		 }else{
-			 marketingExpenseApprove.setVisible(false);
-		 }
+		 setMenuUserRelation(inBag,loginName);
 		 openMenuItem.setVisible(false);
+	 }else if(ev.getActionCommand().equals("Password Change")){
+		 inBag.put("LOGINNAME",lblUserName.getText());
+		 PassChangeScr excelUpload = new PassChangeScr(inBag);
+		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Excel Load")){
 		 ExcelUpload excelUpload = new ExcelUpload();
 		 frame.validate();
@@ -177,27 +182,73 @@ public void actionPerformed(ActionEvent ev)
 		 ReportObservation reportObservation = new ReportObservation();
 		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Marketing Expense Entry")){
-		 inBag.put("LOGINNAME",lblUserName.getText());
-		 ExpenseEntryScreen marketingExpenseEntry = new ExpenseEntryScreen(inBag);
+		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
+		 tempBag.put("LOGINNAME",lblUserName.getText());
+		 ExpsEntryScreen marketingExpenseEntry = new ExpsEntryScreen(tempBag);
 		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Marketing Expense Update")){
-		 inBag.put("LOGINNAME",lblUserName.getText());
-		 ExpenseUpdateScreen marketingExpenseUpdate = new ExpenseUpdateScreen(inBag);
+		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
+		 tempBag.put("LOGINNAME",lblUserName.getText());
+		 ExpsUpdateScreen marketingExpenseUpdate = new ExpsUpdateScreen(tempBag);
 		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Marketing Expense Approve")){
-		 inBag.put("LOGINNAME",lblUserName.getText());
-		 ExpenseApprove marketingExpenseApprove = new ExpenseApprove(inBag);
+		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
+		 tempBag.put("LOGINNAME",lblUserName.getText());
+		 ExpsAppScreen marketingExpenseApprove = new ExpsAppScreen(tempBag);
 		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Marketing Expense Observation")){
-		 inBag.put("LOGINNAME",lblUserName.getText());
-		 ExpenseObservationScreen marketingExpenseObservation = new ExpenseObservationScreen(inBag);
+		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
+		 tempBag.put("LOGINNAME",lblUserName.getText());
+		 ExpsObsScreen marketingExpenseObservation = new ExpsObsScreen(tempBag);
 		 frame.validate();
 	 }else if(ev.getActionCommand().equals("Exit")){
 		 System.exit(0);
 	 }
   }
  
-  /**
+  private ESIBag setMenuUserRelation(ESIBag userBag,String loginName) {
+
+	  try {
+		
+		  excelLoadMenuItem.setVisible(false);
+		  reportObservation.setVisible(false);
+		  marketingExpenseEntry.setVisible(false);
+		  marketingExpenseUpdate.setVisible(false);
+		  marketingExpenseObservation.setVisible(false);
+		  marketingExpenseApprove.setVisible(false);
+		  
+		  userBag = ConnectToDb.getMenuUserRelation(loginName);
+		  
+		  if (userBag.existsBagKey("BRAND")){
+			  if(userBag.get("SALESENTRY").equalsIgnoreCase("1")){
+				  excelLoadMenuItem.setVisible(true);
+			  }
+			  if(userBag.get("SALESOBSERVATION").equalsIgnoreCase("1")){
+				  reportObservation.setVisible(true);
+			  }
+			  if(userBag.get("EXPSENTRY").equalsIgnoreCase("1")){
+				  marketingExpenseEntry.setVisible(true);
+			  }
+			  if(userBag.get("EXPSUPDATE").equalsIgnoreCase("1")){
+				  marketingExpenseUpdate.setVisible(true);
+			  }
+			  if(userBag.get("EXPSOBSERVATION").equalsIgnoreCase("1")){
+				  marketingExpenseObservation.setVisible(true);
+			  }
+			  if(userBag.get("EXPSAPPROVE").equalsIgnoreCase("1")){
+				  marketingExpenseApprove.setVisible(true);
+			  }
+		  }		
+  
+		  
+	} catch (Exception e) {
+		//throw e;
+	}
+	  
+	  return userBag;
+}
+
+/**
    * This dialog is displayed when the user selects the File/Open menu item.
    * Burda icerdeki ekran
    */
