@@ -16,6 +16,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -50,11 +51,14 @@ import com.toedter.calendar.JDateChooser;
 import cb.esi.esiclient.util.BagKeyNotFoundException;
 import cb.esi.esiclient.util.ESIBag;
 import main.ConnectToDb;
+import main.Dispatcher;
 import main.SendMail;
+import util.Util;
 
 public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener,MouseListener,FocusListener{
 	private static final int FRAME_WIDTH = 1100;
 	private static final int FRAME_HEIGHT = 900;
+	private static final Calendar cal = Calendar.getInstance();
 
 	private JFrame frame;
 	private JTable tblReportResult;	
@@ -132,8 +136,9 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 
 	/**
 	 * Initialize the contents of the frame.
+	 * @throws SQLException 
 	 */
-	public ExpsAppScreen(ESIBag inBag) {
+	public ExpsAppScreen(ESIBag inBag) throws SQLException {
 		super("Expense Approve");
 		Toolkit toolkit;
 		Dimension dim;
@@ -306,7 +311,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		}
 		
 		if(userCountry.equalsIgnoreCase("ALL")){
-			ConnectToDb.getPRMDataGroupBy("country", "solgar_prm.prm_exps_addresses",cmbBoxCountry,"","");	
+			Util.getPRMDataGroupBy("country", "solgar_prm.prm_exps_addresses",cmbBoxCountry,"","");	
 			cmbBoxCountry.setMaximumRowCount(50);
 			cmbBoxCountry.setEditable(true);
 			cmbBoxCountry.setSelectedIndex(-1);
@@ -316,7 +321,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 			cmbBoxCountry.addItem("Russia");
 			cmbBoxCountry.setSelectedIndex(0);
 			if(userArea.equalsIgnoreCase("ALL")){
-				ConnectToDb.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
+				Util.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
 				cmbBoxArea.setSelectedIndex(0);
 				cmbBoxArea.setEnabled(true);				
 			}else if(userArea.equalsIgnoreCase("Moscow")){
@@ -333,7 +338,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 			cmbBoxCountry.addItem("Ukraine");
 			cmbBoxCountry.setSelectedIndex(0);
 			if(userArea.equalsIgnoreCase("ALL")){
-				ConnectToDb.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
+				Util.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
 				cmbBoxArea.setSelectedIndex(0);
 				cmbBoxArea.setEnabled(true);				
 			}else if(userArea.equalsIgnoreCase("Kiev")){
@@ -346,7 +351,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		cmbBoxCity.setEnabled(false);
 		
 		cmbBoxExpMain = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMDataGroupBy("main_name", "solgar_prm.prm_exps_types",cmbBoxExpMain,"","");	
+		Util.getPRMDataGroupBy("main_name", "solgar_prm.prm_exps_types",cmbBoxExpMain,"","");	
 		cmbBoxExpMain.setMaximumRowCount(50);
 		cmbBoxExpMain.setEditable(true);
 		cmbBoxExpMain.setSelectedIndex(-1);
@@ -366,42 +371,42 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		cmbBoxExpMerOrganizator.setEnabled(false);
 		
 		cmbBoxExpRekChain = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("group_company", "solgar_prm.prm_russia_chains",cmbBoxExpRekChain);				
+		Util.getPRMData("group_company", "solgar_prm.prm_russia_chains",cmbBoxExpRekChain);				
 		cmbBoxExpRekChain.setMaximumRowCount(50);
 		cmbBoxExpRekChain.setEditable(true);
 		cmbBoxExpRekChain.setSelectedIndex(-1);
 		cmbBoxExpRekChain.setEnabled(false);
 
 		cmbBoxExpRekProduct = new JComboBox( new String[]{});	
-		ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
+		Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
 		cmbBoxExpRekProduct.setMaximumRowCount(50);
 		cmbBoxExpRekProduct.setEditable(true);
 		cmbBoxExpRekProduct.setSelectedIndex(-1);
 		cmbBoxExpRekProduct.setEnabled(false);
 		
 		cmbBoxExpPosProduct = new JComboBox( new String[]{});	
-		ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","SL", "","");
+		Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","SL", "","");
 		cmbBoxExpPosProduct.setMaximumRowCount(50);
 		cmbBoxExpPosProduct.setEditable(true);
 		cmbBoxExpPosProduct.setSelectedIndex(-1);
 		cmbBoxExpPosProduct.setEnabled(false);
 		
 		cmbBoxClinics = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("clinic_name", "solgar_prm.prm_exps_clinics",cmbBoxClinics);				
+		Util.getPRMData("clinic_name", "solgar_prm.prm_exps_clinics",cmbBoxClinics);				
 		cmbBoxClinics.setMaximumRowCount(50);
 		cmbBoxClinics.setEditable(true);
 		cmbBoxClinics.setSelectedIndex(-1);
 		cmbBoxClinics.setEnabled(false);
 		
 		cmbBoxKeyLeader = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader);				
+		Util.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader);				
 		cmbBoxKeyLeader.setMaximumRowCount(50);
 		cmbBoxKeyLeader.setEditable(true);
 		cmbBoxKeyLeader.setSelectedIndex(-1);
 		cmbBoxKeyLeader.setEnabled(false);
 		
 		cmbBoxKeyLeader1 = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader1);				
+		Util.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader1);				
 		cmbBoxKeyLeader1.setMaximumRowCount(50);
 		cmbBoxKeyLeader1.setEditable(true);
 		cmbBoxKeyLeader1.setSelectedIndex(-1);
@@ -416,31 +421,31 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		cmbBoxContracter1.setEnabled(false);
 		
 		cmbBoxsearchEventDateSmall = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEventDateSmall);				
+		Util.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEventDateSmall);				
 		cmbBoxsearchEventDateSmall.setMaximumRowCount(50);
 		cmbBoxsearchEventDateSmall.setEditable(true);
 		cmbBoxsearchEventDateSmall.setSelectedIndex(-1);
 		
 		cmbBoxsearchEventDateBig = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEventDateBig);				
+		Util.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEventDateBig);				
 		cmbBoxsearchEventDateBig.setMaximumRowCount(50);
 		cmbBoxsearchEventDateBig.setEditable(true);
 		cmbBoxsearchEventDateBig.setSelectedIndex(-1);
 		
 		cmbBoxsearchEntryDateSmall = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEntryDateSmall);				
+		Util.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEntryDateSmall);				
 		cmbBoxsearchEntryDateSmall.setMaximumRowCount(50);
 		cmbBoxsearchEntryDateSmall.setEditable(true);
 		cmbBoxsearchEntryDateSmall.setSelectedIndex(-1);
 		
 		cmbBoxsearchEntryDateBig = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEntryDateBig);				
+		Util.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxsearchEntryDateBig);				
 		cmbBoxsearchEntryDateBig.setMaximumRowCount(50);
 		cmbBoxsearchEntryDateBig.setEditable(true);
 		cmbBoxsearchEntryDateBig.setSelectedIndex(-1);
 		
 		cmbBoxTema = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("tema", "solgar_prm.prm_exps_temas",cmbBoxTema);				
+		Util.getPRMData("tema", "solgar_prm.prm_exps_temas",cmbBoxTema);				
 		cmbBoxTema.setMaximumRowCount(50);
 		cmbBoxTema.setEditable(true);
 		cmbBoxTema.setSelectedIndex(-1);
@@ -745,7 +750,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 			if (e.getActionCommand().equals("Approve")) {
 				for (int j = 0; j < model.getRowCount(); j++){
 					if(resultTable.getValueAt(j, 0).toString().equalsIgnoreCase("true")){					
-						ConnectToDb.statuChangeMarktExps(resultTable.getValueAt(j, 1).toString(), userName,"2");
+						Dispatcher.statuChangeMarktExps(resultTable.getValueAt(j, 1).toString(), userName,"2");
 					}
 				}				
 				String emailText = setEmailText();//"Dear reciepents,\n\n"+"Below id's expense approved by necessary user\n\n";						
@@ -761,7 +766,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 				//ConnectToDb.updateExpenseStatus(txtId.getText(),"3",user);		
 				for (int j = 0; j < model.getRowCount(); j++){
 					if(resultTable.getValueAt(j, 0).toString().equalsIgnoreCase("true")){					
-						ConnectToDb.statuChangeMarktExps(resultTable.getValueAt(j, 1).toString(), userName,"3");
+						Dispatcher.statuChangeMarktExps(resultTable.getValueAt(j, 1).toString(), userName,"3");
 					}
 				}
 				for( int i = model.getRowCount() - 1; i >= 0; i-- ) {
@@ -794,7 +799,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 	}  
 	
 	private void createModel() {
-		ESIBag tempBag = ConnectToDb.getMarktExpsWithParam(cmbBoxCountry,cmbBoxArea,cmbBoxCompanyCode,cmbBoxExpMain,cmbBoxExpLevel1,cmbBoxExpLevel2,
+		ESIBag tempBag = Dispatcher.getMarktExpsWithParam(cmbBoxCountry,cmbBoxArea,cmbBoxCompanyCode,cmbBoxExpMain,cmbBoxExpLevel1,cmbBoxExpLevel2,
 				cmbBoxsearchEventDateSmall,cmbBoxsearchEventDateBig,cmbBoxsearchEntryDateSmall,cmbBoxsearchEntryDateBig,cmbBoxStatus,null,null,null);
 		    try{
 			for (int j = 0; j < tempBag.getSize("TABLE"); j++){
@@ -847,7 +852,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 			}
 	}
 
-	public void itemStateChanged(ItemEvent itemEvent) {
+	public void itemStateChanged(ItemEvent itemEvent){
 	  	  JComboBox cmbBox = (JComboBox)itemEvent.getSource();
 	  	  String name = cmbBox.getName();
 	  	  if(cmbBox.getSelectedItem() != null &&cmbBox.getSelectedItem().toString().length()>0){
@@ -855,20 +860,40 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		    		  cmbBoxArea.removeAllItems();
 		    		  cmbBoxRegion.removeAllItems();
 		    		  cmbBoxCity.removeAllItems();	    		  
-		    		  ConnectToDb.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());	    		  
+		    		  try {
+						Util.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	    		  
 		    		  cmbBoxRegion.setSelectedIndex(-1);
 		    		  cmbBoxCity.setSelectedIndex(-1);	    		  	    		  
 		    	  }else if(name.equalsIgnoreCase("Area")){
 		    		  cmbBoxRegion.removeAllItems();
 		    		  cmbBoxCity.removeAllItems();	    		  
-		    		  ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
+		    		  try {
+						Util.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 		    		  cmbBoxExpMerLecture.removeAllItems();
 		    		  cmbBoxExpMerOrganizator.removeAllItems();
 		    		  if(cmbBoxCompanyCode.getSelectedItem() != null && cmbBoxArea.getSelectedItem() != null){
-		    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-	  					  "country",cmbBoxArea.getSelectedItem().toString());
-		    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-		    					  "country",cmbBoxArea.getSelectedItem().toString());
+		    			  try {
+							Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+							  "country",cmbBoxArea.getSelectedItem().toString());
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		    			  try {
+							Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+									  "country",cmbBoxArea.getSelectedItem().toString());
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 		    			  cmbBoxExpMerLecture.setSelectedIndex(-1);
 		    			  cmbBoxExpMerOrganizator.setSelectedIndex(-1);
 		    		  }
@@ -876,15 +901,30 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		    		  cmbBoxCity.setSelectedIndex(-1);	    		  
 		    	  }else if(name.equalsIgnoreCase("Region")){
 		    		  cmbBoxCity.removeAllItems();
-		    		  ConnectToDb.getPRMDataGroupBy("city", "solgar_prm.prm_exps_addresses",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+		    		  try {
+						Util.getPRMDataGroupBy("city", "solgar_prm.prm_exps_addresses",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 		    		  cmbBoxCity.setSelectedIndex(-1);
 		    		  if(cmbBoxCompanyCode.getSelectedItem() != null && cmbBoxArea.getSelectedItem() != null){
 		    			  cmbBoxExpMerLecture.removeAllItems();
 			    		  cmbBoxExpMerOrganizator.removeAllItems();
-		    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-	  					  "country",cmbBoxArea.getSelectedItem().toString());
-		    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-		    					  "country",cmbBoxArea.getSelectedItem().toString());
+			    		  try {
+							Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+							  "country",cmbBoxArea.getSelectedItem().toString());
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+			    		  try {
+							Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+									  "country",cmbBoxArea.getSelectedItem().toString());
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 		    			  cmbBoxExpMerLecture.setSelectedIndex(-1);
 		    			  cmbBoxExpMerOrganizator.setSelectedIndex(-1);
 		    		  }
@@ -900,12 +940,22 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		    		  }
 		    		  cmbBoxExpLevel1.removeAllItems();
 		    		  cmbBoxExpLevel2.removeAllItems();
-		    		  ConnectToDb.getPRMDataGroupBy("level1", "solgar_prm.prm_exps_types",cmbBoxExpLevel1,"main_name",cmbBoxExpMain.getSelectedItem().toString());
+		    		  try {
+						Util.getPRMDataGroupBy("level1", "solgar_prm.prm_exps_types",cmbBoxExpLevel1,"main_name",cmbBoxExpMain.getSelectedItem().toString());
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 		    		  cmbBoxExpLevel1.setSelectedIndex(-1);
 		    		  cmbBoxExpLevel2.setSelectedIndex(-1);
 		    	  }else if(name.equalsIgnoreCase("Level1")){
 		    		  cmbBoxExpLevel2.removeAllItems();
-		    		  ConnectToDb.getPRMDataGroupBy("level2", "solgar_prm.prm_exps_types",cmbBoxExpLevel2,"level1",cmbBoxExpLevel1.getSelectedItem().toString());
+		    		  try {
+						Util.getPRMDataGroupBy("level2", "solgar_prm.prm_exps_types",cmbBoxExpLevel2,"level1",cmbBoxExpLevel1.getSelectedItem().toString());
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 		    		  cmbBoxExpLevel2.setSelectedIndex(-1);
 		    	  }else if(name.equalsIgnoreCase("Level2")){
 		    		  //enson
@@ -914,13 +964,24 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		    			  cmbBoxExpPosProduct.removeAllItems();	
 		    			  cmbBoxExpRekProduct.removeAllItems();	
 			    		  if(cmbBoxCompanyCode.getSelectedItem().toString().equalsIgnoreCase("SOLGAR")){
-		    				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
-		    				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","SL", "","");
+			    			  try {
+								Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
+								Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","SL", "","");
+			    			  } catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}			    			  
 		    				  cmbBoxExpPosProduct.setSelectedIndex(-1);
 		    				  cmbBoxExpRekProduct.setSelectedIndex(-1);
 		    			  }else{
-		    				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN", "","");
-		    				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","BN", "","");
+		    				  try {
+								Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN", "","");
+								Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","BN", "","");
+		    				  } catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+		    				  
 		    				  cmbBoxExpRekProduct.setSelectedIndex(-1);
 		    				  cmbBoxExpPosProduct.setSelectedIndex(-1);
 		    			  }
@@ -929,10 +990,16 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		    		  if(cmbBoxArea.getSelectedItem() != null && cmbBoxCompanyCode.getSelectedItem() != null){
 			    		  cmbBoxExpMerLecture.removeAllItems();
 			    		  cmbBoxExpMerOrganizator.removeAllItems();	
-		    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-	    					  "country",cmbBoxArea.getSelectedItem().toString());
-		    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-		    					  "country",cmbBoxArea.getSelectedItem().toString());	    			  
+			    		  try {
+							Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+								  "country",cmbBoxArea.getSelectedItem().toString());
+							  Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+			    					  "country",cmbBoxArea.getSelectedItem().toString());	 
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+			    		   			  
 		    		  }	    		  	    		  
 		    	  }
 	  	  }
@@ -1298,8 +1365,8 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 		cmbBoxCity.setSelectedItem("");
 		cmbBoxExpMain.setSelectedItem("");
 		cmbBoxExpLevel1.setSelectedItem("");
-		startDate.setDateFormatString("");
-		endDate.setDateFormatString("");
+		startDate.setDate(cal.getTime());
+		endDate.setDate(cal.getTime());
 		txtCountFormat.setText("0");
 		txtAmountFormat.setText("");
 		txtAmount1.setText("");
@@ -1410,7 +1477,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 						}
 
 					} else if (secondStage.equalsIgnoreCase("Фарм.кружки")||
-							secondStage.equalsIgnoreCase("Мини-презентации")) {
+							secondStage.equalsIgnoreCase("МП")) {
 						tempBag.put("TABLE", k, "PAYMENTTYPE", secondStage);
 						tempBag.put("TABLE", k, "TOTALCOUNT", totalCount);
 						tempBag.put("TABLE", k, "TOTALSUM", totalSum);
@@ -1435,7 +1502,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 							l++;
 						}
 
-					}else if (secondStage.equalsIgnoreCase("Внутрисетевые обучения")) {
+					}else if (secondStage.equalsIgnoreCase("ВО")) {
 						tempBag.put("TABLE", k, "PAYMENTTYPE", secondStage);
 						tempBag.put("TABLE", k, "TOTALCOUNT", totalCount);
 						tempBag.put("TABLE", k, "TOTALSUM", totalSum);
@@ -1461,7 +1528,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 						}
 						
 
-					} else if (secondStage.equalsIgnoreCase("Дни Solgar")) {
+					} else if (secondStage.equalsIgnoreCase("ДС")) {
 						tempBag.put("TABLE", k, "PAYMENTTYPE", secondStage);
 						tempBag.put("TABLE", k, "TOTALCOUNT", totalCount);
 						tempBag.put("TABLE", k, "TOTALSUM", totalSum);
@@ -1507,8 +1574,8 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 							l++;
 						}
 
-					}  else if (secondStage.equalsIgnoreCase("Расходы на мед.представителей")||
-							secondStage.equalsIgnoreCase("Расходы на партнеров")) {
+					}  else if (secondStage.equalsIgnoreCase("мед.предст")||
+							secondStage.equalsIgnoreCase("партнер")) {
 						tempBag.put("TABLE", k, "PAYMENTTYPE", secondStage);
 						tempBag.put("TABLE", k, "TOTALCOUNT", totalCount);
 						tempBag.put("TABLE", k, "TOTALSUM", totalSum);
@@ -1520,7 +1587,7 @@ public class ExpsAppScreen extends JFrame implements ActionListener,ItemListener
 							l++;
 						}
 						
-					}   else if (secondStage.equalsIgnoreCase("Централизованные обучения")) {
+					}   else if (secondStage.equalsIgnoreCase("ЦО")) {
 						tempBag.put("TABLE", k, "PAYMENTTYPE", secondStage);
 						tempBag.put("TABLE", k, "TOTALCOUNT", totalCount);
 						tempBag.put("TABLE", k, "TOTALSUM", totalSum);

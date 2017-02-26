@@ -7,6 +7,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 
 import jxl.*;
@@ -14,8 +15,10 @@ import jxl.*;
 import javax.swing.filechooser.*;
 
 import main.Companies;
-import main.ConnectToDb;
+import main.Dispatcher;
+import main.ReportQueries;
 import main.SendMail;
+import util.Util;
 import cb.esi.esiclient.util.ESIBag;
 
 import java.awt.datatransfer.Clipboard;
@@ -49,7 +52,7 @@ public class ExcelUpload extends JFrame implements ActionListener {
 	String header[] = new String[] { "Row Number","Main Group","Sub Group","Pharmacy Address", "Product Name","Aptek No", "Count","Amount","SalesDate","Index","City"};
 
 	//
-	public ExcelUpload(){
+	public ExcelUpload() throws SQLException{
 		// This builds the JFrame portion of the object
 		super("Excel Upload");
 		Toolkit toolkit;
@@ -118,12 +121,12 @@ public class ExcelUpload extends JFrame implements ActionListener {
 		
 		//lblEmpty = new JLabel("");
 		cmbBoxCompanies = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("group_company", "solgar_prm.prm_russia_chains",cmbBoxCompanies);				
+		Util.getPRMData("group_company", "solgar_prm.prm_russia_chains",cmbBoxCompanies);				
 		cmbBoxCompanies.setMaximumRowCount(50);
 		cmbBoxCompanies.setEditable(true);
 		
 		cmbBoxDates = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxDates);				
+		Util.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxDates);				
 		cmbBoxDates.setMaximumRowCount(50);
 		cmbBoxDates.setEditable(true);
 		
@@ -426,6 +429,24 @@ public class ExcelUpload extends JFrame implements ActionListener {
 						outBag = Companies.apteka245Parser(sheet,selectedItem, verticalLimit, horizontalLimit);		
 					}else if (fileName.indexOf("PILULI")>=0){
 						outBag = Companies.piluliParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("KLASSIKA")>=0){
+						outBag = Companies.klassikaParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("OAS")>=0){
+						outBag = Companies.oasParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("MEGAFARM")>=0){
+						outBag = Companies.megaFarmParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("AVICENNA")>=0){
+						outBag = Companies.avicennaParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("DEJURNAYA")>=0){
+						outBag = Companies.dejurnayaParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("NIKA")>=0){
+						outBag = Companies.nikaParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("DIALOG")>=0){
+						outBag = Companies.dialogParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("LISTIK")>=0){
+						outBag = Companies.listikParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("NOVAVITA")>=0){
+						outBag = Companies.novaVitaParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
 					}else if (fileName.indexOf("OTHERS")>=0){
 						outBag = Companies.othersParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
 					}
@@ -476,7 +497,8 @@ public class ExcelUpload extends JFrame implements ActionListener {
 						    	totalAmount = Double.parseDouble("0.00");
 						    }
 						    
-						    if(product.toUpperCase().indexOf("аюсмрх")>=0 || product.toUpperCase().indexOf("BOUNTY")>=0){
+						    if(product.toUpperCase().indexOf("аюсмрх")>=0 || product.toUpperCase().indexOf("BOUNTY")>=0
+						    		|| product.toUpperCase().indexOf("ма ")>=0){
 						    	totalAmountBounty =totalAmountBounty + totalAmount;
 						    	totalCountBounty = totalCountBounty + intCount;
 								bounty = true;
@@ -538,10 +560,10 @@ public class ExcelUpload extends JFrame implements ActionListener {
 				String salesReader = resultTable.getValueAt(1, 9).toString();
 				String salesDate = resultTable.getValueAt(1, 8).toString();
 				
-				if(ConnectToDb.controlLoadSales(mainGroup, salesDate, productName, salesReader)){
+				if(ReportQueries.controlLoadSales(mainGroup, salesDate, productName, salesReader)){
 					JOptionPane.showMessageDialog(pnlErrorMsg, "File already load please check", "Error", JOptionPane.ERROR_MESSAGE);
 				}else{			
-					ConnectToDb.setSaleDataToDB(resultTable);
+					Dispatcher.setSaleDataToDB(resultTable);
 					
 					String emailText = "Dear reciepents,\n\n"+
 					cmbBoxCompanies.getSelectedItem().toString() +" "+txtProductType.getText()
@@ -550,8 +572,8 @@ public class ExcelUpload extends JFrame implements ActionListener {
 					txtTotalCountSolgar.getText()+".\n\nTotal Amount Solgar:"+ txtTotalAmountSolgar.getText()+
 					"\n\nTotal Count Bounty:"+ txtTotalCountBounty.getText()+".\n\nTotal Amount Bounty:"+ txtTotalAmountBounty.getText();
 					
-					//SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","hgokmen@solgarvitamin.ru","herturk@solgarvitamin.ru","", "Auto mail sale report", emailText);
-					SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","","","", "Auto mail sale report", emailText);
+					SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","hgokmen@solgarvitamin.ru","herturk@solgarvitamin.ru","", "Auto mail sale report", emailText);
+					//SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","","","", "Auto mail sale report", emailText);
 					
 					for( int i = dtm.getRowCount() - 1; i >= 0; i-- ) {
 						dtm.removeRow(i);
@@ -560,8 +582,7 @@ public class ExcelUpload extends JFrame implements ActionListener {
 					txtTotalCountSolgar.setText("");
 					txtTotalAmountBounty.setText("");
 					txtTotalCountBounty.setText("");
-				}
-				
+				}				
 				
 			} catch (Exception ex) {
 				String message = ex.getMessage();

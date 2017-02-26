@@ -2,7 +2,6 @@ package src;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
@@ -15,12 +14,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.Date;
-import java.text.DateFormat;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -30,11 +26,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -46,7 +40,9 @@ import com.toedter.calendar.JDateChooser;
 
 import cb.esi.esiclient.util.ESIBag;
 import main.ConnectToDb;
+import main.Dispatcher;
 import main.SendMail;
+import util.Util;
 
 public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListener,MouseListener,FocusListener{
 	private static final int FRAME_WIDTH = 1100;
@@ -81,16 +77,17 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 			"Company","Country","Area","Region","City",
 			"First_Stage","Second_Stage",
 			"Start_Date","End_Date","Total_Count","Total_Sum",
-			"Conf_Food_Sum", "Org_Exps_Sum", "Travel_Agency_Sum","Key_Person_Sum", "Add_Exp_Sum", 
-			"Chain","Contracter","Lecturer","Organizer","Clinic_Name","Key_Leader",
+			"Conf_Food_Sum", "Org_Exps_Sum 1", "Travel_Agency_Sum","Key_Person_Sum 1", "Add_Exp_Sum", 
+			"Chain","Contracter 1","Lecturer","Organizer","Clinic_Name","Key_Leader 1",
 			"Product_Name","Tema","Attenders_Count","Conditions","Statuses","Comment",
-			"Third Stage","Contracter1","Org_Exps_Sum1","Key_Leader1","Key_Person_Sum1","entry_date","entry_user","approve_date","approve_user"};
+			"Third Stage","Contracter 2","Org_Exps_Sum 2","Key_Leader 2","Key_Person_Sum 2","entry_date","entry_user","approve_date","approve_user"};
 
 	private String userName="Hakan KAYAKUTLU";
 	private String userBrand="ALL";
 	private String userCountry="ALL";
 	private String userArea="ALL";
 	private static final DecimalFormat doubleFormatter = new DecimalFormat("#,###");
+	private static final Calendar cal = Calendar.getInstance();
 	/**
 	 * Launch the application.
 	 */
@@ -117,8 +114,9 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 
 	/**
 	 * Initialize the contents of the frame.
+	 * @throws SQLException 
 	 */
-	public ExpsEntryScreen(ESIBag inBag) {
+	public ExpsEntryScreen(ESIBag inBag) throws SQLException {
 		super("Expense Entry");
 		Toolkit toolkit;
 		Dimension dim;
@@ -173,7 +171,10 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    doubleFormatter.setMaximumIntegerDigits(8);
 	    
 		//Table
-		resultTable = new JTable(20, 8);		
+		resultTable = new JTable(20, 8){
+			public boolean isCellEditable(int row, int column){  
+		    return false;  
+		  }};
 		dtm.setColumnIdentifiers(header);
 		resultTable.setModel(dtm);
 		resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -193,7 +194,7 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		
 		lblStartDate = new JLabel("Start Date",JLabel.RIGHT);
 		lblEndDate = new JLabel("End Date",JLabel.RIGHT);
-		lblCount = new JLabel("Count",JLabel.RIGHT);
+		lblCount = new JLabel("Participant Number ",JLabel.RIGHT);
 		lblAmount = new JLabel("Amount",JLabel.RIGHT);
 		
 		lblCompanyCode = new JLabel("Company Code",JLabel.RIGHT);
@@ -215,18 +216,18 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		lblExpPosStatus = new JLabel("Status",JLabel.RIGHT);
 		
 		lblComment = new JLabel("Comment",JLabel.RIGHT);
-		lblContracter = new JLabel("Contracter",JLabel.RIGHT);
-		lblContracter1 = new JLabel("Contracter1",JLabel.RIGHT);
-		lblKeyLeader = new JLabel("Key Leader",JLabel.RIGHT);
-		lblKeyLeader1 = new JLabel("Key Leader1",JLabel.RIGHT);
+		lblContracter = new JLabel("Contracter 1",JLabel.RIGHT);
+		lblContracter1 = new JLabel("Contracter 2",JLabel.RIGHT);
+		lblKeyLeader = new JLabel("Key Leader 1",JLabel.RIGHT);
+		lblKeyLeader1 = new JLabel("Key Leader 2",JLabel.RIGHT);
 		
 		lblAmount1 = new JLabel("Конференц-зал и питание",JLabel.RIGHT);
-		lblAmount2 = new JLabel("Орг.взнос",JLabel.RIGHT);
+		lblAmount2 = new JLabel("Орг.взнос 1",JLabel.RIGHT);
 		lblAmount3 = new JLabel("Турагентство",JLabel.RIGHT);
-		lblAmount4 = new JLabel("Гонорар",JLabel.RIGHT);
-		lblAmount7 = new JLabel("Гонорар1",JLabel.RIGHT);
-		lblAmount5 = new JLabel("Доп.расходы(бензин, мойка и т.д.)",JLabel.RIGHT);
-		lblAmount6 = new JLabel("Орг.взнос 1",JLabel.RIGHT);
+		lblAmount4 = new JLabel("Гонорар 1",JLabel.RIGHT);
+		lblAmount7 = new JLabel("Гонорар 2",JLabel.RIGHT);
+		lblAmount5 = new JLabel("Доп.расходы",JLabel.RIGHT);
+		lblAmount6 = new JLabel("Орг.взнос 2",JLabel.RIGHT);
 		
 		lblEmpty = new JLabel("");
 		lblEmpty1 = new JLabel("");
@@ -234,30 +235,23 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		lblEmpty1.setVisible(false);
 		
 		cmbBoxCompanyCode = new JComboBox( new String[]{});				
-		cmbBoxCompanyCode.setEditable(true);
 		cmbBoxCompanyCode.setEnabled(false);
 		
 		cmbBoxCountry = new JComboBox( new String[]{});		
-		cmbBoxCountry.setEditable(true);
 		cmbBoxCountry.setEnabled(false);
 		
 		cmbBoxArea = new JComboBox( new String[]{});		
-		cmbBoxArea.setEditable(true);
 		cmbBoxArea.setEnabled(false);
 		
 		cmbBoxRegion = new JComboBox( new String[]{});		
-		cmbBoxRegion.setEditable(true);
 		cmbBoxRegion.setEnabled(false);
 		
 		cmbBoxCity = new JComboBox( new String[]{});
-		cmbBoxCity.setEditable(true);	
 		cmbBoxRegion.setEnabled(false);
 		
 		cmbBoxExpMerLecture = new JComboBox( new String[]{});		
-		cmbBoxExpMerLecture.setEditable(true);	
 		
 		cmbBoxExpMerOrganizator = new JComboBox( new String[]{});		
-		cmbBoxExpMerOrganizator.setEditable(true);
 		
 		if(userBrand.equalsIgnoreCase("ALL")){
 			cmbBoxCompanyCode.addItem("SOLGAR");
@@ -273,28 +267,25 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		}
 		
 		cmbBoxExpPosProduct = new JComboBox( new String[]{});	
-		cmbBoxExpPosProduct.setEditable(true);	
 		cmbBoxExpRekProduct = new JComboBox( new String[]{});	
-		cmbBoxExpRekProduct.setEditable(true);
 		
 		if(cmbBoxCompanyCode.getSelectedItem() != null){
 			if(cmbBoxCompanyCode.getSelectedItem().toString().equalsIgnoreCase("SOLGAR")){
-				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
-				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","SL", "","");
+				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
+				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","SL", "","");
 				  cmbBoxExpPosProduct.setSelectedIndex(-1);
 				  cmbBoxExpRekProduct.setSelectedIndex(-1);
 			  }else{
-				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN", "","");
-				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","BN", "","");
+				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN", "","");
+				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","BN", "","");
 				  cmbBoxExpRekProduct.setSelectedIndex(-1);
 				  cmbBoxExpPosProduct.setSelectedIndex(-1);
 			  }
 		}
 		
 		if(userCountry.equalsIgnoreCase("ALL")){
-			ConnectToDb.getPRMDataGroupBy("country", "solgar_prm.prm_exps_addresses",cmbBoxCountry,"","");	
+			Util.getPRMDataGroupBy("country", "solgar_prm.prm_exps_addresses",cmbBoxCountry,"","");	
 			cmbBoxCountry.setMaximumRowCount(50);
-			cmbBoxCountry.setEditable(true);
 			cmbBoxCountry.setSelectedIndex(-1);
 			cmbBoxCountry.setEnabled(true);
 			cmbBoxArea.setEnabled(true);
@@ -302,26 +293,30 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 			cmbBoxCountry.addItem("Russia");
 			cmbBoxCountry.setSelectedIndex(0);
 			if(userArea.equalsIgnoreCase("ALL")){
-				ConnectToDb.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
+				Util.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
 				cmbBoxArea.setSelectedIndex(0);
 				cmbBoxArea.setEnabled(true);				
 			}else if(userArea.equalsIgnoreCase("Moscow")){
 				cmbBoxArea.addItem("Moscow");
 				cmbBoxArea.setSelectedIndex(0);
-				ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());				
+				Util.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());		
+				cmbBoxCity.addItem("");
+				Util.getPRMDataGroupBy("city", "solgar_prm.prm_exps_addresses",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
 			}else if(userArea.equalsIgnoreCase("Region")){
 				cmbBoxArea.addItem("Region");
 				cmbBoxArea.setSelectedIndex(0);
-				ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
+				Util.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());				
 			}else if(userArea.equalsIgnoreCase("Saint Petersburg")){
 				cmbBoxArea.addItem("Saint Petersburg");
 				cmbBoxArea.setSelectedIndex(0);
-				ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
+				Util.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
+				cmbBoxCity.addItem("");
+				Util.getPRMDataGroupBy("city", "solgar_prm.prm_exps_addresses",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
 			}
 			if(cmbBoxCompanyCode.getSelectedItem() != null && cmbBoxArea.getSelectedItem() != null){
-  			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+				Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
 				  "country",cmbBoxArea.getSelectedItem().toString());
-  			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+				Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
   					  "country",cmbBoxArea.getSelectedItem().toString());
   			  cmbBoxExpMerLecture.setSelectedIndex(-1);
   			  cmbBoxExpMerOrganizator.setSelectedIndex(-1);
@@ -330,18 +325,18 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 			cmbBoxCountry.addItem("Ukraine");
 			cmbBoxCountry.setSelectedIndex(0);
 			if(userArea.equalsIgnoreCase("ALL")){
-				ConnectToDb.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
+				Util.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
 				cmbBoxArea.setSelectedIndex(0);
 				cmbBoxArea.setEnabled(true);				
 			}else if(userArea.equalsIgnoreCase("Kiev")){
 				cmbBoxArea.addItem("Kiev");
 				cmbBoxArea.setSelectedIndex(0);
-				ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
+				Util.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
 			}
 			if(cmbBoxCompanyCode.getSelectedItem() != null && cmbBoxArea.getSelectedItem() != null){
-  			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+				Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
 				  "country",cmbBoxArea.getSelectedItem().toString());
-  			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+				Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
   					  "country",cmbBoxArea.getSelectedItem().toString());
   			  cmbBoxExpMerLecture.setSelectedIndex(-1);
   			  cmbBoxExpMerOrganizator.setSelectedIndex(-1);
@@ -351,65 +346,62 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		cmbBoxRegion.setEnabled(true);
 		cmbBoxCity.setEnabled(true);
 				
-		cmbBoxExpMain = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMDataGroupBy("main_name", "solgar_prm.prm_exps_types",cmbBoxExpMain,"","");	
+		cmbBoxExpMain = new JComboBox( new String[]{});	
+		Util.getPRMDataGroupBy("main_name", "solgar_prm.prm_exps_types",cmbBoxExpMain,"","");	
 		cmbBoxExpMain.setMaximumRowCount(50);
-		cmbBoxExpMain.setEditable(true);
-		cmbBoxExpMain.setSelectedIndex(0);
+		cmbBoxExpMain.setSelectedIndex(2);
 		
 		cmbBoxExpLevel1 = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMDataGroupBy("level1", "solgar_prm.prm_exps_types",cmbBoxExpLevel1,"main_name",cmbBoxExpMain.getSelectedItem().toString());
+		Util.getPRMDataGroupBy("level1", "solgar_prm.prm_exps_types",cmbBoxExpLevel1,"main_name",cmbBoxExpMain.getSelectedItem().toString());
 		cmbBoxExpLevel1.setMaximumRowCount(50);
-		cmbBoxExpLevel1.setEditable(true);
 		cmbBoxExpLevel1.setSelectedIndex(-1);
 		
 		cmbBoxExpLevel2 = new JComboBox( new String[]{});	
-		cmbBoxExpLevel2.setEditable(true);	
+		cmbBoxExpLevel2.insertItemAt("", 0);
 		
-		cmbBoxExpRekChain = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("group_company", "solgar_prm.prm_russia_chains",cmbBoxExpRekChain);				
+		cmbBoxExpRekChain = new JComboBox( new String[]{});			
+		Util.getPRMData("group_company", "solgar_prm.prm_russia_chains",cmbBoxExpRekChain);
+		cmbBoxExpRekChain.insertItemAt("", 0);
 		cmbBoxExpRekChain.setMaximumRowCount(50);
-		cmbBoxExpRekChain.setEditable(true);
 		cmbBoxExpRekChain.setSelectedIndex(-1);
 		
 		cmbBoxClinics = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("clinic_name", "solgar_prm.prm_exps_clinics",cmbBoxClinics);				
+		Util.getPRMData("clinic_name", "solgar_prm.prm_exps_clinics",cmbBoxClinics);	
+		cmbBoxClinics.insertItemAt("", 0);
 		cmbBoxClinics.setMaximumRowCount(50);
-		cmbBoxClinics.setEditable(true);
 		cmbBoxClinics.setSelectedIndex(-1);
 		
 		cmbBoxKeyLeader = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader);				
+		Util.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader);
+		cmbBoxKeyLeader.insertItemAt("", 0);
 		cmbBoxKeyLeader.setMaximumRowCount(50);
-		cmbBoxKeyLeader.setEditable(true);
 		cmbBoxKeyLeader.setSelectedIndex(-1);	
 		
 		cmbBoxKeyLeader1 = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader1);				
+		Util.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader1);		
+		cmbBoxKeyLeader1.insertItemAt("", 0);
 		cmbBoxKeyLeader1.setMaximumRowCount(50);
-		cmbBoxKeyLeader1.setEditable(true);
 		cmbBoxKeyLeader1.setSelectedIndex(-1);
 		
 		cmbBoxContracter = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("Contracter", "solgar_prm.prm_exps_contracter",cmbBoxContracter);				
+		Util.getPRMData("Contracter", "solgar_prm.prm_exps_contracter",cmbBoxContracter);
+		cmbBoxContracter.insertItemAt("", 0);
 		cmbBoxContracter.setMaximumRowCount(50);
-		cmbBoxContracter.setEditable(true);
 		cmbBoxContracter.setSelectedIndex(-1);
 		
 		cmbBoxContracter1 = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("Contracter", "solgar_prm.prm_exps_contracter1",cmbBoxContracter1);				
+		Util.getPRMData("Contracter", "solgar_prm.prm_exps_contracter1",cmbBoxContracter1);	
+		cmbBoxContracter1.insertItemAt("", 0);
 		cmbBoxContracter1.setMaximumRowCount(50);
-		cmbBoxContracter1.setEditable(true);
 		cmbBoxContracter1.setSelectedIndex(-1);
 		
 		cmbBoxTema = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("tema", "solgar_prm.prm_exps_temas",cmbBoxTema);				
+		Util.getPRMData("tema", "solgar_prm.prm_exps_temas",cmbBoxTema);	
+		cmbBoxTema.insertItemAt("", 0);
 		cmbBoxTema.setMaximumRowCount(50);
-		cmbBoxTema.setEditable(true);
 		cmbBoxTema.setSelectedIndex(-1);
 		
-		//Date Field		
-		Calendar cal = Calendar.getInstance();
+		//Date Field				
 		startDate = new JDateChooser();
 		startDate.setDateFormatString("yyyy-MM-dd");		
 		startDate.setDate(cal.getTime());
@@ -434,9 +426,9 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		txtEmpty1.setVisible(false);
 		
 		txtCountFormat = new JFormattedTextField(numberFormatter);
-		txtCountFormat.setText("");
+		txtCountFormat.setText("0");
 		txtAmountFormat = new JFormattedTextField(doubleFormatter);
-		txtAmountFormat.setText("0");
+		txtAmountFormat.setText("0.00");
 		
 		txtAmount1 = new JFormattedTextField(doubleFormatter);
 		txtAmount2 = new JFormattedTextField(doubleFormatter);
@@ -573,14 +565,14 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		paramPanelPaymentReceiver.add(cmbBoxContracter1);
 		paramPanelPaymentReceiver.add(lblExpMerLecture);
 		paramPanelPaymentReceiver.add(cmbBoxExpMerLecture);
-		paramPanelPaymentReceiver.add(lblExpMerOrganizator);
-		paramPanelPaymentReceiver.add(cmbBoxExpMerOrganizator);		
 		paramPanelPaymentReceiver.add(lblClinicName);
 		paramPanelPaymentReceiver.add(cmbBoxClinics);		
 		paramPanelPaymentReceiver.add(lblKeyLeader);
 		paramPanelPaymentReceiver.add(cmbBoxKeyLeader);	
 		paramPanelPaymentReceiver.add(lblKeyLeader1);
 		paramPanelPaymentReceiver.add(cmbBoxKeyLeader1);	
+		paramPanelPaymentReceiver.add(lblExpMerOrganizator);
+		paramPanelPaymentReceiver.add(cmbBoxExpMerOrganizator);
 		
 		
 		paramPanelAmounts.add(lblAmount1 );
@@ -632,58 +624,70 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
+			boolean passControl =true;
 			if (e.getActionCommand().equals("Add")) {	
 				 	SimpleDateFormat dcn = new SimpleDateFormat("yyyy-MM-dd");
 				 	boolean amountControl = true;
+				 	boolean mustEnterControl = true;
 				 	if(cmbBoxExpMain.getSelectedItem() != null && cmbBoxExpMain.getSelectedItem().toString().equalsIgnoreCase("Мероприятия")){
 				 		amountControl = amountControl(txtAmountFormat.getText(),txtAmount1.getText(),txtAmount2.getText(),
 							txtAmount3.getText(),txtAmount4.getText(),txtAmount5.getText(),txtAmount6.getText(),txtAmount7.getText());
+				 		mustEnterControl = mustEnterControlMeropriyati();		 		
+				 	}else if(cmbBoxExpMain.getSelectedItem() != null && cmbBoxExpMain.getSelectedItem().toString().equalsIgnoreCase("POS-материалы")){
+				 		mustEnterControl = mustEnterControlPosMaterial();
+				 	}else if(cmbBoxExpMain.getSelectedItem() != null && cmbBoxExpMain.getSelectedItem().toString().equalsIgnoreCase("Реклама")){
+				 		mustEnterControl = mustEnterControlReklam();
 				 	}
-					if(amountControl){			
-						model.setColumnIdentifiers(header);
-						resultTable.setModel(model);						
-						final Object[] row = new Object[35];
-						row[0] = "0";
-						row[1] = "Waiting Approve";
-						row[2] = cmbBoxCompanyCode.getSelectedItem();
-						row[3] = cmbBoxCountry.getSelectedItem();
-						row[4] = cmbBoxArea.getSelectedItem();
-						row[5] = cmbBoxRegion.getSelectedItem();
-						row[6] = cmbBoxCity.getSelectedItem();
-						row[7] = cmbBoxExpMain.getSelectedItem();
-						row[8] = cmbBoxExpLevel1.getSelectedItem();
-						row[9] = dcn.format(startDate.getDate());
-						row[10] = dcn.format(endDate.getDate());
-						row[11] = txtCountFormat.getText();
-						row[12] = formatAmount(txtAmountFormat.getText());
-						row[13] = formatAmount(txtAmount1.getText());
-						row[14] = formatAmount(txtAmount2.getText());
-						row[15] = formatAmount(txtAmount3.getText());					
-						row[16] = formatAmount(txtAmount4.getText());
-						row[17] = formatAmount(txtAmount5.getText());						
-						row[18] = cmbBoxExpRekChain.getSelectedItem();
-						row[19] = cmbBoxContracter.getSelectedItem();
-						row[20] = cmbBoxExpMerLecture.getSelectedItem();
-						row[21] = cmbBoxExpMerOrganizator.getSelectedItem();
-						row[22] = cmbBoxClinics.getSelectedItem();
-						row[23] = cmbBoxKeyLeader.getSelectedItem();
-						row[24] = cmbBoxExpRekProduct.getSelectedItem();
-						row[25] = cmbBoxTema.getSelectedItem();
-						row[26] = txtExpMerUcastnik.getText();
-						row[27] = txtExpRekUsloviya.getText();
-						row[28] = txtExpPosStatus.getText();
-						row[29] = txtComment.getText();
-						row[30] = cmbBoxExpLevel2.getSelectedItem();	
-						row[31] = cmbBoxContracter1.getSelectedItem();
-						row[32] = formatAmount(txtAmount6.getText());
-						row[33] = cmbBoxKeyLeader1.getSelectedItem();
-						row[34] = formatAmount(txtAmount7.getText());
-						// add row to the model
-						model.addRow(row);
-						btnSave.setEnabled(true);
-				}else{
-					JOptionPane.showMessageDialog(pnlInfoMsg, "Please check amounts expenses total amount should be equal to totatl amount", "Error", JOptionPane.ERROR_MESSAGE);
-				}
+				 	
+				 	if(!amountControl){
+				 		JOptionPane.showMessageDialog(pnlInfoMsg, "Please check amounts expenses total amount should be equal to totatl amount", "Error", JOptionPane.ERROR_MESSAGE);
+				 		return;
+				 	}
+			 		if(!mustEnterControl){					 		
+				 		return;
+				 	}
+	 				
+					model.setColumnIdentifiers(header);
+					resultTable.setModel(model);						
+					final Object[] row = new Object[35];
+					row[0] = "0";
+					row[1] = "Waiting Approve";
+					row[2] = cmbBoxCompanyCode.getSelectedItem();
+					row[3] = cmbBoxCountry.getSelectedItem();
+					row[4] = cmbBoxArea.getSelectedItem();
+					row[5] = cmbBoxRegion.getSelectedItem();
+					row[6] = cmbBoxCity.getSelectedItem();
+					row[7] = cmbBoxExpMain.getSelectedItem();
+					row[8] = cmbBoxExpLevel1.getSelectedItem();
+					row[9] = dcn.format(startDate.getDate());
+					row[10] = dcn.format(endDate.getDate());
+					row[11] = txtCountFormat.getText();
+					row[12] = formatAmount(txtAmountFormat.getText());
+					row[13] = formatAmount(txtAmount1.getText());
+					row[14] = formatAmount(txtAmount2.getText());
+					row[15] = formatAmount(txtAmount3.getText());					
+					row[16] = formatAmount(txtAmount4.getText());
+					row[17] = formatAmount(txtAmount5.getText());						
+					row[18] = cmbBoxExpRekChain.getSelectedItem();
+					row[19] = cmbBoxContracter.getSelectedItem();
+					row[20] = cmbBoxExpMerLecture.getSelectedItem();
+					row[21] = cmbBoxExpMerOrganizator.getSelectedItem();
+					row[22] = cmbBoxClinics.getSelectedItem();
+					row[23] = cmbBoxKeyLeader.getSelectedItem();
+					row[24] = cmbBoxExpRekProduct.getSelectedItem();
+					row[25] = cmbBoxTema.getSelectedItem();
+					row[26] = txtExpMerUcastnik.getText();
+					row[27] = txtExpRekUsloviya.getText();
+					row[28] = txtExpPosStatus.getText();
+					row[29] = txtComment.getText();
+					row[30] = cmbBoxExpLevel2.getSelectedItem();	
+					row[31] = cmbBoxContracter1.getSelectedItem();
+					row[32] = formatAmount(txtAmount6.getText());
+					row[33] = cmbBoxKeyLeader1.getSelectedItem();
+					row[34] = formatAmount(txtAmount7.getText());
+					// add row to the model
+					model.addRow(row);
+					btnSave.setEnabled(true);
 				
 				
 			}else if (e.getActionCommand().equals("Update")) {
@@ -749,7 +753,7 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 			}else if (e.getActionCommand().equals("Save")) {				
 				boolean withoutError = true;
 				try{					
-					ConnectToDb.saveMarktExps(resultTable,userName);				
+					Dispatcher.saveMarktExps(resultTable,userName);				
 				}catch (Exception ef) {
 					JOptionPane.showMessageDialog(pnlInfoMsg, ef.getMessage(), "Error in Save", JOptionPane.ERROR_MESSAGE);
 					withoutError = false;
@@ -758,8 +762,8 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 					for( int i = model.getRowCount() - 1; i >= 0; i-- ) {
 						model.removeRow(i);
 					}					
-					String emailText = "Dear reciepents,\n\n"+"Expense entry user\n\n" + userName;						
-					SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","","","", "Auto mail exps entry", emailText);					
+					//String emailText = "Dear reciepents,\n\n"+"Expense entry user\n\n" + userName;						
+					//SendMail.sendEmailToReceipents("hakan.kayakutlu@gmail.com","","","", "Auto mail exps entry", emailText);					
 					cleanAllScreen();
 					btnSave.setEnabled(false);
 					JOptionPane.showMessageDialog(pnlInfoMsg, "Expenses sent to approve", "Information", JOptionPane.INFORMATION_MESSAGE);
@@ -785,20 +789,44 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    		  cmbBoxArea.removeAllItems();
 	    		  cmbBoxRegion.removeAllItems();
 	    		  cmbBoxCity.removeAllItems();	    		  
-	    		  ConnectToDb.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());	    		  
+	    		  try {
+					Util.getPRMDataGroupBy("area", "solgar_prm.prm_exps_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+	    		  cmbBoxArea.insertItemAt("", 0);
 	    		  cmbBoxRegion.setSelectedIndex(-1);
 	    		  cmbBoxCity.setSelectedIndex(-1);	    		  	    		  
 	    	  }else if(name.equalsIgnoreCase("Area")){
 	    		  cmbBoxRegion.removeAllItems();
 	    		  cmbBoxCity.removeAllItems();	    		  
-	    		  ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
+	    		  try {
+					Util.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		  cmbBoxRegion.insertItemAt("", 0);
 	    		  cmbBoxExpMerLecture.removeAllItems();
 	    		  cmbBoxExpMerOrganizator.removeAllItems();
 	    		  if(cmbBoxCompanyCode.getSelectedItem() != null && cmbBoxArea.getSelectedItem() != null){
-	    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-    					  "country",cmbBoxArea.getSelectedItem().toString());
-	    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-	    					  "country",cmbBoxArea.getSelectedItem().toString());
+	    			  try {
+						Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+							  "country",cmbBoxArea.getSelectedItem().toString());
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    			  cmbBoxExpMerLecture.insertItemAt("", 0);
+	    			  try {
+						Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+								  "country",cmbBoxArea.getSelectedItem().toString());
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    			  cmbBoxExpMerOrganizator.insertItemAt("", 0);
 	    			  cmbBoxExpMerLecture.setSelectedIndex(-1);
 	    			  cmbBoxExpMerOrganizator.setSelectedIndex(-1);
 	    		  }
@@ -806,15 +834,28 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    		  cmbBoxCity.setSelectedIndex(-1);	    		  
 	    	  }else if(name.equalsIgnoreCase("Region")){
 	    		  cmbBoxCity.removeAllItems();
-	    		  ConnectToDb.getPRMDataGroupBy("city", "solgar_prm.prm_exps_addresses",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+	    		  try {
+					Util.getPRMDataGroupBy("city", "solgar_prm.prm_exps_addresses",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		  cmbBoxCity.insertItemAt("", 0);
 	    		  cmbBoxCity.setSelectedIndex(-1);
 	    		  if(cmbBoxCompanyCode.getSelectedItem() != null && cmbBoxArea.getSelectedItem() != null){
 	    			  cmbBoxExpMerLecture.removeAllItems();
 		    		  cmbBoxExpMerOrganizator.removeAllItems();
-	    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-    					  "country",cmbBoxArea.getSelectedItem().toString());
-	    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-	    					  "country",cmbBoxArea.getSelectedItem().toString());
+		    		  try {
+						Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+							  "country",cmbBoxArea.getSelectedItem().toString());
+						cmbBoxExpMerLecture.insertItemAt("", 0);
+		    			  Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+		    					  "country",cmbBoxArea.getSelectedItem().toString());
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	    			  
+	    			  cmbBoxExpMerOrganizator.insertItemAt("", 0);
 	    			  cmbBoxExpMerLecture.setSelectedIndex(-1);
 	    			  cmbBoxExpMerOrganizator.setSelectedIndex(-1);
 	    		  }
@@ -830,13 +871,25 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    		  }
 	    		  cmbBoxExpLevel1.removeAllItems();
 	    		  cmbBoxExpLevel2.removeAllItems();
-	    		  ConnectToDb.getPRMDataGroupBy("level1", "solgar_prm.prm_exps_types",cmbBoxExpLevel1,"main_name",cmbBoxExpMain.getSelectedItem().toString());
+	    		  try {
+					Util.getPRMDataGroupBy("level1", "solgar_prm.prm_exps_types",cmbBoxExpLevel1,"main_name",cmbBoxExpMain.getSelectedItem().toString());
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		  cmbBoxExpLevel1.insertItemAt("", 0);
 	    		  cmbBoxExpLevel1.setSelectedIndex(-1);
 	    		  cmbBoxExpLevel2.setSelectedIndex(-1);
 	    	  }else if(name.equalsIgnoreCase("Level1")){
-	    		  cmbBoxExpLevel2.removeAllItems();
-	    		  ConnectToDb.getPRMDataGroupBy("level2", "solgar_prm.prm_exps_types",cmbBoxExpLevel2,"level1",cmbBoxExpLevel1.getSelectedItem().toString());
-	    		  cmbBoxExpLevel2.setSelectedIndex(-1);
+	    		  
+	    		  try {
+					arrangeFieldsSecondStage();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		  
+	    		  
 	    	  }else if(name.equalsIgnoreCase("Level2")){
 	    		  //enson
 	    	  }else if(name.equalsIgnoreCase("CompanyCode")){    		  
@@ -844,13 +897,26 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    			  cmbBoxExpPosProduct.removeAllItems();	
 	    			  cmbBoxExpRekProduct.removeAllItems();	
 		    		  if(cmbBoxCompanyCode.getSelectedItem().toString().equalsIgnoreCase("SOLGAR")){
-	    				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
-	    				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","SL", "","");
+		    			  try {
+							Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
+		    			  } catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		    			  
+	    				  cmbBoxExpPosProduct.insertItemAt("", 0);
+	    				  cmbBoxExpRekProduct.insertItemAt("", 0);
 	    				  cmbBoxExpPosProduct.setSelectedIndex(-1);
 	    				  cmbBoxExpRekProduct.setSelectedIndex(-1);
 	    			  }else{
-	    				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN", "","");
-	    				  ConnectToDb.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","BN", "","");
+	    				  try {
+							Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN", "","");
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	    				  cmbBoxExpPosProduct.insertItemAt("", 0);
+	    				  cmbBoxExpRekProduct.insertItemAt("", 0);
 	    				  cmbBoxExpRekProduct.setSelectedIndex(-1);
 	    				  cmbBoxExpPosProduct.setSelectedIndex(-1);
 	    			  }
@@ -859,10 +925,18 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    		  if(cmbBoxArea.getSelectedItem() != null && cmbBoxCompanyCode.getSelectedItem() != null){
 		    		  cmbBoxExpMerLecture.removeAllItems();
 		    		  cmbBoxExpMerOrganizator.removeAllItems();	
-	    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-    					  "country",cmbBoxArea.getSelectedItem().toString());
-	    			  ConnectToDb.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-	    					  "country",cmbBoxArea.getSelectedItem().toString());	    			  
+		    		  try {
+						Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+							  "country",cmbBoxArea.getSelectedItem().toString());
+						cmbBoxExpMerLecture.insertItemAt("", 0);
+		    			  Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+		    					  "country",cmbBoxArea.getSelectedItem().toString());
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    			  	
+	    			  cmbBoxExpMerOrganizator.insertItemAt("", 0);
 	    		  }	    		  	    		  
 	    	  }
     	  }
@@ -1085,38 +1159,7 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 			/*
 			 * Get the extension of a file.
 			 */
-		}
-		
-		 private boolean amountControl(String totalAmount, String amount1, String amount2,
-					String amount3, String amount4, String amount5, String amount6, String amount7) {
-		    	  double totalAmountExpenses = 0;
-		    	  if(amount1.indexOf(" ")>=0){amount1 = amount1.replace(" ", "");}
-		    	  if(amount2.indexOf(" ")>=0){amount2 = amount2.replace(" ", "");}
-		    	  if(amount3.indexOf(" ")>=0){amount3 = amount3.replace(" ", "");}
-		    	  if(amount4.indexOf(" ")>=0){amount4 = amount4.replace(" ", "");}
-		    	  if(amount5.indexOf(" ")>=0){amount5 = amount5.replace(" ", "");}
-		    	  if(amount6.indexOf(" ")>=0){amount6 = amount6.replace(" ", "");}
-		    	  if(amount7.indexOf(" ")>=0){amount7 = amount7.replace(" ", "");}
-		    	  if(totalAmount.indexOf(" ")>=0){totalAmount = totalAmount.replace(" ", "");}
-		    	  
-		    	  if((amount1.length() > 0 && !amount1.equalsIgnoreCase("0"))||
-		    			  amount2.length() > 0 && !amount2.equalsIgnoreCase("0")||
-		    			  amount3.length() > 0 && !amount3.equalsIgnoreCase("0")||
-		    			  amount4.length() > 0 && !amount4.equalsIgnoreCase("0")||
-		    			  amount5.length() > 0 && !amount5.equalsIgnoreCase("0")||
-		    			  amount6.length() > 0 && !amount6.equalsIgnoreCase("0")||
-		    	  		  amount7.length() > 0 && !amount7.equalsIgnoreCase("0")){
-		    		  totalAmountExpenses = Double.parseDouble(amount1)+Double.parseDouble(amount2)+Double.parseDouble(amount3)+
-		    				  Double.parseDouble(amount4)+Double.parseDouble(amount5)+Double.parseDouble(amount6)+Double.parseDouble(amount7);
-		    		  if(Double.parseDouble(totalAmount) != totalAmountExpenses){
-		    			  return false;
-		    		  }else{
-		    			  return true;
-		    		  }
-		    	  }else{
-		    		  return true;
-		    	  }	  		
-			}
+		}	 
 		 
 		 private void amountShownless(Boolean show) {	
 			  lblAmount1.setVisible(show);
@@ -1143,7 +1186,7 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 			  txtAmount6.setText("0");
 			  txtAmount7.setText("0");
 			  
-			  txtAmountFormat.setText("");
+			  txtAmountFormat.setText("0");
 		 }
 
 		@Override
@@ -1206,17 +1249,19 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 			cmbBoxCity.setSelectedItem("");
 			cmbBoxExpMain.setSelectedItem("");
 			cmbBoxExpLevel1.setSelectedItem("");
-			startDate.setDateFormatString("");
-			endDate.setDateFormatString("");
+			startDate.setDateFormatString("yyyy-MM-dd");		
+			startDate.setDate(cal.getTime());
+			endDate.setDateFormatString("yyyy-MM-dd");		
+			endDate.setDate(cal.getTime());
 			txtCountFormat.setText("0");
-			txtAmountFormat.setText("");
-			txtAmount1.setText("");
-			txtAmount2.setText("");
-			txtAmount3.setText("");
-			txtAmount4.setText("");
-			txtAmount5.setText("");
-			txtAmount6.setText("");
-			txtAmount7.setText("");
+			txtAmountFormat.setText("0");
+			txtAmount1.setText("0");
+			txtAmount2.setText("0");
+			txtAmount3.setText("0");
+			txtAmount4.setText("0");
+			txtAmount5.setText("0");
+			txtAmount6.setText("0");
+			txtAmount7.setText("0");
 			cmbBoxExpRekChain.setSelectedItem("");
 			cmbBoxContracter.setSelectedItem("");
 			cmbBoxContracter1.setSelectedItem("");
@@ -1234,11 +1279,547 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 			cmbBoxExpLevel2.setSelectedItem("");
 		}
 		private String formatAmount(String amount){			
-			if(amount == null && amount.length()==0){
+			if(amount == null || amount.length()==0){
 				amount = "0";
 			}
 			if(amount.indexOf(" ")>=0){amount = amount.replace(" ", "");}
 			String tempAmount = doubleFormatter.format(Double.valueOf(amount));
 			return tempAmount;
 		}
+		
+		private boolean amountControl(String totalAmount, String amount1, String amount2,
+				String amount3, String amount4, String amount5, String amount6, String amount7) {
+	    	  double totalAmountExpenses = 0;
+	    	  if(amount1.indexOf(" ")>=0){amount1 = amount1.replace(" ", "");}
+	    	  if(amount2.indexOf(" ")>=0){amount2 = amount2.replace(" ", "");}
+	    	  if(amount3.indexOf(" ")>=0){amount3 = amount3.replace(" ", "");}
+	    	  if(amount4.indexOf(" ")>=0){amount4 = amount4.replace(" ", "");}
+	    	  if(amount5.indexOf(" ")>=0){amount5 = amount5.replace(" ", "");}
+	    	  if(amount6.indexOf(" ")>=0){amount6 = amount6.replace(" ", "");}
+	    	  if(amount7.indexOf(" ")>=0){amount7 = amount7.replace(" ", "");}
+	    	  if(totalAmount.indexOf(" ")>=0){totalAmount = totalAmount.replace(" ", "");}
+	    	  
+	    	  if(amount1.equalsIgnoreCase("")){amount1 = "0";}
+	    	  if(amount2.equalsIgnoreCase("")){amount2 = "0";}
+	    	  if(amount3.equalsIgnoreCase("")){amount3 = "0";}
+	    	  if(amount4.equalsIgnoreCase("")){amount4 = "0";}
+	    	  if(amount5.equalsIgnoreCase("")){amount5 = "0";}
+	    	  if(amount6.equalsIgnoreCase("")){amount6 = "0";}
+	    	  if(amount7.equalsIgnoreCase("")){amount7 = "0";}
+	    	  
+	    	  if((amount1.length() > 0 && !amount1.equalsIgnoreCase("0"))||
+	    			  amount2.length() > 0 && !amount2.equalsIgnoreCase("0")||
+	    			  amount3.length() > 0 && !amount3.equalsIgnoreCase("0")||
+	    			  amount4.length() > 0 && !amount4.equalsIgnoreCase("0")||
+	    			  amount5.length() > 0 && !amount5.equalsIgnoreCase("0")||
+	    			  amount6.length() > 0 && !amount6.equalsIgnoreCase("0")||
+	    	  		  amount7.length() > 0 && !amount7.equalsIgnoreCase("0")){
+	    		  totalAmountExpenses = Double.parseDouble(amount1)+Double.parseDouble(amount2)+Double.parseDouble(amount3)+
+	    				  Double.parseDouble(amount4)+Double.parseDouble(amount5)+Double.parseDouble(amount6)+Double.parseDouble(amount7);
+	    		  if(Double.parseDouble(totalAmount) != totalAmountExpenses){
+	    			  return false;
+	    		  }else{
+	    			  return true;
+	    		  }
+	    	  }else{
+	    		  return true;
+	    	  }	  		
+		}
+		
+private boolean mustEnterControlMeropriyati(){
+			
+			//Brand, country, area, region, start-end date, second stage 
+			if(cmbBoxCompanyCode.getSelectedItem() == null || cmbBoxCompanyCode.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Company Code ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxCompanyCode.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxCountry.getSelectedItem() == null || cmbBoxCountry.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Country ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxCountry.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxArea.getSelectedItem() == null || cmbBoxArea.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Area ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxArea.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxRegion.getSelectedItem() == null || cmbBoxRegion.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Region ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxRegion.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxExpLevel1.getSelectedItem() == null || cmbBoxExpLevel1.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Second Stage ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxExpLevel1.setBackground(Color.red);
+				return false;
+			}
+			if(startDate.getDate() == null){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Start Date ", "Error", JOptionPane.ERROR_MESSAGE);
+				startDate.setBackground(Color.red);
+				return false;
+			}
+			if(endDate.getDate() == null){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill End Date ", "Error", JOptionPane.ERROR_MESSAGE);
+				endDate.setBackground(Color.red);
+				return false;
+			}
+					
+			if(cmbBoxExpLevel1.getSelectedItem().toString().matches("MK|PAS & Master-Set|Фарм.кружки|Конгресс|Конференция|КС|МП|Школа")){
+				if(txtCountFormat.toString().length() == 0 || txtCountFormat.getText().equalsIgnoreCase("0") ){
+					JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Participant Number ", "Error", JOptionPane.ERROR_MESSAGE);
+					txtCountFormat.setBackground(Color.red);
+					return false;
+				}
+			}	
+			cmbBoxCompanyCode.setBackground(Color.white);
+			cmbBoxCountry.setBackground(Color.white);
+			cmbBoxArea.setBackground(Color.white);
+			cmbBoxRegion.setBackground(Color.white);
+			cmbBoxExpLevel1.setBackground(Color.white);
+			startDate.setBackground(Color.white);
+			endDate.setBackground(Color.white);
+			txtCountFormat.setBackground(Color.white);
+			return true;	
+			
+		}	
+		
+		private boolean mustEnterControlPosMaterial(){	
+			if(cmbBoxCompanyCode.getSelectedItem() == null || cmbBoxCompanyCode.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Company Code ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxCompanyCode.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxCountry.getSelectedItem() == null || cmbBoxCountry.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Country ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxCountry.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxExpLevel1.getSelectedItem() == null || cmbBoxExpLevel1.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Second Stage ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxExpLevel1.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxExpLevel2.getSelectedItem() == null || cmbBoxExpLevel2.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Third Stage ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxExpLevel2.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxArea.getSelectedItem() == null || cmbBoxArea.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Area ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxArea.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxRegion.getSelectedItem() == null || cmbBoxRegion.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Region ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxRegion.setBackground(Color.red);
+				return false;
+			}
+			if(txtCountFormat.toString().trim().length() == 0 || txtCountFormat.getText().equalsIgnoreCase("0") ){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Participant Number ", "Error", JOptionPane.ERROR_MESSAGE);
+				txtCountFormat.setBackground(Color.red);
+				return false;
+			}
+			if(txtAmountFormat.toString().length() == 0 || txtAmountFormat.getText().trim().equalsIgnoreCase(" ") ){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Total Sum ", "Error", JOptionPane.ERROR_MESSAGE);
+				txtAmountFormat.setBackground(Color.red);
+				return false;
+			}
+			if(startDate.getDate() == null){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Start Date ", "Error", JOptionPane.ERROR_MESSAGE);
+				startDate.setBackground(Color.red);
+				return false;
+			}
+			if(endDate.getDate() == null){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill End Date ", "Error", JOptionPane.ERROR_MESSAGE);
+				endDate.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxContracter.getSelectedItem() == null || cmbBoxContracter.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Contracter 1", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxContracter.setBackground(Color.red);
+				return false;
+			}
+			cmbBoxCompanyCode.setBackground(Color.white);
+			cmbBoxCountry.setBackground(Color.white);			
+			cmbBoxExpLevel1.setBackground(Color.white);
+			cmbBoxExpLevel2.setBackground(Color.white);
+			cmbBoxArea.setBackground(Color.white);
+			cmbBoxRegion.setBackground(Color.white);
+			txtCountFormat.setBackground(Color.white);
+			startDate.setBackground(Color.white);
+			endDate.setBackground(Color.white);
+			cmbBoxContracter.setBackground(Color.white);
+			
+		
+			return true;			
+			
+		}
+		private boolean mustEnterControlReklam(){
+			
+			//Brand, country, area, region, start-end date, second stage 
+			if(cmbBoxCompanyCode.getSelectedItem() == null || cmbBoxCompanyCode.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Company Code ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxCompanyCode.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxCountry.getSelectedItem() == null || cmbBoxCountry.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Country ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxCountry.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxArea.getSelectedItem() == null || cmbBoxArea.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Area ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxArea.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxRegion.getSelectedItem() == null || cmbBoxRegion.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Region ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxRegion.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxExpLevel1.getSelectedItem() == null || cmbBoxExpLevel1.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Second Stage ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxExpLevel1.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxExpLevel2.getSelectedItem() == null || cmbBoxExpLevel2.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Third Stage ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxExpLevel2.setBackground(Color.red);
+				return false;
+			}
+			if(txtCountFormat.toString().length() == 0 || txtCountFormat.getText().equalsIgnoreCase("0") ){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Participant Number ", "Error", JOptionPane.ERROR_MESSAGE);
+				txtCountFormat.setBackground(Color.red);
+				return false;
+			}
+			if(txtAmountFormat.toString().length() == 0 || txtAmountFormat.getText().equalsIgnoreCase("0") ){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Total Amountr ", "Error", JOptionPane.ERROR_MESSAGE);
+				txtAmountFormat.setBackground(Color.red);
+				return false;
+			}
+			if(cmbBoxTema.getSelectedItem() == null || cmbBoxTema.getSelectedItem().toString().length()==0){
+				JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Tema ", "Error", JOptionPane.ERROR_MESSAGE);
+				cmbBoxTema.setBackground(Color.red);
+				return false;
+			}	
+			cmbBoxCompanyCode.setBackground(Color.white);
+			cmbBoxCountry.setBackground(Color.white);			
+			cmbBoxExpLevel1.setBackground(Color.white);
+			cmbBoxExpLevel2.setBackground(Color.white);
+			cmbBoxArea.setBackground(Color.white);
+			cmbBoxRegion.setBackground(Color.white);
+			txtCountFormat.setBackground(Color.white);
+			txtAmountFormat.setBackground(Color.white);
+			cmbBoxTema.setBackground(Color.white);
+		
+			return true;	
+			
+		}
+		private void arrangeFieldsSecondStage() throws SQLException{			
+			  cmbBoxExpLevel2.removeAllItems();
+	  		  Util.getPRMDataGroupBy("level2", "solgar_prm.prm_exps_types",cmbBoxExpLevel2,"level1",cmbBoxExpLevel1.getSelectedItem().toString());
+	  		  cmbBoxExpLevel2.setSelectedIndex(-1);
+	  		  
+	  		if(cmbBoxExpMain.getSelectedItem().toString().equalsIgnoreCase("Мероприятия")){ 
+	  			
+	  			txtAmountFormat.setEnabled(false);
+	  			//Set all fields nivisible
+	  			
+	  			txtCountFormat.setText("0");
+				txtAmountFormat.setText("0");
+				txtAmount1.setText("0");
+				txtAmount2.setText("0");
+				txtAmount3.setText("0");
+				txtAmount4.setText("0");
+				txtAmount5.setText("0");
+				txtAmount6.setText("0");
+				txtAmount7.setText("0");
+				cmbBoxExpRekChain.setSelectedItem("");
+				cmbBoxContracter.setSelectedItem("");
+				cmbBoxContracter1.setSelectedItem("");
+				cmbBoxExpMerLecture.setSelectedItem("");
+				cmbBoxExpMerOrganizator.setSelectedItem("");
+				cmbBoxClinics.setSelectedItem("");
+				cmbBoxKeyLeader.setSelectedItem("");
+				cmbBoxKeyLeader1.setSelectedItem("");
+	  			
+	  			lblAmount1.setVisible(false);
+	  			txtAmount1.setVisible(false);//conf zal
+	  			lblAmount2.setVisible(false);
+	  			txtAmount2.setVisible(false);//org vznos
+	  			lblAmount6.setVisible(false);
+	  			txtAmount6.setVisible(false);//org vznos1
+	  			lblAmount3.setVisible(false);
+	  			txtAmount3.setVisible(false);//turagentstvo
+	  			lblAmount4.setVisible(false);
+	  			txtAmount4.setVisible(false);//gonorar
+	  			lblAmount7.setVisible(false);
+	  			txtAmount7.setVisible(false);//gonorar1
+	  			lblAmount5.setVisible(false);
+	  			txtAmount5.setVisible(false);//dop rasxod 			
+	  			
+	  			lblExpRekChain.setVisible(false);
+	  			cmbBoxExpRekChain.setVisible(false);
+	  			lblContracter.setVisible(false);
+	  			cmbBoxContracter.setVisible(false);
+	  			lblContracter1.setVisible(false);
+	  			cmbBoxContracter1.setVisible(false);
+	  			lblExpMerLecture.setVisible(false);
+	  			cmbBoxExpMerLecture.setVisible(false);
+	  			lblExpMerOrganizator.setVisible(false);
+	  			cmbBoxExpMerOrganizator.setVisible(false);
+	  			lblClinicName.setVisible(false);
+	  			cmbBoxClinics.setVisible(false);
+	  			lblKeyLeader.setVisible(false);
+	  			cmbBoxKeyLeader.setVisible(false);
+	  			lblKeyLeader1.setVisible(false);
+	  			cmbBoxKeyLeader1.setVisible(false);	 			
+	  		  
+		  		 if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("MK")){
+		  			lblAmount2.setVisible(true);
+		  			txtAmount2.setVisible(true);//org vznos 
+		  			lblContracter1.setVisible(true);
+		  			cmbBoxContracter1.setVisible(true); 
+		  			lblAmount4.setVisible(true);
+		  			txtAmount4.setVisible(true);//gonorar
+		  			lblKeyLeader.setVisible(true);
+		  			cmbBoxKeyLeader.setVisible(true);
+		  			lblAmount7.setVisible(true);
+		  			txtAmount7.setVisible(true);//gonorar1
+		  			lblKeyLeader1.setVisible(true);
+		  			cmbBoxKeyLeader1.setVisible(true);	
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblAmount3.setVisible(true);
+		  			txtAmount3.setVisible(true);//turagentstvo	  			
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("PAS & Master-Set")){
+		  			lblAmount2.setVisible(true);
+		  			txtAmount2.setVisible(true);//org vznos 
+		  			lblContracter.setVisible(true);
+		  			cmbBoxContracter.setVisible(true); 
+		  			lblAmount4.setVisible(true);
+		  			txtAmount4.setVisible(true);//gonorar
+		  			lblKeyLeader.setVisible(true);
+		  			cmbBoxKeyLeader.setVisible(true);
+		  			lblAmount7.setVisible(true);
+		  			txtAmount7.setVisible(true);//gonorar1
+		  			lblKeyLeader1.setVisible(true);
+		  			cmbBoxKeyLeader1.setVisible(true);	
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblAmount3.setVisible(true);
+		  			txtAmount3.setVisible(true);//turagentstvo 
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("Фарм.кружки")){
+		  			lblAmount1.setVisible(true);
+		  			txtAmount1.setVisible(true);//conf zal
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpRekChain.setVisible(true);
+		  			cmbBoxExpRekChain.setVisible(true);
+		  		
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("ВО")){
+		  			lblAmount2.setVisible(true);
+		  			txtAmount2.setVisible(true);//org vznos 
+		  			lblExpRekChain.setVisible(true);
+		  			cmbBoxExpRekChain.setVisible(true); 	  			 
+		  			lblAmount1.setVisible(true);
+		  			txtAmount1.setVisible(true);//conf zal
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblAmount3.setVisible(true);
+		  			txtAmount3.setVisible(true);//turagentstvo  
+		  			lblExpMerLecture.setVisible(true);
+		  			cmbBoxExpMerLecture.setVisible(true);
+		  			 
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("ДС")){
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblExpRekChain.setVisible(true);
+		  			cmbBoxExpRekChain.setVisible(true); 
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().matches("Конгресс|Конференция")){
+		  			lblAmount2.setVisible(true);
+		  			txtAmount2.setVisible(true);//org vznos 
+		  			lblContracter.setVisible(true);
+		  			cmbBoxContracter.setVisible(true); 
+		  			lblAmount4.setVisible(true);
+		  			txtAmount4.setVisible(true);//gonorar
+		  			lblKeyLeader.setVisible(true);
+		  			cmbBoxKeyLeader.setVisible(true);
+		  			lblAmount7.setVisible(true);
+		  			txtAmount7.setVisible(true);//gonorar1
+		  			lblKeyLeader1.setVisible(true);
+		  			cmbBoxKeyLeader1.setVisible(true);	
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblAmount3.setVisible(true);
+		  			txtAmount3.setVisible(true);//turagentstvo	
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("КС")){
+		  			lblAmount1.setVisible(true);
+		  			txtAmount1.setVisible(true);//conf zal
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblAmount4.setVisible(true);
+		  			txtAmount4.setVisible(true);//gonorar
+		  			lblKeyLeader.setVisible(true);
+		  			cmbBoxKeyLeader.setVisible(true);
+		  			lblAmount7.setVisible(true);
+		  			txtAmount7.setVisible(true);//gonorar1
+		  			lblKeyLeader1.setVisible(true);
+		  			cmbBoxKeyLeader1.setVisible(true);
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblExpMerLecture.setVisible(true);
+		  			cmbBoxExpMerLecture.setVisible(true);
+		  			lblClinicName.setVisible(true);
+		  			cmbBoxClinics.setVisible(true); 
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("МП")){
+		  			lblAmount1.setVisible(true);
+		  			txtAmount1.setVisible(true);//conf zal
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true); 
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("мед.предст")){
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true); 
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("партнер")){
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true); 
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("ЦО")){
+		  			lblAmount1.setVisible(true);
+		  			txtAmount1.setVisible(true);//conf zal
+		  			lblContracter1.setVisible(true);
+		  			cmbBoxContracter1.setVisible(true); 
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true); 
+		  			lblAmount4.setVisible(true);
+		  			txtAmount4.setVisible(true);//gonorar
+		  			lblKeyLeader.setVisible(true);
+		  			cmbBoxKeyLeader.setVisible(true);
+		  			lblAmount3.setVisible(true);
+		  			txtAmount3.setVisible(true);//turagentstvo
+		  			lblExpMerLecture.setVisible(true);
+		  			cmbBoxExpMerLecture.setVisible(true);
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("Школа")){
+		  			lblAmount2.setVisible(true);
+		  			txtAmount2.setVisible(true);//org vznos 
+		  			lblClinicName.setVisible(true);
+		  			cmbBoxClinics.setVisible(true); 
+		  			lblAmount4.setVisible(true);
+		  			txtAmount4.setVisible(true);//gonorar
+		  			lblKeyLeader.setVisible(true);
+		  			cmbBoxKeyLeader.setVisible(true);
+		  			lblAmount7.setVisible(true);
+		  			txtAmount7.setVisible(true);//gonorar1
+		  			lblKeyLeader1.setVisible(true);
+		  			cmbBoxKeyLeader1.setVisible(true);	
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblAmount3.setVisible(true);
+		  			txtAmount3.setVisible(true);//turagentstvo	 
+		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("Академия Solgar")){		  			 
+		  			lblAmount1.setVisible(true);
+		  			txtAmount1.setVisible(true);//conf zal
+		  			lblAmount2.setVisible(true);
+		  			txtAmount2.setVisible(true);//org vznos
+		  			lblAmount6.setVisible(true);
+		  			txtAmount6.setVisible(true);//org vznos1
+		  			lblAmount3.setVisible(true);
+		  			txtAmount3.setVisible(true);//turagentstvo
+		  			lblAmount4.setVisible(true);
+		  			txtAmount4.setVisible(true);//gonorar
+		  			lblAmount7.setVisible(true);
+		  			txtAmount7.setVisible(true);//gonorar1
+		  			lblAmount5.setVisible(true);
+		  			txtAmount5.setVisible(true);//dop rasxod 			
+		  			
+		  			lblExpRekChain.setVisible(true);
+		  			cmbBoxExpRekChain.setVisible(true);
+		  			lblContracter.setVisible(true);
+		  			cmbBoxContracter.setVisible(true);
+		  			lblContracter1.setVisible(true);
+		  			cmbBoxContracter1.setVisible(true);
+		  			lblExpMerLecture.setVisible(true);
+		  			cmbBoxExpMerLecture.setVisible(true);
+		  			lblExpMerOrganizator.setVisible(true);
+		  			cmbBoxExpMerOrganizator.setVisible(true);
+		  			lblClinicName.setVisible(true);
+		  			cmbBoxClinics.setVisible(true);
+		  			lblKeyLeader.setVisible(true);
+		  			cmbBoxKeyLeader.setVisible(true);
+		  			lblKeyLeader1.setVisible(true);
+		  			cmbBoxKeyLeader1.setVisible(true);	 	
+		  		 }
+	  		}else if(cmbBoxExpMain.getSelectedItem().toString().equalsIgnoreCase("POS-материалы")){ 
+	  			txtAmountFormat.setEnabled(true);
+	  			amountShownless(false);
+	  			lblClinicName.setVisible(false);
+	  			cmbBoxClinics.setVisible(false); 
+	  			lblExpRekChain.setVisible(false);
+	  			cmbBoxExpRekChain.setVisible(false); 
+	  			lblExpMerLecture.setVisible(false);
+	  			cmbBoxExpMerLecture.setVisible(false);
+
+	  			lblContracter.setVisible(true);
+	  			cmbBoxContracter.setVisible(true);
+	  			lblContracter1.setVisible(true);
+	  			cmbBoxContracter1.setVisible(true);
+	  			lblExpMerOrganizator.setVisible(true);
+	  			cmbBoxExpMerOrganizator.setVisible(true);
+
+	  			lblKeyLeader.setVisible(true);
+	  			cmbBoxKeyLeader.setVisible(true);
+	  			lblKeyLeader1.setVisible(true);
+	  			cmbBoxKeyLeader1.setVisible(true);	
+	  			
+	  			amountShownless(false);	
+	  			txtAmountFormat.setEnabled(true);
+	  		}else if(cmbBoxExpMain.getSelectedItem().toString().equalsIgnoreCase("Реклама")){   
+	  			amountShownless(false);
+	  			lblExpRekChain.setVisible(true);
+	  			cmbBoxExpRekChain.setVisible(true);
+	  			lblContracter.setVisible(true);
+	  			cmbBoxContracter.setVisible(true);
+	  			lblContracter1.setVisible(true);
+	  			cmbBoxContracter1.setVisible(true);
+	  			lblExpMerLecture.setVisible(true);
+	  			cmbBoxExpMerLecture.setVisible(true);
+	  			lblExpMerOrganizator.setVisible(true);
+	  			cmbBoxExpMerOrganizator.setVisible(true);
+	  			lblClinicName.setVisible(true);
+	  			cmbBoxClinics.setVisible(true);
+	  			lblKeyLeader.setVisible(true);
+	  			cmbBoxKeyLeader.setVisible(true);
+	  			lblKeyLeader1.setVisible(true);
+	  			cmbBoxKeyLeader1.setVisible(true);	 			
+	  			txtAmountFormat.setEnabled(true);
+	  		}
+	  		 
+			
+			}
 }

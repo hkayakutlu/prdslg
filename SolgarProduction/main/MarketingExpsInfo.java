@@ -2,18 +2,13 @@ package main;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Properties;
-import java.math.BigDecimal;
 import java.sql.Date;
 
-import javax.swing.JComboBox;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 import util.Util;
 import cb.esi.esiclient.util.ESIBag;
@@ -273,7 +268,7 @@ public class MarketingExpsInfo {
 		   System.out.println("Goodbye!");
 		}//end main	
 	
-	public void update(JTable resultTable,String userName,int j) throws Exception {
+	public void update(JTable resultTable,String userName,int j,int approvalStatus) throws Exception {
 
 		   Connection conn = null;
 			  PreparedStatement  stmt = null;
@@ -295,7 +290,7 @@ public class MarketingExpsInfo {
 						   		+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);				   
 					   
 					   setData(resultTable, j);					   
-					   stmt.setInt(1,1);//Approval_Status
+					   stmt.setInt(1,approvalStatus);//Approval_Status
 					   setDataToStatement(stmt);					   						
 					   
 					   stmt.setTimestamp(35,Timestamp.valueOf(Util.getCurrentDateTime()));//Startd date

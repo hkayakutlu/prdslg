@@ -5,7 +5,9 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import cb.esi.esiclient.util.ESIBag;
 import main.ConnectToDb;
+import util.Util;
 
 public class LoginScreen extends JFrame {
 
@@ -93,15 +95,20 @@ class PassWordDialog extends JDialog {
         jbtOk.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	ESIBag outBag = new ESIBag();
             	String employeee_name="";
+            	String emplopyeeId = "0";
 				try {
-					employeee_name = ConnectToDb.getAuthorization(jtfUsername.getText().toString(), jpfPassword.getText().toString());
+					outBag = Util.getAuthorization(jtfUsername.getText().toString(), jpfPassword.getText().toString());
+					employeee_name = outBag.get("EMPLOYEE_NAME");
+					emplopyeeId = outBag.get("ID");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
             	if (employeee_name.length()>0) {
                     parent.setVisible(true);
                     parent.setTitle(employeee_name);
+                    parent.setName(emplopyeeId);;
                 	setVisible(false);
                 } else {
                     jlblStatus.setText("Invalid username or password");

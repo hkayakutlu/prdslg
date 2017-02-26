@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.sql.SQLException;
 
 import javax.swing.JFrame;
 import javax.swing.border.EmptyBorder;
@@ -23,6 +24,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import main.ConnectToDb;
+import main.ReportQueries;
+import util.Util;
 import cb.esi.esiclient.util.ESIBag;
 
 public class ReportObservation extends JFrame implements ActionListener,ItemListener{
@@ -66,8 +69,9 @@ public class ReportObservation extends JFrame implements ActionListener,ItemList
 
 	/**
 	 * Initialize the contents of the frame.
+	 * @throws SQLException 
 	 */
-	public ReportObservation() {
+	public ReportObservation() throws SQLException {
 		super("Report Observation");
 		Toolkit toolkit;
 		Dimension dim;
@@ -88,6 +92,7 @@ public class ReportObservation extends JFrame implements ActionListener,ItemList
 		
 		resultTable = new JTable(20, 8);		
 		dtm.setColumnIdentifiers(header);
+		resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		resultTable.setModel(dtm);
 		
 		jScroll.setViewportView(resultTable);
@@ -116,28 +121,28 @@ public class ReportObservation extends JFrame implements ActionListener,ItemList
 		
 		//lblEmpty = new JLabel("");
 		cmbBoxCompanies = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("group_company", "solgar_prm.prm_russia_chains",cmbBoxCompanies);				
+		Util.getPRMData("group_company", "solgar_prm.prm_russia_chains",cmbBoxCompanies);				
 		cmbBoxCompanies.setMaximumRowCount(50);
 		cmbBoxCompanies.setEditable(true);	
 		cmbBoxCompanies.setSelectedIndex(-1);
 		
 		cmbBoxDatesBegin = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxDatesBegin);				
+		Util.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxDatesBegin);				
 		cmbBoxDatesBegin.setMaximumRowCount(50);
 		cmbBoxDatesBegin.setEditable(true);
 		
 		cmbBoxDatesEnd = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxDatesEnd);				
+		Util.getPRMData("report_date", "solgar_prm.prm_report_dates",cmbBoxDatesEnd);				
 		cmbBoxDatesEnd.setMaximumRowCount(50);
 		cmbBoxDatesEnd.setEditable(true);
 		
 		cmbBoxReportTypes = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMData("report_name", "solgar_prm.prm_report_types",cmbBoxReportTypes);
+		Util.getPRMData("report_name", "solgar_prm.prm_report_types",cmbBoxReportTypes);
 		cmbBoxDatesBegin.setMaximumRowCount(50);
 		cmbBoxDatesBegin.setEditable(true);
 		
 		cmbBoxCountry = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMDataGroupBy("country", "solgar_prm.prm_address_group",cmbBoxCountry,"","");	
+		Util.getPRMDataGroupBy("country", "solgar_prm.prm_address_group",cmbBoxCountry,"","");	
 		cmbBoxCountry.setMaximumRowCount(50);
 		cmbBoxCountry.setEditable(true);
 		cmbBoxCountry.setSelectedIndex(-1);
@@ -149,13 +154,13 @@ public class ReportObservation extends JFrame implements ActionListener,ItemList
 		cmbBoxCity.setEditable(true);
 		
 		cmbBoxProduct = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMDataGroupBy("product_official_name", "solgar_tst.sales_product_group",cmbBoxProduct,"product_type","SL");	
+		Util.getPRMDataGroupBy("product_official_name", "solgar_tst.sales_product_group",cmbBoxProduct,"product_type","SL");	
 		cmbBoxProduct.setMaximumRowCount(100);
 		cmbBoxProduct.setEditable(true);
 		cmbBoxProduct.setSelectedIndex(-1);
 		
 		cmbBoxMedRep = new JComboBox( new String[]{});		
-		ConnectToDb.getPRMDataGroupBy("medrep_name", "solgar_prm.prm_report_medrep",cmbBoxMedRep,"company","SL");	
+		Util.getPRMDataGroupBy("medrep_name", "solgar_prm.prm_report_medrep",cmbBoxMedRep,"company","SL");	
 		cmbBoxMedRep.setMaximumRowCount(50);
 		cmbBoxMedRep.setEditable(true);
 		cmbBoxMedRep.setSelectedIndex(-1);
@@ -237,57 +242,51 @@ public class ReportObservation extends JFrame implements ActionListener,ItemList
 				for( int i = dtm.getRowCount() - 1; i >= 0; i-- ) {//Clean Table
 					dtm.removeRow(i);
 				}
+				String selectedChain = "";
+				String selectedCountry ="";
+				String selectedRegion ="";
+				String selectedCity ="";
+				String selectedCompany ="";
+				String selectedProduct ="";
+				String selectedMedRep ="";
 				String selectedReport = cmbBoxReportTypes.getSelectedItem().toString();
+				String selectedBeginDate = cmbBoxDatesBegin.getSelectedItem().toString();
+				String selectedEndDate = cmbBoxDatesEnd.getSelectedItem().toString();
+				
+				if(cmbBoxCompanies.getSelectedItem() != null){
+					selectedChain = cmbBoxCompanies.getSelectedItem().toString();;
+				}				
+				if(cmbBoxCountry.getSelectedItem() != null){
+					 selectedCountry = cmbBoxCountry.getSelectedItem().toString();
+				}
+				if(cmbBoxRegion.getSelectedItem() != null){
+					 selectedRegion = cmbBoxRegion.getSelectedItem().toString();
+				}
+				if(cmbBoxCity.getSelectedItem() != null){
+					 selectedCity = cmbBoxCity.getSelectedItem().toString();
+				}
+				if(cmbBoxCompanyCode.getSelectedItem() != null){
+					 selectedCompany = cmbBoxCompanyCode.getSelectedItem().toString();
+				}
+				if(cmbBoxProduct.getSelectedItem() != null){
+					 selectedProduct = cmbBoxProduct.getSelectedItem().toString();
+				}
+				if(cmbBoxMedRep.getSelectedItem() != null){
+					 selectedMedRep = cmbBoxMedRep.getSelectedItem().toString();
+				}
 				
 				if(selectedReport.equalsIgnoreCase("GENERAL SALES REPORT")){							
-					String selectedChain = "";
-					String selectedCountry ="";
-					String selectedRegion ="";
-					String selectedCity ="";
-					String selectedCompany ="";
-					String selectedProduct ="";
-					String selectedMedRep ="";
-					
-					String selectedBeginDate = cmbBoxDatesBegin.getSelectedItem().toString();
-					String selectedEndDate = cmbBoxDatesEnd.getSelectedItem().toString();
-					
-					if(cmbBoxCompanies.getSelectedItem() != null){
-						selectedChain = cmbBoxCompanies.getSelectedItem().toString();;
-					}				
-					if(cmbBoxCountry.getSelectedItem() != null){
-						 selectedCountry = cmbBoxCountry.getSelectedItem().toString();
-					}
-					if(cmbBoxRegion.getSelectedItem() != null){
-						 selectedRegion = cmbBoxRegion.getSelectedItem().toString();
-					}
-					if(cmbBoxCity.getSelectedItem() != null){
-						 selectedCity = cmbBoxCity.getSelectedItem().toString();
-					}
-					if(cmbBoxCompanyCode.getSelectedItem() != null){
-						 selectedCompany = cmbBoxCompanyCode.getSelectedItem().toString();
-					}
-					if(cmbBoxProduct.getSelectedItem() != null){
-						 selectedProduct = cmbBoxProduct.getSelectedItem().toString();
-					}
-					if(cmbBoxMedRep.getSelectedItem() != null){
-						 selectedMedRep = cmbBoxMedRep.getSelectedItem().toString();
-					}				
-					
 					if(selectedBeginDate.length()==0 || selectedEndDate.length()==0 || selectedCompany.length()==0){//Show error message						
 						JOptionPane.showMessageDialog(pnlErrorMsg, "Please fill date and company code", "Error", JOptionPane.ERROR_MESSAGE);
 					}else{
-						DefaultTableModel dtm = ConnectToDb.repGetTotalCounts(resultTable,selectedReport,selectedBeginDate,selectedEndDate,selectedChain,selectedCompany,selectedCountry,selectedRegion,selectedCity,selectedProduct,selectedMedRep);
+						DefaultTableModel dtm = ReportQueries.repGetTotalCounts(resultTable,selectedReport,selectedBeginDate,selectedEndDate,selectedChain,selectedCompany,selectedCountry,selectedRegion,selectedCity,selectedProduct,selectedMedRep);
 					}
 					
 				}else if(selectedReport.equalsIgnoreCase("CONTROL REPORT DELIVERATION")){					
 					String header[] = new String[] { "Chain Name","Sales Count","Sales Date"};
 					dtm.setColumnIdentifiers(header);
 					resultTable.setModel(dtm);
-					
-					String selectedCompany = cmbBoxCompanies.getSelectedItem().toString();
-					String selectedDate = cmbBoxDatesBegin.getSelectedItem().toString();
-
-					ESIBag outBag =ConnectToDb.repGetDeliverationStatus(selectedCompany,selectedDate,selectedReport);
+					ESIBag outBag =ReportQueries.repGetDeliverationStatus(selectedChain,selectedBeginDate,selectedReport);
 									
 					for (int i = 0; i < outBag.getSize("TABLE"); i++){
 						dtm.addRow(new Object[] {
@@ -297,7 +296,14 @@ public class ReportObservation extends JFrame implements ActionListener,ItemList
 							});
 					}
 					
-				}		
+				}else if(selectedReport.equalsIgnoreCase("ANNUALLY_CHAINS_SALE_REPORT")){
+					if(selectedCompany.equalsIgnoreCase("SOLGAR")){selectedCompany="SL";}else{selectedCompany="BN";}
+					DefaultTableModel dtm = ReportQueries.repGetSaleAnnually(resultTable,selectedReport,selectedBeginDate,selectedEndDate,selectedChain,selectedCompany);					
+				}
+				
+				else if(selectedReport.equalsIgnoreCase("WEEKLY_TRAINING_PLAN")){
+					DefaultTableModel dtm = ReportQueries.repGetWeeklyTrainings(resultTable,selectedCompany,selectedReport);
+				}
 				
 			}else if (e.getActionCommand().equals("Exit")) {
 				setVisible(false);
@@ -317,12 +323,22 @@ public class ReportObservation extends JFrame implements ActionListener,ItemList
 	    	  if(name.equalsIgnoreCase("Country")){
 	    		  cmbBoxRegion.removeAllItems();
 	    		  cmbBoxCity.removeAllItems();
-	    		  ConnectToDb.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+	    		  try {
+					Util.getPRMDataGroupBy("region", "solgar_prm.prm_address_group",cmbBoxRegion,"country",cmbBoxCountry.getSelectedItem().toString());
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	    		  cmbBoxRegion.setSelectedIndex(-1);
 	    		  cmbBoxCity.setSelectedIndex(-1);
 	    	  }else if(name.equalsIgnoreCase("Region")){
 	    		  cmbBoxCity.removeAllItems();
-	    		  ConnectToDb.getPRMDataGroupBy("city", "solgar_prm.prm_address_group",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+	    		  try {
+					Util.getPRMDataGroupBy("city", "solgar_prm.prm_address_group",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	    		  cmbBoxCity.setSelectedIndex(-1);
 	    	  }else if(name.equalsIgnoreCase("City")){
 	    		  
@@ -331,11 +347,23 @@ public class ReportObservation extends JFrame implements ActionListener,ItemList
 	    		  cmbBoxMedRep.removeAllItems();
 	    		  String selectedGroup = cmbBoxCompanyCode.getSelectedItem().toString();
 	    		  if(selectedGroup.equalsIgnoreCase("SOLGAR")){
-	    			  ConnectToDb.getPRMDataGroupBy("product_official_name", "solgar_tst.sales_product_group",cmbBoxProduct,"product_type","SL");
-	    			  ConnectToDb.getPRMDataGroupBy("medrep_name", "solgar_prm.prm_report_medrep",cmbBoxMedRep,"company","SL");	
+	    			  try {
+						Util.getPRMDataGroupBy("product_official_name", "solgar_tst.sales_product_group",cmbBoxProduct,"product_type","SL");
+						Util.getPRMDataGroupBy("medrep_name", "solgar_prm.prm_report_medrep",cmbBoxMedRep,"company","SL");	
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    			  
 	    		  }else{
-	    			  ConnectToDb.getPRMDataGroupBy("product_official_name", "solgar_tst.sales_product_group",cmbBoxProduct,"product_type","BN");
-	    			  ConnectToDb.getPRMDataGroupBy("medrep_name", "solgar_prm.prm_report_medrep",cmbBoxMedRep,"company","BN");	
+	    			  try {
+						Util.getPRMDataGroupBy("product_official_name", "solgar_tst.sales_product_group",cmbBoxProduct,"product_type","BN");
+						Util.getPRMDataGroupBy("medrep_name", "solgar_prm.prm_report_medrep",cmbBoxMedRep,"company","BN");	
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    			  
 	    		  }
 	    		  cmbBoxProduct.setSelectedIndex(-1);
 	    		  cmbBoxMedRep.setSelectedIndex(-1);	    			    		  

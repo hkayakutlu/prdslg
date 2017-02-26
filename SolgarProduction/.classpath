@@ -10,5 +10,13 @@
 	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/mysql-connector-java-5.1.38-bin.jar"/>
 	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/xerces-xercesimpl-2.11.jar"/>
 	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/apache-httpcomponents-httpclient.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/apache-httpcomponents-httpcore.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/commons-fileupload-1.2.2.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/commons-net-3.0.1.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/commons-httpclient-3.0.1.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/SMGUtility_classes.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
