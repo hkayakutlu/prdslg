@@ -4,7 +4,6 @@ import cb.esi.esiclient.util.ESIBag;
 import com.toedter.calendar.JDateChooser;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
@@ -35,37 +34,14 @@ public class StorageStockObservation extends JFrame
   private static final int FRAME_WIDTH = 1100;
   private static final int FRAME_HEIGHT = 900;
   private JLabel lblCompanyName;
-  private JLabel lblChainName;
-  private JLabel lblOpType;
-  private JLabel lblEmpty;
-  private JLabel lblEmpty1;
-  private JLabel lblEmpty2;
-  private JLabel lblEmpty3;
-  private JLabel lblEmpty4;
-  private JLabel lblEmpty5;
-  private JLabel lblAdrCountry;
-  private JLabel lblAdrDistrict;
-  private JLabel lblAdrRegion;
-  private JLabel lblAdrCity;
-  private JLabel lblCompanyCode;
-  private JLabel lblPrdMain;
-  private JLabel lblPrdSub;
-  private JLabel lblProduct;
+  private JLabel lblChainName,lblOpType,lblEmpty,lblEmpty1,lblEmpty2,lblEmpty3,lblEmpty4,lblEmpty5,
+  lblAdrCountry,lblAdrDistrict,lblAdrRegion,lblAdrCity,lblCompanyCode,lblPrdMain,lblPrdSub,lblProduct,lblPrdCategory1,lblPrdCategory2;
   private JPanel paramPanel;
   private JPanel pnlErrorMsg;
   private JScrollPane jScroll;
   private JTable resultTable;
-  private JComboBox cmbBoxCompanies;
-  private JComboBox cmbBoxCountry;
-  private JComboBox cmbBoxDistrict;
-  private JComboBox cmbBoxRegion;
-  private JComboBox cmbBoxCity;
-  private JComboBox cmbBoxOpType;
-  private JComboBox cmbBoxCompanyCode;
-  private JComboBox cmbBoxPrdMain;
-  private JComboBox cmbBoxPrdSub;
-  private JComboBox cmbBoxProduct;
-  private JComboBox cmbBoxRepType;
+  private JComboBox cmbBoxCompanies,cmbBoxCountry,cmbBoxDistrict,cmbBoxRegion,cmbBoxCity,cmbBoxOpType,
+  cmbBoxCompanyCode,cmbBoxPrdMain,cmbBoxPrdSub,cmbBoxProduct,cmbBoxRepType,cmbBoxPrdCategory1,cmbBoxPrdCategory2;
   public JButton butExceltoScreen;
   public JButton btnExit;
   private JDateChooser startDate;
@@ -77,6 +53,7 @@ public class StorageStockObservation extends JFrame
 
   DefaultTableModel dtm = new DefaultTableModel(0, 0);
   String[] header = { "Row Number", "Column1", "Column2" };
+  
 
   public static void main(String[] args)
   {
@@ -128,7 +105,7 @@ public class StorageStockObservation extends JFrame
     this.jScroll.setBorder(new EmptyBorder(10, 10, 10, 10));
     getContentPane().add(this.jScroll, "Center");
 
-    this.paramPanel = new JPanel(new GridLayout(7, 4, 5, 5));
+    this.paramPanel = new JPanel(new GridLayout(9, 4, 5, 5));
 
     this.lblCompanyName = new JLabel("Sales Dates For Each Chain");
     this.lblChainName = new JLabel("Distrubutor Name");
@@ -147,6 +124,8 @@ public class StorageStockObservation extends JFrame
     this.lblPrdMain = new JLabel("Product Main Group");
     this.lblPrdSub = new JLabel("Product Sub Group");
     this.lblProduct = new JLabel("Product Name");
+    this.lblPrdCategory1 = new JLabel("Product Category 1");
+    this.lblPrdCategory2 = new JLabel("Product Category 2");
 
     this.startDate = new JDateChooser();
     this.startDate.setDateFormatString("yyyy-MM-dd");
@@ -187,7 +166,21 @@ public class StorageStockObservation extends JFrame
     this.cmbBoxPrdMain.setSelectedIndex(-1);
 
     this.cmbBoxPrdSub = new JComboBox(new String[0]);
+    
     this.cmbBoxProduct = new JComboBox(new String[0]);
+    this.cmbBoxProduct.addItem("");
+    Util.getPRMDataGroupBy("product_official_name", "solgar_stk.stock_product_group", this.cmbBoxProduct, "product_type", "SL");
+    this.cmbBoxProduct.setSelectedIndex(-1);
+    
+    this.cmbBoxPrdCategory1 = new JComboBox(new String[0]);
+    this.cmbBoxPrdCategory1.addItem("");
+    Util.getPRMDataGroupBy("product_category", "solgar_stk.stock_product_group", this.cmbBoxPrdCategory1, "product_type", "SL");
+    this.cmbBoxPrdCategory1.setSelectedIndex(-1);
+    
+    this.cmbBoxPrdCategory2 = new JComboBox(new String[0]);
+    this.cmbBoxPrdCategory2.addItem("");
+    Util.getPRMDataGroupBy("product_category1", "solgar_stk.stock_product_group", this.cmbBoxPrdCategory2, "product_type", "SL");
+    this.cmbBoxPrdCategory2.setSelectedIndex(-1);
 
     this.cmbBoxOpType = new JComboBox(new String[0]);
     this.cmbBoxOpType.addItem("SALES");
@@ -196,9 +189,12 @@ public class StorageStockObservation extends JFrame
     this.cmbBoxOpType.setEnabled(false);
 
     this.cmbBoxRepType = new JComboBox(new String[0]);
-    this.cmbBoxRepType.addItem("DISTRUBUTOR_SALES");
-    this.cmbBoxRepType.addItem("REGIONAL_SALES");
-    this.cmbBoxRepType.addItem("PRODUCT_SALES");
+    this.cmbBoxRepType.addItem("DISTRUBUTOR_REPORT");
+    this.cmbBoxRepType.addItem("REGIONAL_REPORT");
+    this.cmbBoxRepType.addItem("PRODUCT_REPORT");
+    this.cmbBoxRepType.addItem("PRODUCT_SUB_GROUP_REPORT");
+    this.cmbBoxRepType.addItem("TOP_PRODUCTS_REPORT");
+    this.cmbBoxRepType.addItem("PROMOTION_PRODUCTS_REPORT");
     this.cmbBoxRepType.setSelectedIndex(0);
 
     if (this.userName.matches("Hakan KAYAKUTLU|Халит Гекмен|Эртюрк Мурат Хакан|Смолина Юлия Сергеевна")) {
@@ -260,7 +256,15 @@ public class StorageStockObservation extends JFrame
     this.paramPanel.add(this.lblPrdSub);
     this.paramPanel.add(this.cmbBoxPrdSub);
     this.paramPanel.add(this.lblAdrCity);
-    this.paramPanel.add(this.cmbBoxCity);
+    this.paramPanel.add(this.cmbBoxCity);  
+    this.paramPanel.add(lblPrdCategory1);
+    this.paramPanel.add(cmbBoxPrdCategory1);
+    this.paramPanel.add(lblEmpty);
+    this.paramPanel.add(lblEmpty1);    
+    this.paramPanel.add(lblPrdCategory2);
+    this.paramPanel.add(cmbBoxPrdCategory2);
+    this.paramPanel.add(lblEmpty2);
+    this.paramPanel.add(lblEmpty3);    
     this.paramPanel.add(this.lblProduct);
     this.paramPanel.add(this.cmbBoxProduct);
 
@@ -271,7 +275,7 @@ public class StorageStockObservation extends JFrame
     validate();
     setVisible(true);
     
-    cmbBoxCompanies.setEnabled(true);
+   /* cmbBoxCompanies.setEnabled(true);
     
     cmbBoxCountry.setEnabled(true);
     cmbBoxDistrict.setEnabled(true);
@@ -280,7 +284,8 @@ public class StorageStockObservation extends JFrame
     
     cmbBoxPrdMain.setEnabled(false);
     cmbBoxPrdSub.setEnabled(false);
-    cmbBoxProduct.setEnabled(false);
+    cmbBoxProduct.setEnabled(false);*/
+
   }
 
   public void actionPerformed(ActionEvent e)
@@ -292,19 +297,9 @@ public class StorageStockObservation extends JFrame
           this.dtm.removeRow(i);
         }
 
-        String selectedCountry= "";
-        String selectedDistrubutor = "";
-        String selectedDistrict = "";
-        String selectedRegion = "";
-        String selectedCity = "";
-        String selectedCompany = "";
-        String selectedBrand = "";
-        String selectedMedRep = "";
-        String selectedOpType = "";
-        String selectedPrdMain = "";
-        String selectedPrdSub = "";
-        String selectedProduct = "";
-        String repType = "";
+        String selectedCountry= "",selectedDistrubutor="",selectedDistrict = "",selectedRegion = "",selectedCity = "",selectedCompany = "",
+        		selectedBrand = "",selectedMedRep = "",selectedOpType = "",selectedPrdMain = "",selectedPrdSub = "",
+        		selectedProduct = "",repType = "",selectedPrdCategory1="",selectedPrdCategory2="";
 
         String selectedBeginDate = dcn.format(this.startDate.getDate());
         String selectedEndDate = dcn.format(this.endDate.getDate());
@@ -346,6 +341,12 @@ public class StorageStockObservation extends JFrame
         if ((this.cmbBoxProduct.getSelectedItem() != null) && (this.cmbBoxProduct.getSelectedItem().toString().trim().length() > 0)) {
           selectedProduct = this.cmbBoxProduct.getSelectedItem().toString();
         }
+	    if ((this.cmbBoxPrdCategory1.getSelectedItem() != null) && (this.cmbBoxPrdCategory1.getSelectedItem().toString().trim().length() > 0)) {
+	        selectedPrdCategory1 = this.cmbBoxPrdCategory1.getSelectedItem().toString();
+	    }
+	    if ((this.cmbBoxPrdCategory2.getSelectedItem() != null) && (this.cmbBoxPrdCategory2.getSelectedItem().toString().trim().length() > 0)) {
+	        selectedPrdCategory2 = this.cmbBoxPrdCategory2.getSelectedItem().toString();
+	    }
 
         if ((selectedBeginDate.length() == 0) || (selectedEndDate.length() == 0) || (selectedOpType.length() == 0)) {
           JOptionPane.showMessageDialog(this.pnlErrorMsg, "Please fill date and company code", "Error", 0);
@@ -353,18 +354,36 @@ public class StorageStockObservation extends JFrame
         else
         {
         	DefaultTableModel localDefaultTableModel;
-          if (repType.equalsIgnoreCase("DISTRUBUTOR_SALES"))
+          if (repType.equalsIgnoreCase("DISTRUBUTOR_REPORT"))
             localDefaultTableModel = ReportQueries.repStorageStockMonthly(
               this.resultTable, selectedBeginDate, selectedEndDate, selectedCompany, selectedDistrict, 
-              selectedRegion, selectedCity, selectedBrand, selectedOpType, selectedPrdMain, selectedPrdSub, selectedProduct,repType,selectedCountry);
-          else if (repType.equalsIgnoreCase("REGIONAL_SALES"))
+              selectedRegion, selectedCity, selectedBrand, selectedOpType, selectedPrdMain, selectedPrdSub, selectedProduct,repType,
+              selectedCountry,selectedPrdCategory1,selectedPrdCategory2);
+          else if (repType.equalsIgnoreCase("REGIONAL_REPORT"))
               localDefaultTableModel = ReportQueries.repStorageStockMonthly(
                 this.resultTable, selectedBeginDate, selectedEndDate, selectedCompany, selectedDistrict, 
-                selectedRegion, selectedCity, selectedBrand, selectedOpType, selectedPrdMain, selectedPrdSub, selectedProduct,repType,selectedCountry);
-          else if (repType.equalsIgnoreCase("PRODUCT_SALES"))
+                selectedRegion, selectedCity, selectedBrand, selectedOpType, selectedPrdMain, selectedPrdSub, selectedProduct,repType,
+                selectedCountry,selectedPrdCategory1,selectedPrdCategory2);
+          else if (repType.equalsIgnoreCase("PRODUCT_REPORT"))
               localDefaultTableModel = ReportQueries.repStorageStockMonthly(
                 this.resultTable, selectedBeginDate, selectedEndDate, selectedCompany, selectedDistrict, 
-                selectedRegion, selectedCity, selectedBrand, selectedOpType, selectedPrdMain, selectedPrdSub, selectedProduct,repType,selectedCountry);
+                selectedRegion, selectedCity, selectedBrand, selectedOpType, selectedPrdMain, selectedPrdSub, selectedProduct,repType,
+                selectedCountry,selectedPrdCategory1,selectedPrdCategory2);
+          else if (repType.equalsIgnoreCase("PRODUCT_SUB_GROUP_REPORT"))
+              localDefaultTableModel = ReportQueries.repStorageStockMonthly(
+                this.resultTable, selectedBeginDate, selectedEndDate, selectedCompany, selectedDistrict, 
+                selectedRegion, selectedCity, selectedBrand, selectedOpType, selectedPrdMain, selectedPrdSub, selectedProduct,repType,
+                selectedCountry,selectedPrdCategory1,selectedPrdCategory2);
+          else if (repType.equalsIgnoreCase("TOP_PRODUCTS_REPORT"))
+              localDefaultTableModel = ReportQueries.repStorageStockMonthly(
+                this.resultTable, selectedBeginDate, selectedEndDate, selectedCompany, selectedDistrict, 
+                selectedRegion, selectedCity, selectedBrand, selectedOpType, selectedPrdMain, selectedPrdSub, selectedProduct,repType,
+                selectedCountry,selectedPrdCategory1,selectedPrdCategory2);
+          else if (repType.equalsIgnoreCase("PROMOTION_PRODUCTS_REPORT"))
+              localDefaultTableModel = ReportQueries.repStorageStockMonthly(
+                this.resultTable, selectedBeginDate, selectedEndDate, selectedCompany, selectedDistrict, 
+                selectedRegion, selectedCity, selectedBrand, selectedOpType, selectedPrdMain, selectedPrdSub, selectedProduct,repType,
+                selectedCountry,selectedPrdCategory1,selectedPrdCategory2);
           else {
             localDefaultTableModel = ReportQueries.repStorageStockResult(
               this.resultTable, selectedBeginDate, selectedEndDate, selectedCompany, selectedDistrict, selectedRegion, 
@@ -391,6 +410,22 @@ public class StorageStockObservation extends JFrame
       if (this.cmbBoxCompanyCode.getSelectedItem().toString().equalsIgnoreCase("SOLGAR")) {
         compType = "SL";
       }
+      if (name.equalsIgnoreCase("CompanyCode")) {
+    	     this.cmbBoxProduct.removeAllItems();
+    	     this.cmbBoxPrdCategory2.removeAllItems();
+    	     this.cmbBoxPrdCategory1.removeAllItems();
+    	     this.cmbBoxProduct.addItem("");
+    	     this.cmbBoxPrdCategory2.addItem("");
+    	     this.cmbBoxPrdCategory1.addItem("");
+    	    try{
+	    	    Util.getPRMDataGroupBy("product_official_name", "solgar_stk.stock_product_group", this.cmbBoxProduct, "product_type", compType);
+	    	    Util.getPRMDataGroupBy("product_category1", "solgar_stk.stock_product_group", this.cmbBoxPrdCategory2, "product_type", compType);
+	    	    Util.getPRMDataGroupBy("product_category", "solgar_stk.stock_product_group", this.cmbBoxPrdCategory1, "product_type", compType);
+		      }
+		      catch (SQLException e) {
+		        e.printStackTrace();
+		      }
+	}
       if (name.equalsIgnoreCase("Country")) {
     	  this.cmbBoxCompanies.removeAllItems();
     	  try {  
@@ -442,8 +477,8 @@ public class StorageStockObservation extends JFrame
         {
           if (name.equalsIgnoreCase("PrdMain")) {
             this.cmbBoxPrdSub.removeAllItems();
-            this.cmbBoxProduct.removeAllItems();
             this.cmbBoxPrdSub.addItem("");
+            this.cmbBoxProduct.addItem("");
             try
             {
               Util.getPRMDataTwoConditionsGroupBy("product_sub_group", "solgar_stk.stock_product_group", this.cmbBoxPrdSub, "product_main_group", this.cmbBoxPrdMain.getSelectedItem().toString(), "product_type", compType);
@@ -468,7 +503,7 @@ public class StorageStockObservation extends JFrame
       }
       if(name.equalsIgnoreCase("RepType")){
 
-    	  this.cmbBoxCompanies.setEnabled(false);
+    	  /*this.cmbBoxCompanies.setEnabled(false);
     	  this.cmbBoxCompanies.setSelectedIndex(-1);
     	  
     	  this.cmbBoxCountry.setEnabled(false);
@@ -509,7 +544,7 @@ public class StorageStockObservation extends JFrame
     		  this.cmbBoxDistrict.setEnabled(true);
     		  this.cmbBoxRegion.setEnabled(true);
     		  this.cmbBoxCity.setEnabled(true);
-    	  }
+    	  }*/
     	  
       }     
       

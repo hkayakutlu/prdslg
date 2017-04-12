@@ -26,6 +26,8 @@ public class PharmData {
 		  Connection conn = null;
 		  PreparedStatement  stmt = null;	
 		  ESIBag outBag = new ESIBag();
+		  int pharmId=0;
+		  int generatedId=0;
 		  try{		  
 			  Class.forName("com.mysql.jdbc.Driver");
 		      conn = (Connection) DriverManager.getConnection(prop.getProperty("DB_URL_UPDATE"), prop.getProperty("USER"), prop.getProperty("PASS"));		
@@ -52,6 +54,7 @@ public class PharmData {
 			      }
 			     
 			      if(id<0){//if update first delete
+			    	  pharmId = getPharmacyId(conn, id*-1,brand);
 			    	  deletePharmacy(conn,id,brand,username);
 			      }
 			      
@@ -61,15 +64,15 @@ public class PharmData {
 				    			  +"`pharmacy_address`,`pharmacy_category`,`assortiment`,`pharmacy_type`,`promo`,`marketing_staff`,`pharmacy_response_person`,`pharmacy_tel`,"
 				    			  +"`pharmacy_email`,`pharmacy_activeness`,`pharmacy_activation_date`,`Comments`,`marketing_staff_no`,`pharmacy_number_sale`,`found_no`,"
 				    			  +"`full_address`,`requested`,`building_type`,`country_code`,`administrative_area_name`,`sub_administrative_area_name`,`street`,"
-				    			  +"`homenumber`,`point_y`,`point_x`,`processed`,`status`,`entry_user`,`entry_date`)"
-							   		+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);	
+				    			  +"`homenumber`,`point_y`,`point_x`,`processed`,`status`,`pharmacy_id`,`entry_user`,`entry_date`)"
+							   		+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);	
 				      }else{
 				    	  stmt = (PreparedStatement) conn.prepareStatement( "INSERT INTO solgar_tst.pharmacy_data_bounty(`country`,`area`,`region`,`city`,`district`,`metro`,`group_company`,`subgroup_company`,`pharmacy_no`,"
 				    			  +"`pharmacy_address`,`pharmacy_category`,`assortiment`,`pharmacy_type`,`promo`,`marketing_staff`,`pharmacy_response_person`,`pharmacy_tel`,"
 				    			  +"`pharmacy_email`,`pharmacy_activeness`,`pharmacy_activation_date`,`Comments`,`marketing_staff_no`,`pharmacy_number_sale`,`found_no`,"
 				    			  +"`full_address`,`requested`,`building_type`,`country_code`,`administrative_area_name`,`sub_administrative_area_name`,`street`,"
-				    			  +"`homenumber`,`point_y`,`point_x`,`processed`,`status`,`entry_user`,`entry_date`)"
-								   	+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);  
+				    			  +"`homenumber`,`point_y`,`point_x`,`processed`,`status`,`pharmacy_id`,`entry_user`,`entry_date`)"
+								   	+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);  
 				      }
 						
 						   stmt.setString(1,inBag.get("RESULTTABLE",j,"COUNTRY"));
@@ -113,15 +116,21 @@ public class PharmData {
 						   stmt.setString(34,point_x);
 						   stmt.setInt(35,1);
 						   stmt.setInt(36,1);//STATUS
-						   stmt.setString(37,username);
-						   stmt.setTimestamp(38,Timestamp.valueOf(Util.getCurrentDateTime()));					  
+						   stmt.setInt(37,pharmId);//STATUS
+						   stmt.setString(38,username);
+						   stmt.setTimestamp(39,Timestamp.valueOf(Util.getCurrentDateTime()));					  
 						   stmt.executeUpdate();
 						   
 						   ResultSet keyResultSet = stmt.getGeneratedKeys();
-				            if (keyResultSet.next()) {
-				            	inBag.put("RELATIONID", String.valueOf(keyResultSet.getInt(1)));
-				            }				   
+				           if (keyResultSet.next()) {
+				        	   generatedId = keyResultSet.getInt(1);
+				           	   inBag.put("RELATIONID", String.valueOf(generatedId));
+				           }				   
 						   stmt.close();
+						   
+						   if(id==0){//Yeni ise update et doctor id yi
+							updatePharmacyId(conn,generatedId,brand); 
+						   }	
 			    	}
 		      }
 			 
@@ -156,13 +165,13 @@ public class PharmData {
 		   try{
 			   id = id*-1;
 			   if(brand.equalsIgnoreCase("SOLGAR")){
-				   stmt = (PreparedStatement) conn.prepareStatement( "update solgar_tst.pharmacy_data_solgar set status = 0,entry_user=?,entry_date=?  WHERE status = 1 and id = ?");	  	
+				   stmt = (PreparedStatement) conn.prepareStatement( "update solgar_tst.pharmacy_data_solgar set status = 0  WHERE status = 1 and id = ?");	  	
 			   }else{
-				   stmt = (PreparedStatement) conn.prepareStatement( "update solgar_tst.pharmacy_data_bounty set status = 0,entry_user=?,entry_date=?  WHERE status = 1 and id = ?");
+				   stmt = (PreparedStatement) conn.prepareStatement( "update solgar_tst.pharmacy_data_bounty set status = 0  WHERE status = 1 and id = ?");
 			   }
-			   stmt.setString(1,userName);
-			   stmt.setTimestamp(2,Timestamp.valueOf(Util.getCurrentDateTime()));
-			   stmt.setInt(3,id);
+			   //stmt.setString(1,userName);
+			   //stmt.setTimestamp(2,Timestamp.valueOf(Util.getCurrentDateTime()));
+			   stmt.setInt(1,id);
 			   stmt.executeUpdate();
 			   stmt.close(); 					
 				
@@ -172,6 +181,58 @@ public class PharmData {
 			      e.printStackTrace();
 			      throw e;
 			   }finally{}//end try	
+		
+	}
+	 
+	 private void updatePharmacyId(Connection conn,int id,String brand) throws Exception {
+		 PreparedStatement  stmt = null;				  
+		   try{
+			   if(brand.equalsIgnoreCase("SOLGAR")){
+				   stmt = (PreparedStatement) conn.prepareStatement( "update solgar_tst.pharmacy_data_solgar set pharmacy_id = ? WHERE status = 1 and id = ?");
+			   }else{
+				   stmt = (PreparedStatement) conn.prepareStatement( "update solgar_tst.pharmacy_data_bounty set pharmacy_id = ? WHERE status = 1 and id = ?");
+			   }
+			   stmt.setInt(1,id);
+			   stmt.setInt(2,id);
+			   stmt.executeUpdate();
+			   stmt.close(); 					
+				
+		      }catch(SQLException se){
+			      throw se;
+			   }catch(Exception e){
+			      e.printStackTrace();
+			      throw e;
+			   }finally{}//end try	
+		
+	}
+	 private int getPharmacyId(Connection conn,int id,String brand) throws Exception {
+		 Statement stmt =null;
+		 String sorgu  ="";
+		 int doctorId=0;
+		   try{
+			   if(brand.equalsIgnoreCase("SOLGAR")){
+				   sorgu  = "select * from solgar_tst.pharmacy_data_solgar where status = 1 ";
+			   }else{
+				   sorgu  = "select * from solgar_tst.pharmacy_data_bounty where status = 1 ";
+			   }
+			   sorgu = sorgu +" and id ="+id;
+			   
+			   stmt = (Statement) conn.createStatement();
+	           ResultSet rs = stmt.executeQuery(sorgu);
+	           
+	           while (rs.next()){
+	        	   doctorId = rs.getInt("pharmacy_id");
+	           }
+			   					
+	           stmt.close();
+	           
+		      }catch(SQLException se){
+			      throw se;
+			   }catch(Exception e){
+			      e.printStackTrace();
+			      throw e;
+			   }finally{}//end try	
+		   return doctorId;
 		
 	}
 
@@ -246,7 +307,31 @@ public class PharmData {
 			   if(inBag.existsBagKey("MARKETING_STAFF") && inBag.get("MARKETING_STAFF").toString().length()>0){
 				   sorgu = sorgu +" and marketing_staff ='"+inBag.get("MARKETING_STAFF").toString()+"'";
 			   }
+			   if(inBag.existsBagKey("MAIN_GROUP") && inBag.get("MAIN_GROUP").toString().length()>0){
+				   sorgu = sorgu +" and group_company ='"+inBag.get("MAIN_GROUP").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("CATEGORY") && inBag.get("CATEGORY").toString().length()>0){
+				   sorgu = sorgu +" and pharmacy_category ='"+inBag.get("CATEGORY").toString()+"'";
+			   }
 			   
+			   if(inBag.existsBagKey("SUB_GROUP") && inBag.get("SUB_GROUP").toString().length()>0){
+				   sorgu = sorgu +" and subgroup_company ='"+inBag.get("SUB_GROUP").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("ASSORTIMENT") && inBag.get("ASSORTIMENT").toString().length()>0){
+				   sorgu = sorgu +" and assortiment ='"+inBag.get("ASSORTIMENT").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("ACTIVENESS") && inBag.get("ACTIVENESS").toString().length()>0){
+				   sorgu = sorgu +" and pharmacy_activeness ='"+inBag.get("ACTIVENESS").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("PHARMACYTYPE") && inBag.get("PHARMACYTYPE").toString().length()>0){
+				   sorgu = sorgu +" and pharmacy_type ='"+inBag.get("PHARMACYTYPE").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("PROMO") && inBag.get("PROMO").toString().length()>0){
+				   sorgu = sorgu +" and promo ='"+inBag.get("PROMO").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("ADDRESS") && inBag.get("ADDRESS").toString().length()>0){
+				   sorgu = sorgu +" and pharmacy_address like'%"+inBag.get("ADDRESS").toString()+"%'";
+			   }
 				          
 	           stmt = (Statement) conn.createStatement();
 	           ResultSet rs = stmt.executeQuery(sorgu);
@@ -296,6 +381,8 @@ public class PharmData {
 	        	   outBag.put("TABEL",j,"ENTRY_DATE", rs.getString("entry_date"));	
 	        	   j++;
 	           } 
+	           
+	           outBag.put("COUNT",String.valueOf(j));
 	           
 	           stmt.close();
 	           conn.close();

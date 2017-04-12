@@ -442,7 +442,7 @@ public class Companies {
 					}	
 		
 					Cell c4 = sheet.getCell(index, i);//count
-					if(c4.getContents() != null && c4.getContents().length() >0){
+					if(c4.getContents() != null && c4.getContents().trim().length() >0){
 						outBag.put("TABLE",tableindex,"COUNT", c4.getContents());
 					}else{
 						outBag.put("TABLE",tableindex,"COUNT", "0");
@@ -1636,7 +1636,7 @@ public class Companies {
 					startOfColumn = columNo + 1;
 					startOfRow = rowNo + 1;
 					productColumn = columNo;
-					pharmacyRow = rowNo;
+					pharmacyRow = rowNo-1;
 					aptekaRow=rowNo-1;
 				}
 				if ( c1.getContents().indexOf("Краткий текст материала")>=0) {
@@ -1679,16 +1679,18 @@ public class Companies {
 						outBag.put("TABLE",tableindex,"APTEKNO", aptekNo);
 					}else{
 						outBag.put("TABLE",tableindex,"APTEKNO", "");
-					}						
-					
+					}											
 					Cell c2 = sheet.getCell(productColumn, i); //product name
 					if(c2.getContents() != null && c2.getContents().length() >0){
 						outBag.put("TABLE",tableindex,"PRODUCT",c2.getContents());
-					}	
-		
+					}		
 					Cell c4 = sheet.getCell(index, i);//count
 					if(c4.getContents() != null && c4.getContents().length() >0){
-						outBag.put("TABLE",tableindex,"COUNT", c4.getContents());
+						if(c4.getContents().equalsIgnoreCase("-* 0,р-")){
+							outBag.put("TABLE",tableindex,"COUNT", "0");
+						}else{
+							outBag.put("TABLE",tableindex,"COUNT", c4.getContents());
+						}
 					}else{
 						outBag.put("TABLE",tableindex,"COUNT", "0");
 					}
@@ -1747,7 +1749,7 @@ public class Companies {
 		index = startOfColumn;
 		
 				
-		while (index < horizontalLimit-2) {
+		while (index < horizontalLimit-1) {
 					
 			for (int i = startOfRow; i < verticalLimit-1; i++) {
 	
@@ -1786,7 +1788,7 @@ public class Companies {
 				}
 	
 			}		
-				index = index+2;
+				index = index+1;
 			
 	}
 		
@@ -1985,6 +1987,157 @@ public class Companies {
 				Cell c3 = sheet.getCell(index, pharmacyRow);//pharmacy name
 				String pharmacyName = c3.getContents();
 				Cell c2 = sheet.getCell(productColumn, i); //product name
+				String productName = c2.getContents();
+			
+				if(pharmacyName != null && pharmacyName.length() >0
+						&& productName != null && productName.length() >5){	
+					
+					outBag.put("TABLE",tableindex,"PHARMACY", pharmacyName);
+					outBag.put("TABLE",tableindex,"APTEKNO", pharmacyName);
+					outBag.put("TABLE",tableindex,"PRODUCT",productName);	
+		
+					Cell c4 = sheet.getCell(index, i);//count
+					if(c4.getContents() != null && c4.getContents().length() >0){
+						outBag.put("TABLE",tableindex,"COUNT", c4.getContents());
+					}else{
+						outBag.put("TABLE",tableindex,"COUNT", "0");
+					}
+					
+					outBag.put("TABLE",tableindex,"AMOUNT", "0.00");					
+					outBag.put("TABLE",tableindex,"SUBGROUP", mainGroup);
+					outBag.put("TABLE",tableindex,"MAINGROUP", mainGroup);
+					outBag.put("TABLE",tableindex,"CITY", "");
+					outBag.put("TABLE",tableindex,"SALESREADER", pharmacyName);
+					
+					tableindex++;
+		
+				}
+	
+			}		
+				index = index+1;
+			
+	}
+		
+		return outBag;
+		
+	}
+	public static ESIBag vitaSamaraParserNew(Sheet sheet,String mainGroup, int verticalLimit,int horizontalLimit) {
+		int startOfRow = 0,startOfColumn = 0,productColumn=0,pharmacyRow=0,tableindex = 0,aptekaRow=0,pharmacyColumn=0,productRow=0;
+		boolean breakFor = false;
+		
+		int index = 0;
+		ESIBag outBag = new ESIBag();
+
+		for (int rowNo = 0; rowNo < verticalLimit; rowNo++) {//Tum exceli gez bul
+
+			for (int columNo = 0; columNo < horizontalLimit; columNo++) {
+
+				// Товар Склад Расх_Количество Расх_СуммаЗакуп
+				Cell c1 = sheet.getCell(columNo, rowNo);
+				if (c1.getContents().indexOf("Наименование") >= 0 ) {//Colum dikey row yatay
+					startOfColumn = columNo +1;
+					productRow = rowNo;
+				}
+				if (c1.getContents().indexOf("Адрес") >= 0 ) {//Colum dikey row yatay
+					startOfRow = rowNo + 1;		
+					pharmacyRow = rowNo+1;
+					pharmacyColumn = columNo;
+					breakFor = true;
+					break;
+				}
+
+			}
+
+			if (breakFor) {
+				break;
+			}
+
+		}
+
+		index = startOfColumn;
+		
+				
+		while (index < horizontalLimit-1) {
+					
+			for (int i = startOfRow; i < verticalLimit-1; i++) {
+	
+				Cell c3 = sheet.getCell(pharmacyColumn, i);//pharmacy name
+				String pharmacyName = c3.getContents();
+				Cell c2 = sheet.getCell(index, productRow); //product name
+				String productName = c2.getContents();
+			
+				if(pharmacyName != null && pharmacyName.length() >0
+						&& productName != null && productName.length() >5){	
+					
+					outBag.put("TABLE",tableindex,"PHARMACY", pharmacyName);
+					outBag.put("TABLE",tableindex,"APTEKNO", pharmacyName);
+					outBag.put("TABLE",tableindex,"PRODUCT",productName);	
+		
+					Cell c4 = sheet.getCell(index, i);//count
+					if(c4.getContents() != null && c4.getContents().length() >0){
+						outBag.put("TABLE",tableindex,"COUNT", c4.getContents());
+					}else{
+						outBag.put("TABLE",tableindex,"COUNT", "0");
+					}
+					
+					outBag.put("TABLE",tableindex,"AMOUNT", "0.00");					
+					outBag.put("TABLE",tableindex,"SUBGROUP", mainGroup);
+					outBag.put("TABLE",tableindex,"MAINGROUP", mainGroup);
+					outBag.put("TABLE",tableindex,"CITY", "");
+					outBag.put("TABLE",tableindex,"SALESREADER", pharmacyName);
+					
+					tableindex++;
+		
+				}
+	
+			}		
+				index = index+1;
+			
+	}
+		
+		return outBag;
+		
+	}
+	public static ESIBag vitaSamaraParserProductHorizontal(Sheet sheet,String mainGroup, int verticalLimit,int horizontalLimit) {
+		int startOfRow = 0,startOfColumn = 0,productColumn=0,pharmacyRow=0,tableindex = 0,aptekaRow=0,pharmacyColumn=0,productRow=0;
+		boolean breakFor = false;
+		
+		int index = 0;
+		ESIBag outBag = new ESIBag();
+
+		for (int rowNo = 0; rowNo < verticalLimit; rowNo++) {//Tum exceli gez bul
+
+			for (int columNo = 0; columNo < horizontalLimit; columNo++) {
+
+				// Товар Склад Расх_Количество Расх_СуммаЗакуп
+				Cell c1 = sheet.getCell(columNo, rowNo);
+				if (c1.getContents().indexOf("Наименование") >= 0 ) {//Colum dikey row yatay
+					startOfColumn = columNo +1;
+					productRow = rowNo;
+					startOfRow = rowNo + 5;		
+					pharmacyRow = rowNo+1;
+					pharmacyColumn = columNo;
+					breakFor = true;
+					break;
+				}
+			}
+
+			if (breakFor) {
+				break;
+			}
+
+		}
+
+		index = startOfColumn;
+		
+				
+		while (index < horizontalLimit-1) {
+					
+			for (int i = startOfRow; i < verticalLimit-1; i++) {
+	
+				Cell c3 = sheet.getCell(pharmacyColumn, i);//pharmacy name
+				String pharmacyName = c3.getContents();
+				Cell c2 = sheet.getCell(index, productRow); //product name
 				String productName = c2.getContents();
 			
 				if(pharmacyName != null && pharmacyName.length() >0
@@ -3908,5 +4061,146 @@ public class Companies {
 			}
 		return outBag;
 		
+	}
+	public static ESIBag evalarParser(Sheet sheet,String mainGroup, int verticalLimit,int horizontalLimit) {
+		int startOfRow = 0,startOfTovar = 0,startOfSklad = 0,
+				startOfCount = 0,startOfAmount = 0,tableindex = 0,startOfSubGroup=0,startOfPharmacyNo=0,startOfCity=0;
+		boolean breakFor = false;
+		String pharmacy="";
+		
+		ESIBag outBag = new ESIBag();
+
+		for (int rowNo = 0; rowNo < verticalLimit; rowNo++) {//Tum exceli gez bul
+
+			for (int columNo = 0; columNo < horizontalLimit; columNo++) {
+
+				// Товар Склад Расх_Количество Расх_СуммаЗакуп
+				Cell c1 = sheet.getCell(columNo, rowNo);
+				if (c1.getContents().indexOf("Наименование") >= 0) {
+					startOfTovar = columNo;
+					startOfRow = rowNo + 1;
+				}
+				if (c1.getContents().indexOf("Аптека") >= 0) {
+					startOfSklad = columNo;
+				}
+				if (c1.getContents().indexOf("Кол-во") >= 0) {
+					startOfCount = columNo;
+				}
+				if (c1.getContents().indexOf("Сумма поставки") >= 0) {
+					startOfAmount = columNo;
+				}				
+
+			}
+
+			if (breakFor) {
+				break;
+			}
+
+		}
+
+		for (int i = startOfRow; i < verticalLimit; i++) {
+			if (i>0){
+				Cell c2 = sheet.getCell(startOfTovar, i);
+				if(c2.getContents() != null && c2.getContents().length() >0){
+					outBag.put("TABLE",tableindex,"PRODUCT", c2.getContents());
+
+					Cell c3 = sheet.getCell(startOfSklad, i);
+					if(c3.getContents() != null && c3.getContents().length() >0){
+						pharmacy = c3.getContents();
+						outBag.put("TABLE",tableindex,"SALESREADER", pharmacy);			
+					}else{
+						outBag.put("TABLE",tableindex,"SALESREADER", "");
+					}					
+					
+					Cell c4 = sheet.getCell(startOfCount, i);
+					if(c4.getContents() != null && c4.getContents().length() >0){
+						String count  = c4.getContents();
+						outBag.put("TABLE",tableindex,"COUNT", count);
+					}else{
+						outBag.put("TABLE",tableindex,"COUNT", "0");
+					}
+		
+					Cell c5 = sheet.getCell(startOfAmount, i);
+					if(c5.getContents() != null && c5.getContents().length() >0){
+						outBag.put("TABLE",tableindex,"AMOUNT", c5.getContents());
+					}else{
+						outBag.put("TABLE",tableindex,"AMOUNT", "0.00");
+					}
+					
+					outBag.put("TABLE",tableindex,"SUBGROUP", mainGroup);
+					outBag.put("TABLE",tableindex,"APTEKNO", "");
+					outBag.put("TABLE",tableindex,"CITY", "");					
+					outBag.put("TABLE",tableindex,"MAINGROUP", mainGroup);	
+					outBag.put("TABLE",tableindex,"PHARMACY", pharmacy);
+					
+					tableindex++;
+			 }
+		 }
+		}
+		
+		return outBag;
+	}
+	
+	public static ESIBag sheksnaParserNew(Sheet sheet,String mainGroup, int verticalLimit,int horizontalLimit) {
+		int startOfRow = 0,startOfColumn = 0,tableindex = 0;
+		boolean breakFor = false;
+		String productName="";
+		String city = "";
+		String address = "";
+		ESIBag outBag = new ESIBag();
+
+		for (int rowNo = 0; rowNo < verticalLimit; rowNo++) {//Tum exceli gez bul
+
+			for (int columNo = 0; columNo < horizontalLimit; columNo++) {
+
+				// Товар Склад Расх_Количество Расх_СуммаЗакуп
+				Cell c1 = sheet.getCell(columNo, rowNo);
+				if (c1.getContents().indexOf("Названия строк") >= 0) {
+					startOfColumn = columNo;//dikey
+					startOfRow = rowNo + 1;//yatay
+					breakFor =true;
+					break;
+				}
+
+			}
+
+			if (breakFor) {
+				break;
+			}
+
+		}
+
+		for (int i = startOfRow; i < verticalLimit-1; i++) {
+
+			Cell c2 = sheet.getCell(startOfColumn, i);
+			if(c2.getContents() != null && c2.getContents().length() >0){//City adres and product 
+				if(c2.getContents().trim().subSequence(0, 6).toString().matches("Аптека"))	{
+					address = c2.getContents().trim();
+				}else{
+					productName = c2.getContents().trim();
+					outBag.put("TABLE",tableindex,"PRODUCT",productName);
+					outBag.put("TABLE",tableindex,"APTEKNO", "");				
+					outBag.put("TABLE",tableindex,"PHARMACY", address);
+
+					Cell c4 = sheet.getCell(startOfColumn+1, i);
+					if(c4.getContents() != null && c4.getContents().length() >0){ //Count
+						outBag.put("TABLE",tableindex,"COUNT", c4.getContents().trim());						
+					}else{
+						outBag.put("TABLE",tableindex,"COUNT", "0");
+					}
+
+					outBag.put("TABLE",tableindex,"REMAINING", "0");					
+					outBag.put("TABLE",tableindex,"AMOUNT", "0.00");
+					outBag.put("TABLE",tableindex,"SUBGROUP", mainGroup);
+					outBag.put("TABLE",tableindex,"MAINGROUP", mainGroup);					
+					outBag.put("TABLE",tableindex,"CITY", "");
+					outBag.put("TABLE",tableindex,"SALESREADER", address);
+					tableindex++;
+				}	
+															
+			}								
+			}
+		
+		return outBag;
 	}
 }

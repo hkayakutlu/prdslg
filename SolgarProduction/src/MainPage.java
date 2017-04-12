@@ -3,9 +3,13 @@ package src;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 import javax.swing.*;
 
+import org.apache.log4j.Logger;
+
+import cb.esi.esiclient.util.BagKeyNotFoundException;
 import cb.esi.esiclient.util.ESIBag;
 import main.ConnectToDb;
 import util.Util;
@@ -24,13 +28,17 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
 	private static final int FRAME_WIDTH = 1100;
 	private static final int FRAME_HEIGHT = 900;	
 	private static final String Version = "9-2-8";
+	private static String  Lang = "RU";
+	final static Logger logger = Logger.getLogger(MainPage.class);
+	
 	  private JFrame frame;
 	  private JMenuBar menuBar,menuBarUser;
-	  private JMenu fileMenu,editMenu,salesReportsMenu,marketingExpensesMenu,chainExpensesMenu,organizationMenu,dataBaseMenu;
-	  private JMenuItem openMenuItem,excelLoadMenuItem,reportObservation,exitMenuItem,cutMenuItem,copyMenuItem,pasteMenuItem,
+	  private JMenu fileMenu,editMenu,salesReportsMenu,marketingExpensesMenu,chainExpensesMenu,organizationMenu,dataBaseMenu,executiveScreensMenu;
+	  private JMenuItem openMenuItem,excelLoadMenuItem,reportObservation,exitMenuItem,
 	  marketingExpenseEntry,marketingExpenseApprove,marketingExpenseObservation,marketingExpenseUpdate,marketingExpenseUpdateApproved,stockLoadMenuItem,
 	  stockObservationMenuItem,passChangeScr,chainExpenseEntry,chainExpenseObservation,chainExpenseUpdate,chainExpenseCampaignEntry,
-	  staffDefinition,staffAssesmentDefinition,staffAssesmentObservation,pharmDataDefinition,doctorDataDefinition;
+	  staffDefinition,staffAssesmentDefinition,staffAssesmentObservation,pharmDataDefinition,doctorDataDefinition,
+	  engMenuItem,rusMenuItem,marketingExpsExecutiveScr,pharmacyExecutiveScr,doctorExecutiveScr,chainExpenseExecutiveScr,stockObservationMenuItemExc;
 	  private JLabel lblImage,lblYouAreWelcome,lblUserName,lblEmpId;
 	  private JPanel pnlInfoMsg; 
  
@@ -65,9 +73,12 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
 
     //frame.setContentPane(new JLabel(new ImageIcon("C:\\SolgarPic.png")));
 	//lblImage =  new JLabel(new ImageIcon("images/SolgarPic.png"));
-	lblImage =  new JLabel(new ImageIcon("C:\\SolgarPic.png"));
+	lblImage =  new JLabel(new ImageIcon("C:\\SolgarInternalSysFile\\SolgarPic.png"));
     frame.setContentPane(lblImage);
     //add(lblImage,BorderLayout.CENTER);
+    
+    //Load Bundle
+    ResourceBundle rb = ConnectToDb.readBundleFile(Lang);
     
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setLocationRelativeTo(null);
@@ -75,124 +86,189 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
     
     // build the File menu
     //Yeni ekran menulerini buraya ekle
-    fileMenu = new JMenu("File");
+    fileMenu = new JMenu(rb.getString("MainMenu"));
+    fileMenu.setName("File");
     
-    openMenuItem = new JMenuItem("LogIn");
+    openMenuItem = new JMenuItem(rb.getString("LogIn"));
+    openMenuItem.setActionCommand("LogIn");
     openMenuItem.addActionListener(this);
     fileMenu.add(openMenuItem);
 
-    salesReportsMenu = new JMenu("Sales Reports");
+    salesReportsMenu = new JMenu(rb.getString("SalesReports"));
+    salesReportsMenu.setActionCommand("Sales Reports");
     fileMenu.add(salesReportsMenu);  
     salesReportsMenu.setVisible(false);    
     
-    excelLoadMenuItem = new JMenuItem("Excel Load");
+    excelLoadMenuItem = new JMenuItem(rb.getString("ExcelLoad"));
+    excelLoadMenuItem.setActionCommand("Excel Load");
     excelLoadMenuItem.addActionListener(this);
     salesReportsMenu.add(excelLoadMenuItem);
     //excelLoadMenuItem.setVisible(false);
     
-    stockLoadMenuItem = new JMenuItem("Distrubutor Stock&Sale Load");
+    stockLoadMenuItem = new JMenuItem(rb.getString("DistrubutorStock&SaleLoad"));
+    stockLoadMenuItem.setActionCommand("Distrubutor Stock&Sale Load");
     stockLoadMenuItem.addActionListener(this);
     salesReportsMenu.add(stockLoadMenuItem);
     
-    stockObservationMenuItem = new JMenuItem("Distrubutor Stock&Sale Observation");
+    stockObservationMenuItem = new JMenuItem(rb.getString("DistrubutorStock&SaleObservation"));
+    stockObservationMenuItem.setActionCommand("Distrubutor Stock&Sale Observation");
     stockObservationMenuItem.addActionListener(this);
     salesReportsMenu.add(stockObservationMenuItem);
     
-    reportObservation = new JMenuItem("Report Observation");
+    reportObservation = new JMenuItem(rb.getString("ReportObservation"));
+    reportObservation.setActionCommand("Report Observation");
     reportObservation.addActionListener(this);
     salesReportsMenu.add(reportObservation);
     //reportObservation.setVisible(false);
     
-    marketingExpensesMenu = new JMenu("Marketing Expenses");
+    marketingExpensesMenu = new JMenu(rb.getString("MarketingExpenses"));
+    marketingExpensesMenu.setActionCommand("MarketingExpenses");
     fileMenu.add(marketingExpensesMenu);  
     marketingExpensesMenu.setVisible(false); 
     
-    marketingExpenseEntry = new JMenuItem("Marketing Expense Entry");
+    marketingExpenseEntry = new JMenuItem(rb.getString("MarketingExpenseEntry"));
+    marketingExpenseEntry.setActionCommand("Marketing Expense Entry");
     marketingExpenseEntry.addActionListener(this);
     marketingExpensesMenu.add(marketingExpenseEntry);
     
-    marketingExpenseUpdate = new JMenuItem("Marketing Expense Update");
+    marketingExpenseUpdate = new JMenuItem(rb.getString("MarketingExpenseUpdate"));
+    marketingExpenseUpdate.setActionCommand("Marketing Expense Update");
     marketingExpenseUpdate.addActionListener(this);
     marketingExpensesMenu.add(marketingExpenseUpdate);
     
-    marketingExpenseUpdateApproved = new JMenuItem("Marketing Expense Approved Operations Update");
+    marketingExpenseUpdateApproved = new JMenuItem(rb.getString("MarketingExpenseApprovedOperationsUpdate"));
+    marketingExpenseUpdateApproved.setActionCommand("Marketing Expense Approved Operations Update");
     marketingExpenseUpdateApproved.addActionListener(this);
     marketingExpensesMenu.add(marketingExpenseUpdateApproved);
     
-    marketingExpenseApprove = new JMenuItem("Marketing Expense Approve");
+    marketingExpenseApprove = new JMenuItem(rb.getString("MarketingExpenseApprove"));
+    marketingExpenseApprove.setActionCommand("Marketing Expense Approve");
     marketingExpenseApprove.addActionListener(this);
     marketingExpensesMenu.add(marketingExpenseApprove);
     
-    marketingExpenseObservation = new JMenuItem("Marketing Expense Observation");
+    marketingExpenseObservation = new JMenuItem(rb.getString("MarketingExpenseObservation"));
+    marketingExpenseObservation.setActionCommand("Marketing Expense Observation");
     marketingExpenseObservation.addActionListener(this);
     marketingExpensesMenu.add(marketingExpenseObservation);
  
-    chainExpensesMenu = new JMenu("Chain Expenses");
+    chainExpensesMenu = new JMenu(rb.getString("ChainExpenses"));
+    chainExpensesMenu.setActionCommand("Chain Expenses");
     fileMenu.add(chainExpensesMenu);  
     chainExpensesMenu.setVisible(false); 
     
-    chainExpenseEntry = new JMenuItem("Chain Expense Entry");
+    chainExpenseEntry = new JMenuItem(rb.getString("ChainExpenseEntry"));
+    chainExpenseEntry.setActionCommand("Chain Expense Entry");
     chainExpenseEntry.addActionListener(this);
     chainExpensesMenu.add(chainExpenseEntry);
     
-    chainExpenseUpdate = new JMenuItem("Chain Expense Update");
+    chainExpenseUpdate = new JMenuItem(rb.getString("ChainExpenseUpdate"));
+    chainExpenseUpdate.setActionCommand("Chain Expense Update");
     chainExpenseUpdate.addActionListener(this);
     chainExpensesMenu.add(chainExpenseUpdate);
     
-    chainExpenseCampaignEntry = new JMenuItem("Chain Expense Campaign Entry");
+    chainExpenseCampaignEntry = new JMenuItem(rb.getString("ChainExpenseCampaignEntry"));
+    chainExpenseCampaignEntry.setActionCommand("Chain Expense Campaign Entry");
     chainExpenseCampaignEntry.addActionListener(this);
     chainExpensesMenu.add(chainExpenseCampaignEntry);
     
-    chainExpenseObservation = new JMenuItem("Chain Expense Observation");
+    chainExpenseObservation = new JMenuItem(rb.getString("ChainExpenseObservation"));
+    chainExpenseObservation.setActionCommand("Chain Expense Observation");
     chainExpenseObservation.addActionListener(this);
     chainExpensesMenu.add(chainExpenseObservation);
     
-    organizationMenu = new JMenu("Organization");
+    organizationMenu = new JMenu(rb.getString("Organization"));
+    organizationMenu.setActionCommand("Organization");
     fileMenu.add(organizationMenu);  
     organizationMenu.setVisible(false); 
     
-    staffDefinition = new JMenuItem("Staff Definition&Update");
+    staffDefinition = new JMenuItem(rb.getString("StaffDefinition&Update"));
+    staffDefinition.setActionCommand("Staff Definition&Update");
     staffDefinition.addActionListener(this);
     organizationMenu.add(staffDefinition);
     
-    staffAssesmentDefinition = new JMenuItem("Staff Assesment Definition&Update");
+    staffAssesmentDefinition = new JMenuItem(rb.getString("StaffAssesmentDefinition&Update"));
+    staffAssesmentDefinition.setActionCommand("Staff Assesment Definition&Update");
     staffAssesmentDefinition.addActionListener(this);
     organizationMenu.add(staffAssesmentDefinition);
     
-    staffAssesmentObservation = new JMenuItem("Staff Assesment Observation");
+    staffAssesmentObservation = new JMenuItem(rb.getString("StaffAssesmentObservation"));
+    staffAssesmentObservation.setActionCommand("Staff Assesment Observation");
     staffAssesmentObservation.addActionListener(this);
     organizationMenu.add(staffAssesmentObservation);
     
-    dataBaseMenu = new JMenu("Database");
+    dataBaseMenu = new JMenu(rb.getString("Database"));
+    dataBaseMenu.setActionCommand("Database");
     fileMenu.add(dataBaseMenu);  
     dataBaseMenu.setVisible(false);
     
-    pharmDataDefinition = new JMenuItem("Apteka Entry&Update");
+    pharmDataDefinition = new JMenuItem(rb.getString("AptekaEntry&Update"));
+    pharmDataDefinition.setActionCommand("Apteka Entry&Update");
     pharmDataDefinition.addActionListener(this);
     dataBaseMenu.add(pharmDataDefinition);
     
-    doctorDataDefinition = new JMenuItem("Doctor Entry&Update");
+    doctorDataDefinition = new JMenuItem(rb.getString("DoctorEntry&Update"));
+    doctorDataDefinition.setActionCommand("Doctor Entry&Update");
     doctorDataDefinition.addActionListener(this);
     dataBaseMenu.add(doctorDataDefinition);
     
+    executiveScreensMenu = new JMenu(rb.getString("ExecutiveScreens"));
+    executiveScreensMenu.setActionCommand("ExecutiveScreens");
+    fileMenu.add(executiveScreensMenu);  
+    executiveScreensMenu.setVisible(false);
     
-    exitMenuItem = new JMenuItem("Exit");
+    stockObservationMenuItemExc = new JMenuItem(rb.getString("DistrubutorStock&SaleObservation"));
+    stockObservationMenuItemExc.setActionCommand("Distrubutor Stock&Sale Observation");
+    stockObservationMenuItemExc.addActionListener(this);
+    executiveScreensMenu.add(stockObservationMenuItemExc);
+    
+    marketingExpsExecutiveScr = new JMenuItem(rb.getString("MarketingExecutiveScreen"));
+    marketingExpsExecutiveScr.setActionCommand("MarketingExpsExecutiveScr");
+    marketingExpsExecutiveScr.addActionListener(this);
+    executiveScreensMenu.add(marketingExpsExecutiveScr);  
+    
+    pharmacyExecutiveScr = new JMenuItem(rb.getString("PharmacyExecutiveScr"));
+    pharmacyExecutiveScr.setActionCommand("PharmacyExecutiveScr");
+    pharmacyExecutiveScr.addActionListener(this);
+    executiveScreensMenu.add(pharmacyExecutiveScr);
+    
+    doctorExecutiveScr = new JMenuItem(rb.getString("DoctorExecutiveScr"));
+    doctorExecutiveScr.setActionCommand("DoctorExecutiveScr");
+    doctorExecutiveScr.addActionListener(this);
+    executiveScreensMenu.add(doctorExecutiveScr);
+    
+    chainExpenseExecutiveScr = new JMenuItem(rb.getString("ChainExpenseExecutiveScr"));
+    chainExpenseExecutiveScr.setActionCommand("ChainExpenseExecutiveScr");
+    chainExpenseExecutiveScr.addActionListener(this);
+    executiveScreensMenu.add(chainExpenseExecutiveScr);
+    
+    exitMenuItem = new JMenuItem(rb.getString("Exit"));
+    exitMenuItem.setActionCommand("Exit");
     exitMenuItem.addActionListener(this);
     fileMenu.add(exitMenuItem);
  
     // build the Edit menu
-    editMenu = new JMenu("Edit");
-    cutMenuItem = new JMenuItem("Cut");
-    copyMenuItem = new JMenuItem("Copy");
-    pasteMenuItem = new JMenuItem("Paste");
+    editMenu = new JMenu(rb.getString("Edit"));
+    //cutMenuItem = new JMenuItem("Cut");
+    //copyMenuItem = new JMenuItem("Copy");
+    //pasteMenuItem = new JMenuItem("Paste");
+    engMenuItem = new JMenuItem("English");
+    rusMenuItem = new JMenuItem("Russian");
     
-    passChangeScr = new JMenuItem("Password Change");
+    engMenuItem.addActionListener(this);
+    engMenuItem.setVisible(false);
+    rusMenuItem.addActionListener(this);
+    rusMenuItem.setVisible(false);
+    
+    passChangeScr = new JMenuItem(rb.getString("PasswordChange"));
+    passChangeScr.setActionCommand("Password Change");
     passChangeScr.addActionListener(this);
     passChangeScr.setVisible(false);
     
-    editMenu.add(cutMenuItem);
-    editMenu.add(copyMenuItem);
-    editMenu.add(pasteMenuItem);
+   // editMenu.add(cutMenuItem);
+   // editMenu.add(copyMenuItem);
+   // editMenu.add(pasteMenuItem);
+    editMenu.add(engMenuItem);
+    editMenu.add(rusMenuItem);
     editMenu.add(passChangeScr);
  
     // add menus to menubar
@@ -228,7 +304,11 @@ public class MainPage extends JFrame implements Runnable,ActionListener{
 	  staffAssesmentObservation.setVisible(false);
 	  pharmDataDefinition.setVisible(false);
 	  doctorDataDefinition.setVisible(false);
-   
+	  marketingExpsExecutiveScr.setVisible(false);
+	  stockObservationMenuItemExc.setVisible(false);
+	  pharmacyExecutiveScr.setVisible(false);
+	  doctorExecutiveScr.setVisible(false);
+	  chainExpenseExecutiveScr.setVisible(false);
   }
  
   /**
@@ -250,7 +330,14 @@ public void actionPerformed(ActionEvent ev)
 	     }catch (Exception e) {
 			// TODO: handle exception
 		}
-		 LoginScreen login = new LoginScreen();
+	     inBag.put("LANGUAGE", Lang);
+		 LoginScreen login =null;
+		try {
+			login = new LoginScreen(inBag);
+		} catch (BagKeyNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		 login.setVisible(false);
 		 String loginName = login.getTitle();
 		 String loginId  = login.getName();
@@ -261,9 +348,53 @@ public void actionPerformed(ActionEvent ev)
 		 chainExpensesMenu.setVisible(true);
 		 organizationMenu.setVisible(true);
 		 dataBaseMenu.setVisible(true);
+		 executiveScreensMenu.setVisible(true);
 		 setMenuUserRelation(inBag,loginName);
 		 openMenuItem.setVisible(false);
 		 passChangeScr.setVisible(true);
+		 engMenuItem.setVisible(true);
+		 rusMenuItem.setVisible(true);
+		 logger.info(loginName + ": Enter the system.");
+	 }else if(ev.getActionCommand().matches("English|Russian")){		 
+		 if(ev.getActionCommand().equalsIgnoreCase("English")){
+			 Lang = "EN";
+		 }else{Lang = "RU";}
+		 ResourceBundle rb = ConnectToDb.readBundleFile(Lang);
+		 fileMenu.setText(rb.getString("MainMenu"));
+		 editMenu.setText(rb.getString("Edit"));
+		 openMenuItem.setText(rb.getString("LogIn"));
+		 salesReportsMenu.setText(rb.getString("SalesReports"));
+		 excelLoadMenuItem.setText(rb.getString("ExcelLoad"));
+		 stockLoadMenuItem.setText(rb.getString("DistrubutorStock&SaleLoad"));
+		 stockObservationMenuItem.setText(rb.getString("DistrubutorStock&SaleObservation"));
+		 reportObservation.setText(rb.getString("ReportObservation"));
+		 marketingExpensesMenu.setText(rb.getString("MarketingExpenses"));
+		 marketingExpenseEntry.setText(rb.getString("MarketingExpenseEntry"));
+		 marketingExpenseUpdate.setText(rb.getString("MarketingExpenseUpdate"));
+		 marketingExpenseUpdateApproved.setText(rb.getString("MarketingExpenseApprovedOperationsUpdate"));
+		 marketingExpenseApprove.setText(rb.getString("MarketingExpenseApprove"));
+		 marketingExpenseObservation.setText(rb.getString("MarketingExpenseObservation"));
+		 chainExpensesMenu.setText(rb.getString("ChainExpenses"));
+		 chainExpenseEntry.setText(rb.getString("ChainExpenseEntry"));
+		 chainExpenseUpdate.setText(rb.getString("ChainExpenseUpdate"));
+		 chainExpenseCampaignEntry.setText(rb.getString("ChainExpenseCampaignEntry"));
+		 chainExpenseObservation.setText(rb.getString("ChainExpenseObservation"));
+		 organizationMenu.setText(rb.getString("Organization"));
+		 staffDefinition.setText(rb.getString("StaffDefinition&Update"));
+		 staffAssesmentDefinition.setText(rb.getString("StaffAssesmentDefinition&Update"));
+		 staffAssesmentObservation.setText(rb.getString("StaffAssesmentObservation"));
+		 dataBaseMenu.setText(rb.getString("Database"));
+		 pharmDataDefinition.setText(rb.getString("AptekaEntry&Update"));
+		 doctorDataDefinition.setText("Doctor Entry&Update");
+		 exitMenuItem.setText(rb.getString("Exit"));
+		 passChangeScr.setText(rb.getString("PasswordChange"));
+		 exitMenuItem.setText(rb.getString("Exit"));
+		 executiveScreensMenu.setText(rb.getString("ExecutiveScreens"));
+		 marketingExpsExecutiveScr.setText(rb.getString("MarketingExecutiveScreen"));
+		 pharmacyExecutiveScr.setText(rb.getString("PharmacyExecutiveScr"));
+		 doctorExecutiveScr.setText(rb.getString("DoctorExecutiveScr"));
+		 chainExpenseExecutiveScr.setText(rb.getString("ChainExpenseExecutiveScr"));
+		
 	 }else if(ev.getActionCommand().equals("Excel Load")){
 		 try {
 			ExcelUpload excelUpload = new ExcelUpload();
@@ -435,6 +566,7 @@ public void actionPerformed(ActionEvent ev)
 		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
 		 tempBag.put("LOGINNAME",lblUserName.getText());
 		 tempBag.put("EMPLOYEEID",lblEmpId.getText());
+		 tempBag.put("LANGUAGE",Lang);
 		 try {
 			PharmacyEntryUpdate pharmEntry = new PharmacyEntryUpdate(tempBag);
 		} catch (SQLException e) {
@@ -446,6 +578,7 @@ public void actionPerformed(ActionEvent ev)
 		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
 		 tempBag.put("LOGINNAME",lblUserName.getText());
 		 tempBag.put("EMPLOYEEID",lblEmpId.getText());
+		 tempBag.put("LANGUAGE",Lang);
 		 try {
 			DoctorEntryUpdate pharmEntry = new DoctorEntryUpdate(tempBag);
 		} catch (SQLException e) {
@@ -453,7 +586,54 @@ public void actionPerformed(ActionEvent ev)
 			e.printStackTrace();
 		}
 		 frame.validate();
-	 }	  
+	 }else if(ev.getActionCommand().equals("MarketingExpsExecutiveScr")){
+		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
+		 tempBag.put("LOGINNAME",lblUserName.getText());
+		 tempBag.put("EMPLOYEEID",lblEmpId.getText());
+		 try {
+			ExpsManagerialScreen expManagerial = new ExpsManagerialScreen(tempBag);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 frame.validate();
+	 }else if(ev.getActionCommand().equals("PharmacyExecutiveScr")){
+		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
+		 tempBag.put("LOGINNAME",lblUserName.getText());
+		 tempBag.put("EMPLOYEEID",lblEmpId.getText());
+		 tempBag.put("LANGUAGE",Lang);
+		 try {
+			PharmacyManagerialScreen pharmManagerial = new PharmacyManagerialScreen(tempBag);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 frame.validate();
+	 }else if(ev.getActionCommand().equals("DoctorExecutiveScr")){
+		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
+		 tempBag.put("LOGINNAME",lblUserName.getText());
+		 tempBag.put("EMPLOYEEID",lblEmpId.getText());
+		 tempBag.put("LANGUAGE",Lang);
+		 try {
+			DoctorManagerialScreen doctorManagerial = new DoctorManagerialScreen(tempBag);
+		
+		 } catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 frame.validate();
+	 }else if(ev.getActionCommand().equals("ChainExpenseExecutiveScr")){
+		 ESIBag tempBag = setMenuUserRelation(inBag,lblUserName.getText());
+		 tempBag.put("LOGINNAME",lblUserName.getText());
+		 tempBag.put("EMPLOYEEID",lblEmpId.getText());
+		 try {
+			ChainExpsManagerialScreen chainExpsManagerial = new ChainExpsManagerialScreen(tempBag);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 frame.validate();
+	 }		  
 	 else if(ev.getActionCommand().equals("Exit")){
 		 System.exit(0);
 	 }
@@ -491,6 +671,7 @@ public void actionPerformed(ActionEvent ev)
 			  }
 			  if(userBag.get("STORAGEOBSERVATION").equalsIgnoreCase("1")){
 				  stockObservationMenuItem.setVisible(true);
+				  stockObservationMenuItemExc.setVisible(true);
 			  }	
 			  if(userBag.get("CHAINEXPSENTRY").equalsIgnoreCase("1")){
 				  chainExpenseEntry.setVisible(true);
@@ -519,7 +700,18 @@ public void actionPerformed(ActionEvent ev)
 			  if(userBag.get("DOCTORDATADEFINITION").equalsIgnoreCase("1")){
 				  doctorDataDefinition.setVisible(true);
 			  }
-			  
+			  if(userBag.get("EXECUTIVEMRKTEXPENSE").equalsIgnoreCase("1")){
+				  marketingExpsExecutiveScr.setVisible(true);
+			  }
+			  if(userBag.get("EXECUTIVEPHARMACY").equalsIgnoreCase("1")){
+				  pharmacyExecutiveScr.setVisible(true);
+			  }
+			  if(userBag.get("EXECUTIVEDOCTOR").equalsIgnoreCase("1")){
+				  doctorExecutiveScr.setVisible(true);
+			  }
+			  if(userBag.get("EXECUTIVECHAINEXPENSE").equalsIgnoreCase("1")){
+				  chainExpenseExecutiveScr.setVisible(true);
+			  }
 		  }				  
 	} catch (Exception e) {
 		//throw e;
@@ -558,6 +750,10 @@ public void actionPerformed(ActionEvent ev)
 @Override
 public void run() {
 	MainPage();
+}
+
+public static String giveLangCode(){
+	return Lang;
 }
 
 }

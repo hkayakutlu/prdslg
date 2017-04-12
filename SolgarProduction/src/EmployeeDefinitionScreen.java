@@ -419,20 +419,24 @@ public class EmployeeDefinitionScreen extends JFrame implements ActionListener,M
 				ESIBag outBag = new ESIBag();
 				int row = table.getRowCount();
 				for (int j = 0; j  < row; j++) {	
-					formatToBagValue(outBag, j, 0, "TABEL", "ID");
-					formatToBagValue(outBag, j, 1, "TABEL", "COMPANY");
-					formatToBagValue(outBag, j, 2, "TABEL", "TABELNOMER");
-					formatToBagValue(outBag, j, 3, "TABEL", "UNIT");
-					formatToBagValue(outBag, j, 4, "TABEL", "TITLE");
-					formatToBagValue(outBag, j, 5, "TABEL", "NAME");
-					formatToBagValue(outBag, j, 6, "TABEL", "ACTIVENESS");
-					formatToBagValue(outBag, j, 7, "TABEL", "STARTDATE");
-					formatToBagValue(outBag, j, 8, "TABEL", "ENDDATE");
-					formatToBagValue(outBag, j, 9, "TABEL", "EMAIL");
-					formatToBagValue(outBag, j, 10, "TABEL", "PASSWORD");
-					formatToBagValue(outBag, j, 11, "TABEL", "ADDITIONALSTATUS");
-					formatToBagValue(outBag, j, 12, "TABEL", "BIRTHDATE");
-					outBag.put("TABEL",j,"USER",userName);						
+					long id =Long.parseLong(table.getValueAt(j, 0).toString());
+					outBag.put("USERNAME", userName);
+					if(id<=0){
+						formatToBagValue(outBag, j, 0, "TABEL", "ID");
+						formatToBagValue(outBag, j, 1, "TABEL", "COMPANY");
+						formatToBagValue(outBag, j, 2, "TABEL", "TABELNOMER");
+						formatToBagValue(outBag, j, 3, "TABEL", "UNIT");
+						formatToBagValue(outBag, j, 4, "TABEL", "TITLE");
+						formatToBagValue(outBag, j, 5, "TABEL", "NAME");
+						formatToBagValue(outBag, j, 6, "TABEL", "ACTIVENESS");
+						formatToBagValue(outBag, j, 7, "TABEL", "STARTDATE");
+						formatToBagValue(outBag, j, 8, "TABEL", "ENDDATE");
+						formatToBagValue(outBag, j, 9, "TABEL", "EMAIL");
+						formatToBagValue(outBag, j, 10, "TABEL", "PASSWORD");
+						formatToBagValue(outBag, j, 11, "TABEL", "ADDITIONALSTATUS");
+						formatToBagValue(outBag, j, 12, "TABEL", "BIRTHDATE");
+						outBag.put("TABEL",j,"USER",userName);	
+					}
 				}
 				
 				boolean result = Dispatcher.saveEmployee(outBag);

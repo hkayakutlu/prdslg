@@ -15,16 +15,11 @@ import java.util.Calendar;
 import jxl.*;
 
 import javax.swing.filechooser.*;
-
 import com.toedter.calendar.JDateChooser;
 
-import main.Companies;
-import main.ConnectToDb;
 import main.Dispatcher;
-import main.ReportQueries;
 import main.SendMail;
 import main.Storages;
-import main.StoragesInfo;
 import util.Util;
 import cb.esi.esiclient.util.ESIBag;
 
@@ -57,7 +52,8 @@ public class StorageSalesStockUpload extends JFrame implements ActionListener {
 	private JDateChooser beginDate,endDate;
 	
 	DefaultTableModel dtm = new DefaultTableModel(0, 0);
-	String header[] = new String[] { "Row Number","Distrubutor","Operation Type","City", "Product Name","Product Type", "Count","Amount","Begin Date","End Date"};
+	String header[] = new String[] { "Row Number","Distrubutor","Operation Type","City", "Product Name","Product Type", 
+			"Count","Amount","Begin Date","End Date","Client","Legal Address","Actual Address","INN","Segment"};
 	SimpleDateFormat dcn = new SimpleDateFormat("yyyy-MM-dd");
 	private String userName="Hakan KAYAKUTLU";
 	private String userBrand="ALL";
@@ -376,7 +372,7 @@ public class StorageSalesStockUpload extends JFrame implements ActionListener {
 				double totalAmountSolgar = 0;
 				int totalCountBounty = 0;
 				double totalAmountBounty = 0;
-				String product ="";
+				String product ="",client="",LegalAddress="",ActualAddress="",INN="",Segment="";
 				DecimalFormat df = new DecimalFormat("#.00");
 				boolean solgar = false;
 				boolean bounty = false;
@@ -454,56 +450,77 @@ public class StorageSalesStockUpload extends JFrame implements ActionListener {
 					    String amountStr = outBag.get("TABLE",i,"AMOUNT");
 					    product = outBag.get("TABLE",i,"PRODUCT");
 	
+					    if(outBag.existsBagKey("TABLE",i,"CLIENT")){
+					    	client = outBag.get("TABLE",i,"CLIENT");
+					    }
+					    if(outBag.existsBagKey("TABLE",i,"LEGALADDRESS")){
+					    	LegalAddress = outBag.get("TABLE",i,"LEGALADDRESS");
+					    }
+					    if(outBag.existsBagKey("TABLE",i,"ACTUALADDRESS")){
+					    	ActualAddress = outBag.get("TABLE",i,"ACTUALADDRESS");
+					    }
+					    if(outBag.existsBagKey("TABLE",i,"INN")){
+					    	INN = outBag.get("TABLE",i,"INN");
+					    }
+					    if(outBag.existsBagKey("TABLE",i,"SEGMENT")){
+					    	Segment = outBag.get("TABLE",i,"SEGMENT");
+					    }
 
-					        if(countStr.indexOf(".")>0){
-					        	countStr = countStr.substring(0, countStr.indexOf("."));
+					 
+				        if(countStr.indexOf(".")>0){
+				        	countStr = countStr.substring(0, countStr.indexOf("."));
+						}
+					    if(countStr.indexOf(",")>0){
+					    	countStr = countStr.substring(0, countStr.indexOf(","));
+						}
+					    countStr =  countStr.replaceAll("^\\s+","");
+					    countStr = countStr.replaceAll("\\s+$","");
+					    int intCount =  Integer.parseInt(countStr);					    
+					    
+					    if(amountStr != null && amountStr.trim().length()>0){
+						    amountStr = amountStr.replaceAll("\\s+", "");	
+						    amountStr = amountStr.replaceAll("═", "");
+						    amountStr = amountStr.trim();
+						    if(amountStr.equalsIgnoreCase(",00")){
+						    	amountStr = "0.00";
 							}
-						    if(countStr.indexOf(",")>0){
-						    	countStr = countStr.substring(0, countStr.indexOf(","));
+						    if(amountStr.indexOf(",")>=0){
+						    	amountStr = amountStr.replaceAll(",", ".");
 							}
-						    countStr =  countStr.replaceAll("^\\s+","");
-						    countStr = countStr.replaceAll("\\s+$","");
-						    int intCount =  Integer.parseInt(countStr);					    
-						    
-						    if(amountStr != null && amountStr.trim().length()>0){
-							    amountStr = amountStr.replaceAll("\\s+", "");	
-							    amountStr = amountStr.replaceAll("═", "");
-							    amountStr = amountStr.trim();
-							    if(amountStr.equalsIgnoreCase(",00")){
-							    	amountStr = "0.00";
-								}
-							    if(amountStr.indexOf(",")>=0){
-							    	amountStr = amountStr.replaceAll(",", ".");
-								}
-							    totalAmount = Double.parseDouble(amountStr);
-						    }else{
-						    	totalAmount = Double.parseDouble("0.00");
-						    }
-						    
-						    if(product.toUpperCase().indexOf("аюсмрх")>=0 || product.toUpperCase().indexOf("BOUNTY")>=0){
-						    	productType = "BN";
-						    	totalAmountBounty =totalAmountBounty + totalAmount;
-						    	totalCountBounty = totalCountBounty + intCount;
-								bounty = true;
-							}else{
-								productType = "SL";
-								totalAmountSolgar =totalAmountSolgar + totalAmount;		
-								totalCountSolgar = totalCountSolgar + intCount;
-								solgar = true;
-							}
-						    
-						    dtm.addRow(new Object[] 
-					        		{ i+1,
-					        		outBag.get("TABLE",i,"MAINGROUP"),
-					        		stockSalesType,
-					        		outBag.get("TABLE",i,"CITY"), 
-					        		product, 
-					        		productType,
-					        		countStr.trim(),
-					        		amountStr.trim(),
-					        		beginDateStr,
-					        		endDateStr
-					        		});
+						    totalAmount = Double.parseDouble(amountStr);
+					    }else{
+					    	totalAmount = Double.parseDouble("0.00");
+					    }
+					    
+					    if(product.toUpperCase().indexOf("аюсмрх")>=0 || product.toUpperCase().indexOf("BOUNTY")>=0){
+					    	productType = "BN";
+					    	totalAmountBounty =totalAmountBounty + totalAmount;
+					    	totalCountBounty = totalCountBounty + intCount;
+							bounty = true;
+						}else{
+							productType = "SL";
+							totalAmountSolgar =totalAmountSolgar + totalAmount;		
+							totalCountSolgar = totalCountSolgar + intCount;
+							solgar = true;
+						}
+					    
+					    dtm.addRow(new Object[] 
+				        		{ i+1,
+				        		outBag.get("TABLE",i,"MAINGROUP"),
+				        		stockSalesType,
+				        		outBag.get("TABLE",i,"CITY"), 
+				        		product, 
+				        		productType,
+				        		countStr.trim(),
+				        		amountStr.trim(),
+				        		beginDateStr,
+				        		endDateStr,
+				        		client.trim(),
+				        		LegalAddress.trim(),
+				        		ActualAddress.trim(),
+				        		INN.trim(),
+				        		Segment.trim()
+				        		});
 						    
 							        
 					 }		

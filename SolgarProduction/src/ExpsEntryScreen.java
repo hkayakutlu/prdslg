@@ -185,7 +185,6 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		jScroll.setBorder(new EmptyBorder(10, 10, 10, 10));
 		getContentPane().add(jScroll, BorderLayout.CENTER);
 		
-		
 		//labels
 		lblAdrCountry = new JLabel("Country",JLabel.RIGHT);		
 		lblAdrArea = new JLabel("Area",JLabel.RIGHT);
@@ -249,8 +248,7 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		cmbBoxCity = new JComboBox( new String[]{});
 		cmbBoxRegion.setEnabled(false);
 		
-		cmbBoxExpMerLecture = new JComboBox( new String[]{});		
-		
+		cmbBoxExpMerLecture = new JComboBox( new String[]{});				
 		cmbBoxExpMerOrganizator = new JComboBox( new String[]{});		
 		
 		if(userBrand.equalsIgnoreCase("ALL")){
@@ -271,13 +269,13 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		
 		if(cmbBoxCompanyCode.getSelectedItem() != null){
 			if(cmbBoxCompanyCode.getSelectedItem().toString().equalsIgnoreCase("SOLGAR")){
-				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
-				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","SL", "","");
+				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "country",cmbBoxCountry.getSelectedItem().toString());
+				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","SL", "country",cmbBoxCountry.getSelectedItem().toString());
 				  cmbBoxExpPosProduct.setSelectedIndex(-1);
 				  cmbBoxExpRekProduct.setSelectedIndex(-1);
 			  }else{
-				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN", "","");
-				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","BN", "","");
+				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN", "country",cmbBoxCountry.getSelectedItem().toString());
+				  Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpPosProduct,"company","BN", "country",cmbBoxCountry.getSelectedItem().toString());
 				  cmbBoxExpRekProduct.setSelectedIndex(-1);
 				  cmbBoxExpPosProduct.setSelectedIndex(-1);
 			  }
@@ -314,10 +312,10 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 				Util.getPRMDataGroupBy("city", "solgar_prm.prm_exps_addresses",cmbBoxCity,"region",cmbBoxRegion.getSelectedItem().toString());
 			}
 			if(cmbBoxCompanyCode.getSelectedItem() != null && cmbBoxArea.getSelectedItem() != null){
-				Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-				  "country",cmbBoxArea.getSelectedItem().toString());
-				Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-  					  "country",cmbBoxArea.getSelectedItem().toString());
+				Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+				  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
+				Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+  					  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
   			  cmbBoxExpMerLecture.setSelectedIndex(-1);
   			  cmbBoxExpMerOrganizator.setSelectedIndex(-1);
   		  }
@@ -334,10 +332,10 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 				Util.getPRMDataGroupBy("region", "solgar_prm.prm_exps_addresses",cmbBoxRegion,"area",cmbBoxArea.getSelectedItem().toString());
 			}
 			if(cmbBoxCompanyCode.getSelectedItem() != null && cmbBoxArea.getSelectedItem() != null){
-				Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-				  "country",cmbBoxArea.getSelectedItem().toString());
-				Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-  					  "country",cmbBoxArea.getSelectedItem().toString());
+				Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+				  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
+				Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+  					  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
   			  cmbBoxExpMerLecture.setSelectedIndex(-1);
   			  cmbBoxExpMerOrganizator.setSelectedIndex(-1);
   		  }
@@ -365,38 +363,38 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		cmbBoxExpRekChain.setMaximumRowCount(50);
 		cmbBoxExpRekChain.setSelectedIndex(-1);
 		
-		cmbBoxClinics = new JComboBox( new String[]{});		
-		Util.getPRMData("clinic_name", "solgar_prm.prm_exps_clinics",cmbBoxClinics);	
+		cmbBoxClinics = new JComboBox( new String[]{});			
+		Util.getPRMDataGroupBy("clinic_name", "solgar_prm.prm_exps_clinics",cmbBoxClinics,"country",cmbBoxCountry.getSelectedItem().toString());
 		cmbBoxClinics.insertItemAt("", 0);
 		cmbBoxClinics.setMaximumRowCount(50);
 		cmbBoxClinics.setSelectedIndex(-1);
 		
 		cmbBoxKeyLeader = new JComboBox( new String[]{});		
-		Util.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader);
+		Util.getPRMDataGroupBy("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader,"cntry",cmbBoxCountry.getSelectedItem().toString());
 		cmbBoxKeyLeader.insertItemAt("", 0);
 		cmbBoxKeyLeader.setMaximumRowCount(50);
 		cmbBoxKeyLeader.setSelectedIndex(-1);	
 		
 		cmbBoxKeyLeader1 = new JComboBox( new String[]{});		
-		Util.getPRMData("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader1);		
+		Util.getPRMDataGroupBy("leader_name", "solgar_prm.prm_exps_key_leader",cmbBoxKeyLeader1,"cntry",cmbBoxCountry.getSelectedItem().toString());
 		cmbBoxKeyLeader1.insertItemAt("", 0);
 		cmbBoxKeyLeader1.setMaximumRowCount(50);
 		cmbBoxKeyLeader1.setSelectedIndex(-1);
 		
 		cmbBoxContracter = new JComboBox( new String[]{});		
-		Util.getPRMData("Contracter", "solgar_prm.prm_exps_contracter",cmbBoxContracter);
+		Util.getPRMDataGroupBy("Contracter", "solgar_prm.prm_exps_contracter",cmbBoxContracter,"country",cmbBoxCountry.getSelectedItem().toString());
 		cmbBoxContracter.insertItemAt("", 0);
 		cmbBoxContracter.setMaximumRowCount(50);
 		cmbBoxContracter.setSelectedIndex(-1);
 		
 		cmbBoxContracter1 = new JComboBox( new String[]{});		
-		Util.getPRMData("Contracter", "solgar_prm.prm_exps_contracter1",cmbBoxContracter1);	
+		Util.getPRMDataGroupBy("Contracter", "solgar_prm.prm_exps_contracter1",cmbBoxContracter1,"country",cmbBoxCountry.getSelectedItem().toString());
 		cmbBoxContracter1.insertItemAt("", 0);
 		cmbBoxContracter1.setMaximumRowCount(50);
 		cmbBoxContracter1.setSelectedIndex(-1);
 		
 		cmbBoxTema = new JComboBox( new String[]{});		
-		Util.getPRMData("tema", "solgar_prm.prm_exps_temas",cmbBoxTema);	
+		Util.getPRMDataGroupBy("tema", "solgar_prm.prm_exps_temas",cmbBoxTema,"country",cmbBoxCountry.getSelectedItem().toString());
 		cmbBoxTema.insertItemAt("", 0);
 		cmbBoxTema.setMaximumRowCount(50);
 		cmbBoxTema.setSelectedIndex(-1);
@@ -812,16 +810,16 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    		  cmbBoxExpMerOrganizator.removeAllItems();
 	    		  if(cmbBoxCompanyCode.getSelectedItem() != null && cmbBoxArea.getSelectedItem() != null){
 	    			  try {
-						Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-							  "country",cmbBoxArea.getSelectedItem().toString());
+						Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+							  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 	    			  cmbBoxExpMerLecture.insertItemAt("", 0);
 	    			  try {
-						Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-								  "country",cmbBoxArea.getSelectedItem().toString());
+						Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+								  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -846,11 +844,11 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    			  cmbBoxExpMerLecture.removeAllItems();
 		    		  cmbBoxExpMerOrganizator.removeAllItems();
 		    		  try {
-						Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-							  "country",cmbBoxArea.getSelectedItem().toString());
+						Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+							  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
 						cmbBoxExpMerLecture.insertItemAt("", 0);
-		    			  Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-		    					  "country",cmbBoxArea.getSelectedItem().toString());
+		    			  Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+		    					  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -898,19 +896,18 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    			  cmbBoxExpRekProduct.removeAllItems();	
 		    		  if(cmbBoxCompanyCode.getSelectedItem().toString().equalsIgnoreCase("SOLGAR")){
 		    			  try {
-							Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL", "","");
+							Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","SL","country",cmbBoxCountry.getSelectedItem().toString());
 		    			  } catch (SQLException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 		    			  
 	    				  cmbBoxExpPosProduct.insertItemAt("", 0);
-	    				  cmbBoxExpRekProduct.insertItemAt("", 0);
 	    				  cmbBoxExpPosProduct.setSelectedIndex(-1);
 	    				  cmbBoxExpRekProduct.setSelectedIndex(-1);
 	    			  }else{
 	    				  try {
-							Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN", "","");
+							Util.getPRMDataTwoConditionsGroupBy("product", "solgar_prm.prm_exps_top_products",cmbBoxExpRekProduct,"company","BN","country",cmbBoxCountry.getSelectedItem().toString());
 						} catch (SQLException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -926,11 +923,11 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 		    		  cmbBoxExpMerLecture.removeAllItems();
 		    		  cmbBoxExpMerOrganizator.removeAllItems();	
 		    		  try {
-						Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-							  "country",cmbBoxArea.getSelectedItem().toString());
+						Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerLecture,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+							  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
 						cmbBoxExpMerLecture.insertItemAt("", 0);
-		    			  Util.getPRMDataTwoConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
-		    					  "country",cmbBoxArea.getSelectedItem().toString());
+		    			  Util.getPRMDataThreeConditionsGroupBy("lecture", "solgar_prm.prm_exps_lectures",cmbBoxExpMerOrganizator,"company_name",cmbBoxCompanyCode.getSelectedItem().toString(),
+		    					  "country",cmbBoxArea.getSelectedItem().toString(),"cntry",cmbBoxCountry.getSelectedItem().toString());
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -1326,7 +1323,7 @@ public class ExpsEntryScreen extends JFrame implements ActionListener,ItemListen
 	    	  }	  		
 		}
 		
-private boolean mustEnterControlMeropriyati(){
+		private boolean mustEnterControlMeropriyati(){
 			
 			//Brand, country, area, region, start-end date, second stage 
 			if(cmbBoxCompanyCode.getSelectedItem() == null || cmbBoxCompanyCode.getSelectedItem().toString().length()==0){
@@ -1372,17 +1369,47 @@ private boolean mustEnterControlMeropriyati(){
 					return false;
 				}
 			}	
-			cmbBoxCompanyCode.setBackground(Color.white);
-			cmbBoxCountry.setBackground(Color.white);
-			cmbBoxArea.setBackground(Color.white);
-			cmbBoxRegion.setBackground(Color.white);
-			cmbBoxExpLevel1.setBackground(Color.white);
-			startDate.setBackground(Color.white);
-			endDate.setBackground(Color.white);
-			txtCountFormat.setBackground(Color.white);
-			return true;	
 			
-		}	
+			if (cmbBoxExpLevel1.getSelectedItem().toString().matches("ÌÏ|ÊÑ|Ôàðì.êðóæêè|ÂÎ|ÖÎ")) {
+				if (cmbBoxExpMerOrganizator.getSelectedItem() == null
+						|| cmbBoxExpMerOrganizator.getSelectedItem().toString().length() == 0) {
+					JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Organizator ", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					cmbBoxExpMerOrganizator.setBackground(Color.red);
+					return false;
+				}
+	
+				if (cmbBoxExpMerLecture.getSelectedItem() == null
+						|| cmbBoxExpMerLecture.getSelectedItem().toString().length() == 0) {
+					JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Lecture ", "Error", JOptionPane.ERROR_MESSAGE);
+					cmbBoxExpMerLecture.setBackground(Color.red);
+					return false;
+				}
+			}
+	
+			if (cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("ÂÎ")) {
+				if (cmbBoxExpRekChain.getSelectedItem() == null
+						|| cmbBoxExpRekChain.getSelectedItem().toString().length() == 0) {
+					JOptionPane.showMessageDialog(pnlInfoMsg, "Please fill Chain ", "Error", JOptionPane.ERROR_MESSAGE);
+					cmbBoxExpRekChain.setBackground(Color.red);
+					return false;
+				}
+			}
+	
+				cmbBoxExpMerOrganizator.setBackground(Color.white);
+				cmbBoxExpMerLecture.setBackground(Color.white);
+				cmbBoxExpRekChain.setBackground(Color.white);
+				cmbBoxCompanyCode.setBackground(Color.white);
+				cmbBoxCountry.setBackground(Color.white);
+				cmbBoxArea.setBackground(Color.white);
+				cmbBoxRegion.setBackground(Color.white);
+				cmbBoxExpLevel1.setBackground(Color.white);
+				startDate.setBackground(Color.white);
+				endDate.setBackground(Color.white);
+				txtCountFormat.setBackground(Color.white);
+				return true;	
+				
+			}	
 		
 		private boolean mustEnterControlPosMaterial(){	
 			if(cmbBoxCompanyCode.getSelectedItem() == null || cmbBoxCompanyCode.getSelectedItem().toString().length()==0){
@@ -1694,8 +1721,8 @@ private boolean mustEnterControlMeropriyati(){
 		  			cmbBoxExpMerOrganizator.setVisible(true);
 		  			lblAmount5.setVisible(true);
 		  			txtAmount5.setVisible(true);//dop rasxod 
-		  			lblExpMerOrganizator.setVisible(true);
-		  			cmbBoxExpMerOrganizator.setVisible(true); 
+		  			lblExpMerLecture.setVisible(true);
+		  			cmbBoxExpMerLecture.setVisible(true); 
 		  		 }else if(cmbBoxExpLevel1.getSelectedItem().toString().equalsIgnoreCase("ìåä.ïðåäñò")){
 		  			lblAmount5.setVisible(true);
 		  			txtAmount5.setVisible(true);//dop rasxod 

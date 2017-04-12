@@ -22,6 +22,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -30,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.JComboBox;
 
+import main.ConnectToDb;
 import main.Dispatcher;
 import util.Util;
 
@@ -61,8 +63,7 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 	private String userArea="All";	
 	private String empid="-1";
 	private JTextField txtDoctorName,txtDoctorTel;
-	private JComboBox cmbBoxCountry,cmbBoxArea,
-	cmbBoxRegion,cmbBoxCity,cmbBoxCompanyCode,
+	private JComboBox cmbBoxCountry,cmbBoxArea,cmbBoxRegion,cmbBoxCity,cmbBoxCompanyCode,
 	cmbBoxSpeciality,cmbBoxMrktStaff,cmbBoxDoctorCtgry,cmbBoxUnifiedSpeciality,cmbBoxActiveness;
 	private JDateChooser doctorActivationDate;
 	private static final DecimalFormat doubleFormatter = new DecimalFormat("#,###");
@@ -75,10 +76,11 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 	String headerResult[] = new String[] {"Id", "BRAND", "Country", "Area", "Region", "City", "Activeness", "Medrep", "Activation Date", "Doctor Name", "Унифицированные специальности", 
 			"Специальность", "Должность / Регалии", "Category", "Clinic Name","Clinic Address", "Clinic Count", "Key Person", "Doctor Tel", "Doctor Email", "Full Address", "Building Type", 
 			"Country Code", "Administrative Area Name", "Sub Administrative Area Name", "Street", "Home Number", "point_y", "point_x","Entry User","Entry Date"};
-	private JTextField txtDoctorEmail,txtPointY,txtPointX,txtHomeNumber,txtStreet,txtBuildingType,txtSubArea,txtArea,txtCountryCode,txtOffAddress,txtClinicCount,txtclinicName;
-	private JTextField txtPositionRegalia;
-	private JTextField txtKeyPerson;
-	private JTextField txtid;
+	private JTextField txtDoctorEmail,txtPointY,txtPointX,txtHomeNumber,txtStreet,txtBuildingType,
+	txtSubArea,txtArea,txtCountryCode,txtOffAddress,txtClinicCount,txtclinicName,txtPositionRegalia,txtKeyPerson,txtid;
+	private String Lang = "RU";
+	private ResourceBundle resourceBundle;
+	private JTextField txtCount;
 	/**
 	 * Launch the application.
 	 */
@@ -121,6 +123,10 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 						userArea = inBag.get("AREA").toString();
 						empid = inBag.get("EMPLOYEEID").toString();
 					}
+					if (inBag.existsBagKey("LANGUAGE")) {
+				    	  Lang = inBag.get("LANGUAGE").toString();
+				      }
+				    resourceBundle = ConnectToDb.readBundleFile(Lang);
 					
 				} catch (Exception e) {
 					// simdilik yoksa yok
@@ -149,19 +155,19 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		getContentPane().add(pnlAddress);
 		pnlAddress.setLayout(null);
 		
-		JLabel lblCountry = new JLabel("Country");
+		JLabel lblCountry = new JLabel(resourceBundle.getString("Country"));
 		lblCountry.setBounds(10, 56, 69, 14);
 		pnlAddress.add(lblCountry);
 		
-		JLabel lblArea = new JLabel("Area");
+		JLabel lblArea = new JLabel(resourceBundle.getString("Area"));
 		lblArea.setBounds(10, 81, 46, 14);
 		pnlAddress.add(lblArea);
 		
-		JLabel lblRegion = new JLabel("Region");
+		JLabel lblRegion = new JLabel(resourceBundle.getString("Region"));
 		lblRegion.setBounds(10, 106, 46, 14);
 		pnlAddress.add(lblRegion);
 		
-		JLabel lblCity = new JLabel("City");
+		JLabel lblCity = new JLabel(resourceBundle.getString("City"));
 		lblCity.setBounds(10, 131, 46, 14);
 		pnlAddress.add(lblCity);
 		
@@ -195,7 +201,7 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 			cmbBoxCountry.addItem("Russia");
 			cmbBoxCountry.setSelectedIndex(0);		
 			Util.getPRMDataGroupBy("area", "solgar_prm.prm_sales_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
-			cmbBoxArea.setSelectedIndex(0);
+			cmbBoxArea.setSelectedIndex(-1);
 			cmbBoxArea.setEnabled(true);
 			/*cmbBoxCountry.addItem("Russia");
 			cmbBoxCountry.setSelectedIndex(0);				
@@ -231,13 +237,13 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		}
 		
 		
-		JLabel lblCompany = new JLabel("Company");
-		lblCompany.setBounds(10, 32, 46, 14);
+		JLabel lblCompany = new JLabel(resourceBundle.getString("Company"));
+		lblCompany.setBounds(10, 32, 69, 14);
 		pnlAddress.add(lblCompany);
 
 		cmbBoxCompanyCode = new JComboBox( new String[]{});
 		cmbBoxCompanyCode.setEnabled(false);
-		cmbBoxCompanyCode.setBounds(59, 29, 130, 17);
+		cmbBoxCompanyCode.setBounds(97, 29, 92, 17);
 		pnlAddress.add(cmbBoxCompanyCode);
 		
 		if(userBrand.equalsIgnoreCase("ALL")){
@@ -259,23 +265,23 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		getContentPane().add(pnlAgreement);
 		pnlAgreement.setLayout(null);
 		
-		JLabel lblDoctorTel = new JLabel("Doctor Tel");
+		JLabel lblDoctorTel = new JLabel(resourceBundle.getString("DoctorTel"));
 		lblDoctorTel.setBounds(292, 98, 120, 17);
 		pnlAgreement.add(lblDoctorTel);
 		
-		JLabel lblDoctorName = new JLabel("Doctor Name");
+		JLabel lblDoctorName = new JLabel(resourceBundle.getString("DoctorName"));
 		lblDoctorName.setBounds(10, 23, 120, 17);
 		pnlAgreement.add(lblDoctorName);
 		
-		JLabel lblPharmActivationDate = new JLabel("Doctor Activation Date");
+		JLabel lblPharmActivationDate = new JLabel(resourceBundle.getString("DoctorActivationDate"));
 		lblPharmActivationDate.setBounds(10, 178, 120, 17);
 		pnlAgreement.add(lblPharmActivationDate);
 		
-		JLabel lblDoctorEmail = new JLabel("Doctor Email");
+		JLabel lblDoctorEmail = new JLabel(resourceBundle.getString("DoctorEmail"));
 		lblDoctorEmail.setBounds(292, 123, 120, 17);
 		pnlAgreement.add(lblDoctorEmail);
 		
-		txtDoctorTel = new JTextField();
+		txtDoctorTel = new JTextField(resourceBundle.getString("DoctorTel"));
 		txtDoctorTel.setBounds(408, 95, 130, 17);
 		txtDoctorTel.setText("0");
 		pnlAgreement.add(txtDoctorTel);
@@ -291,17 +297,18 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		doctorActivationDate.setDate(cal.getTime());
 		pnlAgreement.add(doctorActivationDate);
 		
-		JLabel lblSpeciality = new JLabel("Speciality");
+		JLabel lblSpeciality = new JLabel(resourceBundle.getString("Speciality"));
 		lblSpeciality.setBounds(10, 123, 120, 17);
 		pnlAgreement.add(lblSpeciality);
 		
 		cmbBoxSpeciality = new JComboBox();
+		cmbBoxSpeciality.addItem("");
 		Util.getPRMData("specialty", "solgar_prm.prm_sales_doctor_speaciality",cmbBoxSpeciality);		
 		cmbBoxSpeciality.setSelectedIndex(-1);
 		cmbBoxSpeciality.setBounds(140, 123, 140, 17);
 		pnlAgreement.add(cmbBoxSpeciality);
 		
-		JLabel lblMarketingStaff = new JLabel("Marketing Staff");
+		JLabel lblMarketingStaff = new JLabel(resourceBundle.getString("MarketingStaff"));
 		lblMarketingStaff.setBounds(10, 48, 120, 17);
 		pnlAgreement.add(lblMarketingStaff);		
 		
@@ -312,17 +319,18 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		pnlAgreement.add(cmbBoxMrktStaff);
 		
 		cmbBoxDoctorCtgry = new JComboBox();
+		cmbBoxDoctorCtgry.addItem("");
 		cmbBoxDoctorCtgry.addItem("A");
 		cmbBoxDoctorCtgry.addItem("B");
 		cmbBoxDoctorCtgry.setSelectedIndex(-1);
 		cmbBoxDoctorCtgry.setBounds(140, 74, 140, 17);
 		pnlAgreement.add(cmbBoxDoctorCtgry);
 		
-		JLabel lblPharmCtgry = new JLabel("Doctor Category");
+		JLabel lblPharmCtgry = new JLabel(resourceBundle.getString("DoctorCategory"));
 		lblPharmCtgry.setBounds(10, 74, 120, 17);
 		pnlAgreement.add(lblPharmCtgry);
 		
-		JLabel lblAssortiment = new JLabel("Main Speciality");
+		JLabel lblAssortiment = new JLabel(resourceBundle.getString("MainSpeciality"));
 		lblAssortiment.setBounds(10, 98, 120, 17);
 		pnlAgreement.add(lblAssortiment);
 		
@@ -333,7 +341,7 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		cmbBoxUnifiedSpeciality.setBounds(140, 98, 140, 17);
 		pnlAgreement.add(cmbBoxUnifiedSpeciality);
 		
-		JLabel lblDoctorActiveness = new JLabel("Doctor Activeness");
+		JLabel lblDoctorActiveness = new JLabel(resourceBundle.getString("DoctorActiveness"));
 		lblDoctorActiveness.setBounds(292, 50, 109, 17);
 		pnlAgreement.add(lblDoctorActiveness);
 		
@@ -349,12 +357,14 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		pnlAgreement.add(txtDoctorEmail);
 		txtDoctorEmail.setColumns(10);
 		
-		btnListAptek = new JButton("List Doctor");
+		btnListAptek = new JButton(resourceBundle.getString("ListDoctor"));
+		btnListAptek.setActionCommand("List Doctor");
+		btnListAptek.setForeground(Color.BLUE);
 		btnListAptek.setBounds(408, 173, 130, 23);
 		pnlAgreement.add(btnListAptek);
 		
-		JLabel lblPosition = new JLabel("Position");
-		lblPosition.setBounds(10, 152, 46, 14);
+		JLabel lblPosition = new JLabel(resourceBundle.getString("Position"));
+		lblPosition.setBounds(10, 152, 120, 14);
 		pnlAgreement.add(lblPosition);
 		
 		txtPositionRegalia = new JTextField();
@@ -364,9 +374,19 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		
 		txtid = new JTextField();
 		txtid.setEnabled(false);
-		txtid.setBounds(285, 176, 86, 20);
+		txtid.setBounds(432, 142, 86, 20);
 		pnlAgreement.add(txtid);
 		txtid.setColumns(10);
+		
+		JLabel lblCount = new JLabel(resourceBundle.getString("Count"));
+		lblCount.setBounds(259, 179, 46, 14);
+		pnlAgreement.add(lblCount);
+		
+		txtCount = new JTextField();
+		txtCount.setEnabled(false);
+		txtCount.setBounds(315, 176, 62, 20);
+		pnlAgreement.add(txtCount);
+		txtCount.setColumns(10);
 		
 		JPanel pnlResult = new JPanel();
 		pnlResult.setBorder(new TitledBorder(null, "Result", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
@@ -397,27 +417,39 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		getContentPane().add(panelButon);
 		panelButon.setLayout(null);
 		
-		btnAdd = new JButton("ADD");
+		btnAdd = new JButton(resourceBundle.getString("ADD"));
+		btnAdd.setActionCommand("ADD");
+		btnAdd.setForeground(Color.RED);
 		btnAdd.setBounds(50, 28, 139, 23);
 		panelButon.add(btnAdd);
 		
-		btnUpdate = new JButton("UPDATE");
+		btnUpdate = new JButton(resourceBundle.getString("UPDATE"));
+		btnUpdate.setActionCommand("UPDATE");
+		btnUpdate.setForeground(Color.RED);
 		btnUpdate.setBounds(221, 28, 132, 23);
 		panelButon.add(btnUpdate);
 		
-		btnDelete = new JButton("DELETE");
+		btnDelete = new JButton(resourceBundle.getString("DELETE"));
+		btnDelete.setActionCommand("DELETE");
+		btnDelete.setForeground(Color.RED);
 		btnDelete.setBounds(377, 28, 132, 23);
 		panelButon.add(btnDelete);
 		
-		btnSave = new JButton("SAVE");
+		btnSave = new JButton(resourceBundle.getString("SAVE"));
+		btnSave.setActionCommand("SAVE");
+		btnSave.setForeground(Color.RED);
 		btnSave.setBounds(537, 28, 139, 23);
 		panelButon.add(btnSave);
 		
-		btnCleanUp = new JButton("CLEANUP");
+		btnCleanUp = new JButton(resourceBundle.getString("CLEANUP"));
+		btnCleanUp.setActionCommand("CLEANUP");
+		btnCleanUp.setForeground(Color.RED);
 		btnCleanUp.setBounds(701, 28, 139, 23);
 		panelButon.add(btnCleanUp);
 		
-		btnExit = new JButton("EXIT");
+		btnExit = new JButton(resourceBundle.getString("EXIT"));
+		btnExit.setActionCommand("EXIT");
+		btnExit.setForeground(Color.RED);
 		btnExit.setBounds(885, 28, 132, 23);
 		panelButon.add(btnExit);
 		
@@ -434,25 +466,25 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		getContentPane().add(pnlAddr);
 		pnlAddr.setLayout(null);
 		
-		JLabel lblClinicAddress = new JLabel("Clinic Address");
+		JLabel lblClinicAddress = new JLabel(resourceBundle.getString("ClinicAddress"));
 		lblClinicAddress.setBounds(5, 147, 103, 14);
 		pnlAddr.add(lblClinicAddress);
 		
-		JLabel lblClinicName = new JLabel("Clinic Name");
-		lblClinicName.setBounds(5, 25, 85, 14);
+		JLabel lblClinicName = new JLabel(resourceBundle.getString("ClinicName"));
+		lblClinicName.setBounds(5, 25, 110, 14);
 		pnlAddr.add(lblClinicName);
 		
 		txtclinicName = new JTextField();
-		txtclinicName.setBounds(100, 22, 191, 20);
+		txtclinicName.setBounds(125, 22, 165, 20);
 		pnlAddr.add(txtclinicName);
 		txtclinicName.setColumns(10);
 		
-		JLabel lblClinicCount = new JLabel("Clinic Count");
-		lblClinicCount.setBounds(5, 50, 103, 14);
+		JLabel lblClinicCount = new JLabel(resourceBundle.getString("ClinicCount"));
+		lblClinicCount.setBounds(5, 50, 113, 14);
 		pnlAddr.add(lblClinicCount);
 		
 		txtClinicCount = new JTextField();
-		txtClinicCount.setBounds(100, 47, 80, 20);
+		txtClinicCount.setBounds(110, 47, 80, 20);
 		pnlAddr.add(txtClinicCount);
 		txtClinicCount.setColumns(10);
 		
@@ -478,12 +510,12 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		txtAreaAddress.setLineWrap(true);
 		txtAreaAddress.setRows(2);
 		
-		JLabel lblKeyPerson = new JLabel("Key Person");
-		lblKeyPerson.setBounds(10, 75, 80, 14);
+		JLabel lblKeyPerson = new JLabel(resourceBundle.getString("KeyPerson"));
+		lblKeyPerson.setBounds(5, 75, 110, 14);
 		pnlAddr.add(lblKeyPerson);
 		
 		txtKeyPerson = new JTextField();
-		txtKeyPerson.setBounds(100, 73, 191, 20);
+		txtKeyPerson.setBounds(125, 73, 166, 20);
 		pnlAddr.add(txtKeyPerson);
 		txtKeyPerson.setColumns(10);
 		
@@ -493,7 +525,7 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		getContentPane().add(pnlAddOfficial);
 		pnlAddOfficial.setLayout(null);
 		
-		JLabel lblOffAddress = new JLabel("Official Address");
+		JLabel lblOffAddress = new JLabel(resourceBundle.getString("OfficialAddress"));
 		lblOffAddress.setBounds(10, 24, 103, 14);
 		pnlAddOfficial.add(lblOffAddress);
 		
@@ -504,7 +536,7 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		pnlAddOfficial.add(txtOffAddress);
 		txtOffAddress.setColumns(10);
 		
-		JLabel lblCountryCode = new JLabel("Country Code");
+		JLabel lblCountryCode = new JLabel(resourceBundle.getString("CountryCode"));
 		lblCountryCode.setBounds(10, 49, 103, 14);
 		pnlAddOfficial.add(lblCountryCode);
 		
@@ -515,7 +547,7 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		pnlAddOfficial.add(txtCountryCode);
 		txtCountryCode.setColumns(10);
 		
-		JLabel lblAdmArea = new JLabel("Area");
+		JLabel lblAdmArea = new JLabel(resourceBundle.getString("Area"));
 		lblAdmArea.setBounds(10, 74, 86, 14);
 		pnlAddOfficial.add(lblAdmArea);
 		
@@ -526,7 +558,7 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		pnlAddOfficial.add(txtArea);
 		txtArea.setColumns(10);
 		
-		JLabel lblSubArea = new JLabel("Sub Area");
+		JLabel lblSubArea = new JLabel(resourceBundle.getString("SubArea"));
 		lblSubArea.setBounds(10, 99, 103, 14);
 		pnlAddOfficial.add(lblSubArea);
 		
@@ -537,15 +569,15 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		pnlAddOfficial.add(txtSubArea);
 		txtSubArea.setColumns(10);
 		
-		JLabel lblBuildingType = new JLabel("Building Type");
+		JLabel lblBuildingType = new JLabel(resourceBundle.getString("BuildingType"));
 		lblBuildingType.setBounds(419, 49, 103, 14);
 		pnlAddOfficial.add(lblBuildingType);
 		
-		JLabel lblStreet = new JLabel("Street");
+		JLabel lblStreet = new JLabel(resourceBundle.getString("Street"));
 		lblStreet.setBounds(419, 74, 78, 14);
 		pnlAddOfficial.add(lblStreet);
 		
-		JLabel lblHomeNo = new JLabel("Home Number");
+		JLabel lblHomeNo = new JLabel(resourceBundle.getString("HomeNumber"));
 		lblHomeNo.setBounds(419, 99, 103, 14);
 		pnlAddOfficial.add(lblHomeNo);
 		
@@ -570,11 +602,11 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		pnlAddOfficial.add(txtHomeNumber);
 		txtHomeNumber.setColumns(10);
 		
-		JLabel lblPointX = new JLabel("Point_X");
+		JLabel lblPointX = new JLabel(resourceBundle.getString("Point_X"));
 		lblPointX.setBounds(839, 49, 56, 14);
 		pnlAddOfficial.add(lblPointX);
 		
-		JLabel lblPointY = new JLabel("Point_Y");
+		JLabel lblPointY = new JLabel(resourceBundle.getString("Point_Y"));
 		lblPointY.setBounds(839, 74, 56, 14);
 		pnlAddOfficial.add(lblPointY);
 		
@@ -592,7 +624,9 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		pnlAddOfficial.add(txtPointY);
 		txtPointY.setColumns(10);
 		
-		btnGetAddress = new JButton("Find Address");
+		btnGetAddress = new JButton(resourceBundle.getString("FindAddress"));
+		btnGetAddress.setActionCommand("Find Address");
+		btnGetAddress.setForeground(Color.BLUE);
 		btnGetAddress.setBounds(839, 20, 215, 23);
 		pnlAddOfficial.add(btnGetAddress);
 		cmbBoxRegion.addItemListener(this);
@@ -869,7 +903,7 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 	    	cmbBoxRegion.setSelectedItem("");
 	    	cmbBoxCity.setSelectedItem("");	    
 	    	cmbBoxActiveness.setSelectedItem("");
-	    	cmbBoxMrktStaff.setSelectedItem("");
+	    	//cmbBoxMrktStaff.setSelectedItem("");
 	    	doctorActivationDate.setDate(cal.getTime());
 	    	txtDoctorName.setText("");
 	    	cmbBoxUnifiedSpeciality.setSelectedItem("");
@@ -944,6 +978,12 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 			 if(cmbBoxCity.getSelectedItem() !=null){tempBag.put("CITY", cmbBoxCity.getSelectedItem().toString());} 
 			 if(cmbBoxMrktStaff.getSelectedItem() !=null){tempBag.put("MARKETING_STAFF", cmbBoxMrktStaff.getSelectedItem().toString());}
 			 
+			 if(cmbBoxSpeciality.getSelectedItem() !=null){tempBag.put("MAIN_SPECIALITY", cmbBoxSpeciality.getSelectedItem().toString());}
+			 if(cmbBoxUnifiedSpeciality.getSelectedItem() !=null){tempBag.put("SUB_SPECIALITY", cmbBoxUnifiedSpeciality.getSelectedItem().toString());}
+			 if(cmbBoxDoctorCtgry.getSelectedItem() !=null){tempBag.put("CATEGORY", cmbBoxDoctorCtgry.getSelectedItem().toString());}
+			 if(cmbBoxActiveness.getSelectedItem() !=null){tempBag.put("ACTIVENESS", cmbBoxActiveness.getSelectedItem().toString());}
+			 if(txtDoctorName.getText() !=null && txtDoctorName.getText().trim().length()>0){tempBag.put("DOCTOR_NAME", txtDoctorName.getText().toString());}
+			 
 			 DefaultTableModel dtm2 = (DefaultTableModel) tableResult.getModel();
 	    	 for( int j = dtm2.getRowCount() - 1; j >= 0; j-- ) {
 	    		 dtm2.removeRow(j);
@@ -989,6 +1029,7 @@ public class DoctorEntryUpdate extends JFrame implements ActionListener,ItemList
 		        			tempBag.get("TABEL",j,"ENTRY_DATE")
 		        		});		
 			}
+				txtCount.setText(tempBag.get("COUNT"));
 			
 	    }catch (Exception e) {
 			// simdilik yoksa yok

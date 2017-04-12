@@ -25,6 +25,8 @@ public class DoctorData {
 		  Connection conn = null;
 		  PreparedStatement  stmt = null;	
 		  ESIBag outBag = new ESIBag();
+		  int doctorId=0;
+		  int generatedId=0;
 		  try{		  
 			  Class.forName("com.mysql.jdbc.Driver");
 		      conn = (Connection) DriverManager.getConnection(prop.getProperty("DB_URL_UPDATE"), prop.getProperty("USER"), prop.getProperty("PASS"));		
@@ -43,20 +45,21 @@ public class DoctorData {
 				      String controlfalse = control_uniquless(doctor_name, point_x, point_y);
 				      if(controlfalse.equalsIgnoreCase("1")){
 				    	  outBag.put("RC","false");
-				    	  outBag.put("ERROR_MESSAGE", "Please check next pharmacy already recorded:"+doctor_name);
+				    	  outBag.put("ERROR_MESSAGE", "Please check next doctor already recorded:"+doctor_name);
 				    	  return outBag;
 				      }
 			      }
 			     
 			      if(id<0){//if update first delete
+			    	  doctorId = getDoctorId(conn, id*-1);
 			    	  deleteDoctor(conn,id,username);
 			      }
 			      if(!entryUser.equalsIgnoreCase("Delete"))  {
 			    	  stmt = (PreparedStatement) conn.prepareStatement( "INSERT INTO solgar_tst.doctor_data(`status`,`brand`,`country`,`area`,`region`,`city`,"
 			    			  +"`activeness`,`medrep`,`doctor_date`,`doctor_name`,`Unified_specialty`,`Specialty`,`Position_regalia`,`category`,`clinic_name`,"
 			    			  +"`clinic_address`,`clinic_count`,`key_person`,`doctor_tel`,`doctor_email`,`full_address`,`requested`,`building_type`,`country_code`,"
-			    			  +"`administrative_area_name`,`sub_administrative_area_name`,`street`,`homenumber`,`point_y`,`point_x`,`entry_date`,`entry_user`)"
-						   		+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);//32
+			    			  +"`administrative_area_name`,`sub_administrative_area_name`,`street`,`homenumber`,`point_y`,`point_x`,`doctor_id`,`entry_date`,`entry_user`)"
+						   		+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);//32
 				      
 				    	  stmt.setInt(1,1);//Status
 				    	  stmt.setString(2,inBag.get("RESULTTABLE",j,"BRAND"));
@@ -95,14 +98,22 @@ public class DoctorData {
 				    	  stmt.setString(28,inBag.get("RESULTTABLE",j,"HOMENUMBER"));
 				    	  stmt.setString(29,inBag.get("RESULTTABLE",j,"POINT_Y"));
 				    	  stmt.setString(30,inBag.get("RESULTTABLE",j,"POINT_X"));
-				    	  stmt.setTimestamp(31,Timestamp.valueOf(Util.getCurrentDateTime()));
-				    	  stmt.setString(32,username);
+				    	  stmt.setInt(31,doctorId);//Status
+				    	  stmt.setTimestamp(32,Timestamp.valueOf(Util.getCurrentDateTime()));
+				    	  stmt.setString(33,username);
 				    	  stmt.executeUpdate();
-						   ResultSet keyResultSet = stmt.getGeneratedKeys();
-				            if (keyResultSet.next()) {
-				            	inBag.put("RELATIONID", String.valueOf(keyResultSet.getInt(1)));
-				            }				   
-						   stmt.close();
+						   
+				    	  ResultSet keyResultSet = stmt.getGeneratedKeys();
+				          if (keyResultSet.next()) {
+				        	generatedId = keyResultSet.getInt(1);
+				            inBag.put("RELATIONID", String.valueOf(generatedId));
+				          }				   
+						  stmt.close();
+						  
+						  if(id==0){//Yeni ise update et doctor id yi
+							  updateDoctorId(conn,generatedId); 
+						  }						  
+						  
 			      }
 		      }
 			 
@@ -137,10 +148,10 @@ public class DoctorData {
 		   try{
 			   id = id*-1;
 			   
-			   stmt = (PreparedStatement) conn.prepareStatement( "update solgar_tst.doctor_data set status = 0,entry_user=?,entry_date=?  WHERE status = 1 and id = ?");			   
-			   stmt.setString(1,userName);
-			   stmt.setTimestamp(2,Timestamp.valueOf(Util.getCurrentDateTime()));
-			   stmt.setInt(3,id);
+			   stmt = (PreparedStatement) conn.prepareStatement( "update solgar_tst.doctor_data set status = 0  WHERE status = 1 and id = ?");			   
+			   //stmt.setString(1,userName);
+			   //stmt.setTimestamp(2,Timestamp.valueOf(Util.getCurrentDateTime()));
+			   stmt.setInt(1,id);
 			   stmt.executeUpdate();
 			   stmt.close(); 					
 				
@@ -150,6 +161,51 @@ public class DoctorData {
 			      e.printStackTrace();
 			      throw e;
 			   }finally{}//end try	
+		
+	}
+	 
+	 private void updateDoctorId(Connection conn,int id) throws Exception {
+		 PreparedStatement  stmt = null;				  
+		   try{
+			   
+			   stmt = (PreparedStatement) conn.prepareStatement( "update solgar_tst.doctor_data set doctor_id = ? WHERE status = 1 and id = ?");			   
+			   stmt.setInt(1,id);
+			   stmt.setInt(2,id);
+			   stmt.executeUpdate();
+			   stmt.close(); 					
+				
+		      }catch(SQLException se){
+			      throw se;
+			   }catch(Exception e){
+			      e.printStackTrace();
+			      throw e;
+			   }finally{}//end try	
+		
+	}
+	 private int getDoctorId(Connection conn,int id) throws Exception {
+		 Statement stmt =null;
+		 String sorgu  ="";
+		 int doctorId=0;
+		   try{
+			   sorgu  = "select * from solgar_tst.doctor_data where status = 1 ";
+			   sorgu = sorgu +" and id ="+id;
+			   
+			   stmt = (Statement) conn.createStatement();
+	           ResultSet rs = stmt.executeQuery(sorgu);
+	           
+	           while (rs.next()){
+	        	   doctorId = rs.getInt("doctor_id");
+	           }
+			   					
+	           stmt.close();
+	           
+		      }catch(SQLException se){
+			      throw se;
+			   }catch(Exception e){
+			      e.printStackTrace();
+			      throw e;
+			   }finally{}//end try	
+		   return doctorId;
 		
 	}
 	 
@@ -221,6 +277,22 @@ public class DoctorData {
 			   if(inBag.existsBagKey("MARKETING_STAFF") && inBag.get("MARKETING_STAFF").toString().length()>0){
 				   sorgu = sorgu +" and medrep ='"+inBag.get("MARKETING_STAFF").toString()+"'";
 			   }
+			   
+			   if(inBag.existsBagKey("SUB_SPECIALITY") && inBag.get("SUB_SPECIALITY").toString().length()>0){
+				   sorgu = sorgu +" and specialty ='"+inBag.get("SUB_SPECIALITY").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("MAIN_SPECIALITY") && inBag.get("MAIN_SPECIALITY").toString().length()>0){
+				   sorgu = sorgu +" and unified_specialty ='"+inBag.get("MAIN_SPECIALITY").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("CATEGORY") && inBag.get("CATEGORY").toString().length()>0){
+				   sorgu = sorgu +" and category ='"+inBag.get("CATEGORY").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("ACTIVENESS") && inBag.get("ACTIVENESS").toString().length()>0){
+				   sorgu = sorgu +" and activeness ='"+inBag.get("ACTIVENESS").toString()+"'";
+			   }
+			   if(inBag.existsBagKey("DOCTOR_NAME") && inBag.get("DOCTOR_NAME").toString().length()>0){
+				   sorgu = sorgu +" and doctor_name like '%"+inBag.get("DOCTOR_NAME").toString()+"%'";
+			   }
 				          
 	           stmt = (Statement) conn.createStatement();
 	           ResultSet rs = stmt.executeQuery(sorgu);
@@ -260,6 +332,7 @@ public class DoctorData {
 	         	   outBag.put("TABEL",j,"ENTRY_USER", rs.getString("entry_user"));	        	   
 	        	   j++;
 	           } 
+	           outBag.put("COUNT",String.valueOf(j));
 	           
 	           stmt.close();
 	           conn.close();

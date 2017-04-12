@@ -151,7 +151,8 @@ public class Storages {
 	}
 	
 	public static ESIBag protekSalesParser(Sheet sheet,String mainGroup, int verticalLimit,int horizontalLimit) {
-		int startOfRow = 0,startOfTovar = 0,startOfSklad = 0,startOfCount = 0,startOfAmount = 0,tableindex = 0;
+		int startOfRow = 0,startOfTovar = 0,startOfSklad = 0,startOfCount = 0,startOfAmount = 0,tableindex = 0,
+				startOfClient = 0,startOfCorpAdress = 0,startOfRetailAdress = 0,startOfINN = 0,startOfSegment = 0;
 		boolean breakFor = false;
 		String pharmacy="";
 		
@@ -167,14 +168,35 @@ public class Storages {
 					startOfTovar = columNo;
 					startOfRow = rowNo + 1;
 				}
-				if (c1.getContents().indexOf("регион") >= 0) {
-					startOfSklad = columNo;
-					breakFor = true;
-					break;
+				if (c1.getContents().indexOf("клиент") >= 0) {
+					startOfClient = columNo;
+					startOfRow = rowNo + 1;
+				}
+				if (c1.getContents().indexOf("юр. адрес") >= 0) {
+					startOfCorpAdress = columNo;
+					startOfRow = rowNo + 1;
+				}
+				if (c1.getContents().indexOf("факт. адрес") >= 0) {
+					startOfRetailAdress = columNo;
+					startOfRow = rowNo + 1;
+				}
+				if (c1.getContents().indexOf("ИНН") >= 0) {
+					startOfINN = columNo;
+					startOfRow = rowNo + 1;
 				}
 				if (c1.getContents().indexOf("отгружено") >= 0) {
 					startOfCount = columNo;
 				}
+				if (c1.getContents().indexOf("регион") >= 0) {
+					startOfSklad = columNo;
+					
+				}				
+				if (c1.getContents().indexOf("сегмент") >= 0) {
+					startOfSegment = columNo;
+					breakFor = true;
+					break;
+				}
+				
 
 			}
 
@@ -200,6 +222,45 @@ public class Storages {
 					}else{
 						outBag.put("TABLE",tableindex,"COUNT", "0");
 					}
+					Cell c5 = sheet.getCell(startOfClient, i);
+					if(c5.getContents() != null && c5.getContents().length() >0){
+						String client  = c5.getContents();
+						outBag.put("TABLE",tableindex,"CLIENT", client);
+					}else{
+						outBag.put("TABLE",tableindex,"CLIENT", "");
+					}
+					
+					Cell c6 = sheet.getCell(startOfCorpAdress, i);
+					if(c6.getContents() != null && c6.getContents().length() >0){
+						String legalAddress  = c6.getContents();
+						outBag.put("TABLE",tableindex,"LEGALADDRESS", legalAddress);
+					}else{
+						outBag.put("TABLE",tableindex,"LEGALADDRESS", "");
+					}
+					
+					Cell c7 = sheet.getCell(startOfRetailAdress, i);
+					if(c7.getContents() != null && c7.getContents().length() >0){
+						String actualAddress  = c7.getContents();
+						outBag.put("TABLE",tableindex,"ACTUALADDRESS", actualAddress);
+					}else{
+						outBag.put("TABLE",tableindex,"ACTUALADDRESS", "");
+					}
+					
+					Cell c8 = sheet.getCell(startOfINN, i);
+					if(c8.getContents() != null && c8.getContents().length() >0){
+						String INN  = c8.getContents();
+						outBag.put("TABLE",tableindex,"INN", INN);
+					}else{
+						outBag.put("TABLE",tableindex,"INN", "");
+					}
+					
+					Cell c9 = sheet.getCell(startOfSegment, i);
+					if(c9.getContents() != null && c9.getContents().length() >0){
+						String segment  = c9.getContents();
+						outBag.put("TABLE",tableindex,"SEGMENT", segment);
+					}else{
+						outBag.put("TABLE",tableindex,"SEGMENT", "");
+					}
 		
 					outBag.put("TABLE",tableindex,"AMOUNT","0.00");					
 					outBag.put("TABLE",tableindex,"MAINGROUP", mainGroup);			
@@ -213,9 +274,8 @@ public class Storages {
 	}
 	
 	public static ESIBag protekStockParser(Sheet sheet,String mainGroup, int verticalLimit,int horizontalLimit) {
-		int startOfRow = 0,startOfTovar = 0,startOfSklad = 0,startOfCount = 0,startOfAmount = 0,tableindex = 0;
+		int startOfRow = 0,startOfTovar = 0,startOfSklad = 0,startOfCount = 0,startOfCount1 = 0,tableindex = 0;
 		boolean breakFor = false;
-		String pharmacy="";
 		
 		ESIBag outBag = new ESIBag();
 
@@ -234,6 +294,9 @@ public class Storages {
 				}
 				if (c1.getContents().indexOf("всего") >= 0) {
 					startOfCount = columNo;
+				}
+				if (c1.getContents().indexOf("входящий транзит") >= 0) {
+					startOfCount1 = columNo;
 					breakFor = true;
 					break;
 				}
@@ -256,13 +319,18 @@ public class Storages {
 					outBag.put("TABLE",tableindex,"PRODUCT", c2.getContents());							
 		
 					Cell c4 = sheet.getCell(startOfCount, i);
+					String count = "0";
 					if(c4.getContents() != null && c4.getContents().length() >0){
-						String count  = c4.getContents();
-						outBag.put("TABLE",tableindex,"COUNT", count);
-					}else{
-						outBag.put("TABLE",tableindex,"COUNT", "0");
+						count  = c4.getContents();
 					}
-		
+					Cell c5 = sheet.getCell(startOfCount1, i);
+					String count1 = "0";
+					if(c5.getContents() != null && c5.getContents().length() >0){
+						count1  = c5.getContents();
+					}
+					int totCount = Integer.parseInt(count)+Integer.parseInt(count1);
+					
+					outBag.put("TABLE",tableindex,"COUNT", String.valueOf(totCount));
 					outBag.put("TABLE",tableindex,"AMOUNT","0.00");					
 					outBag.put("TABLE",tableindex,"MAINGROUP", mainGroup);			
 				

@@ -2,27 +2,38 @@ package src;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ResourceBundle;
 
 import javax.swing.*;
 
+import cb.esi.esiclient.util.BagKeyNotFoundException;
 import cb.esi.esiclient.util.ESIBag;
-import main.ConnectToDb;
 import util.Util;
+import util.PublicInterface;
 
 public class LoginScreen extends JFrame {
 
     private PassWordDialog passDialog;
+    private String Lang;   
 
-    public LoginScreen() {  	
+    public LoginScreen(ESIBag inBag) throws BagKeyNotFoundException {  	
+    	Lang = inBag.get("LANGUAGE").toString();
         passDialog = new PassWordDialog(this, true);
-        passDialog.setVisible(true);
+        passDialog.setVisible(true);        
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JFrame frame = new LoginScreen();
+            	ESIBag inBag = new ESIBag();
+                JFrame frame =null;
+				try {
+					frame = new LoginScreen(inBag);
+				} catch (BagKeyNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
                 frame.getContentPane().setBackground(Color.BLACK);
                 frame.setTitle("Logged In");
                 frame.setLocationRelativeTo(null);
@@ -36,16 +47,17 @@ public class LoginScreen extends JFrame {
 
 class PassWordDialog extends JDialog {
 
-    private final JLabel jlblUsername = new JLabel("Username");
-    private final JLabel jlblPassword = new JLabel("Password");
+    private final JLabel jlblUsername = new JLabel(PublicInterface.resourceBundle.getString("Username"));
+    private final JLabel jlblPassword = new JLabel(PublicInterface.resourceBundle.getString("Password"));
 
     private final JTextField jtfUsername = new JTextField(15);
     private final JPasswordField jpfPassword = new JPasswordField();
 
-    private final JButton jbtOk = new JButton("Login");
-    private final JButton jbtCancel = new JButton("Cancel");
+    private final JButton jbtOk = new JButton(PublicInterface.resourceBundle.getString("Login"));
+    private final JButton jbtCancel = new JButton(PublicInterface.resourceBundle.getString("Cancel"));
 
     private final JLabel jlblStatus = new JLabel(" ");
+    
 
     public PassWordDialog() {
         this(null, true);

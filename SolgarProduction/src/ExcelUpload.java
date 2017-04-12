@@ -400,7 +400,7 @@ public class ExcelUpload extends JFrame implements ActionListener {
 					}else if (fileName.indexOf("UNIVERSITETSKY_APTEKI")>=0){
 						outBag = Companies.universitestskyAptekiParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
 					}else if (fileName.indexOf("VITA_SAMARA")>=0){
-						outBag = Companies.vitaSamaraParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+						outBag = Companies.vitaSamaraParserProductHorizontal(sheet,selectedItem, verticalLimit, horizontalLimit);		
 					}else if (fileName.indexOf("VITA_TOMSK")>=0){
 						outBag = Companies.vitaTomskParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
 					}else if (fileName.indexOf("ZDOROV.RU")>=0){
@@ -447,9 +447,13 @@ public class ExcelUpload extends JFrame implements ActionListener {
 						outBag = Companies.listikParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
 					}else if (fileName.indexOf("NOVAVITA")>=0){
 						outBag = Companies.novaVitaParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}else if (fileName.indexOf("EVALAR")>=0){
+						outBag = Companies.evalarParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
 					}else if (fileName.indexOf("OTHERS")>=0){
 						outBag = Companies.othersParser(sheet,selectedItem, verticalLimit, horizontalLimit);		
-					}
+					}else if (fileName.indexOf("SHEKSNA")>=0){
+						outBag = Companies.sheksnaParserNew(sheet,selectedItem, verticalLimit, horizontalLimit);		
+					}				
 					
 					int i = 0;
 					// add row dynamically into the table     

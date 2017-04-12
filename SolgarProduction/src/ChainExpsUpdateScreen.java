@@ -89,6 +89,7 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 	String headerTarget[] = new String[] {"Id", "Year", "Month", "Trgt1", "Trgt2", "Trgt3", "Trgt4", "Trgt5"};
 	String headerRelease[] = new String[] {"Id", "Year", "Month", "Purchase","Sell Out", "Amount"};
 	String headerBonusTypes[] = new String[] {"Id", "Bonus Type", "1", "2", "3", "4"};
+	private JTextField txtAgrNo1;
 
 	/**
 	 * Launch the application.
@@ -142,7 +143,7 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
     
 		JPanel pnlStage = new JPanel();
 		pnlStage.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Create Payment Row With Below Data", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, new Color(0, 0, 0)));
-		pnlStage.setBounds(356, 294, 797, 139);
+		pnlStage.setBounds(356, 318, 797, 139);
 		getContentPane().add(pnlStage);
 		pnlStage.setLayout(null);
 		
@@ -168,28 +169,30 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 		lbltotPaySum.setBounds(10, 61, 117, 14);
 		pnlStage.add(lbltotPaySum);
 		
-		JLabel lblPurchaseSum = new JLabel("Purchasing Sum");
+		JLabel lblPurchaseSum = new JLabel("Operation Sum");
 		lblPurchaseSum.setBounds(10, 86, 108, 14);
 		pnlStage.add(lblPurchaseSum);
 		
-		JLabel lblPurchaseAmnt = new JLabel("Purchasing Amount");
+		JLabel lblPurchaseAmnt = new JLabel("Operation Amount");
 		lblPurchaseAmnt.setBounds(10, 114, 117, 14);
 		pnlStage.add(lblPurchaseAmnt);
 		
-		JLabel lblSellOutSum = new JLabel("Sell Out Sum");
+		/*JLabel lblSellOutSum = new JLabel("Sell Out Sum");
 		lblSellOutSum.setBounds(299, 28, 81, 14);
+		lblSellOutSum.setVisible(false);
 		pnlStage.add(lblSellOutSum);
 		
 		JLabel lblSellOutAmont = new JLabel("Sell Out Amount");
 		lblSellOutAmont.setBounds(299, 57, 93, 14);
-		pnlStage.add(lblSellOutAmont);
+		lblSellOutAmont.setVisible(false);
+		pnlStage.add(lblSellOutAmont);*/
 		
 		JLabel lblPayDate = new JLabel("Payment Date");
-		lblPayDate.setBounds(299, 82, 93, 14);
+		lblPayDate.setBounds(299, 32, 93, 14);
 		pnlStage.add(lblPayDate);
 		
 		JLabel lblPayOrderNo = new JLabel("Payment Order No ");
-		lblPayOrderNo.setBounds(299, 110, 93, 14);
+		lblPayOrderNo.setBounds(299, 61, 93, 14);
 		pnlStage.add(lblPayOrderNo);
 		
 		JLabel lblAdvertisementType = new JLabel("Advertisment Type");
@@ -223,24 +226,26 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 		fmtxPurchasingAmount.setBounds(137, 108, 108, 20);
 		pnlStage.add(fmtxPurchasingAmount);
 		
-		fmtxSellOutSum = new JFormattedTextField(numberFormatter);
+		/*fmtxSellOutSum = new JFormattedTextField(numberFormatter);
 		fmtxSellOutSum.setText("0");
 		fmtxSellOutSum.setBounds(403, 29, 72, 20);
+		fmtxSellOutSum.setVisible(false);
 		pnlStage.add(fmtxSellOutSum);
 		
 		fmtxSellAmountAmount = new JFormattedTextField(doubleFormatter);
 		fmtxSellAmountAmount.setText("0.00");
 		fmtxSellAmountAmount.setBounds(403, 58, 81, 20);
-		pnlStage.add(fmtxSellAmountAmount);
+		fmtxSellAmountAmount.setVisible(false);
+		pnlStage.add(fmtxSellAmountAmount);*/
 		
 		paymentDate = new JDateChooser();
 		paymentDate.setDateFormatString("yyyy-MM-dd");
-		paymentDate.setBounds(403, 86, 101, 20);
+		paymentDate.setBounds(402, 28, 101, 20);
 		paymentDate.setDate(cal.getTime());
 		pnlStage.add(paymentDate);
 		
 		txtPaymentOrderNo = new JTextField();
-		txtPaymentOrderNo.setBounds(403, 111, 101, 20);
+		txtPaymentOrderNo.setBounds(402, 58, 101, 20);
 		pnlStage.add(txtPaymentOrderNo);
 		txtPaymentOrderNo.setColumns(10);
 		
@@ -332,7 +337,7 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 		
 		JPanel pnlAgreement = new JPanel();
 		pnlAgreement.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Agreement Info", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, new Color(0, 0, 0)));
-		pnlAgreement.setBounds(243, 110, 264, 173);
+		pnlAgreement.setBounds(243, 110, 264, 197);
 		getContentPane().add(pnlAgreement);
 		pnlAgreement.setLayout(null);
 		
@@ -349,11 +354,11 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 		pnlAgreement.add(lblAgreementNo);
 		
 		JLabel lblAgreementBeginDate = new JLabel("Agreement Begin Date");
-		lblAgreementBeginDate.setBounds(10, 117, 124, 14);
+		lblAgreementBeginDate.setBounds(10, 141, 124, 14);
 		pnlAgreement.add(lblAgreementBeginDate);
 		
 		JLabel lblAgreementEndDate = new JLabel("Agreement End Date");
-		lblAgreementEndDate.setBounds(10, 142, 124, 14);
+		lblAgreementEndDate.setBounds(10, 166, 124, 14);
 		pnlAgreement.add(lblAgreementEndDate);
 
 		cmbBoxChain = new JComboBox( new String[]{});
@@ -376,14 +381,14 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 		txtAgreementNo.setColumns(20);
 		
 		agreementBeginDate = new JDateChooser();
-		agreementBeginDate.setBounds(148, 117, 108, 20);
+		agreementBeginDate.setBounds(148, 141, 108, 20);
 		agreementBeginDate.setDateFormatString("yyyy-MM-dd");		
 		agreementBeginDate.setDate(cal.getTime());
 		agreementBeginDate.setEnabled(false);
 		pnlAgreement.add(agreementBeginDate);
 		
 		agreementEndDate = new JDateChooser();
-		agreementEndDate.setBounds(148, 142, 108, 20);
+		agreementEndDate.setBounds(148, 166, 108, 20);
 		agreementEndDate.setDateFormatString("yyyy-MM-dd");		
 		agreementEndDate.setDate(cal.getTime());
 		agreementEndDate.setEnabled(false);
@@ -397,6 +402,16 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 		txtFixBonus.setBounds(138, 51, 118, 14);
 		txtFixBonus.setEnabled(false);
 		pnlAgreement.add(txtFixBonus);
+		
+		JLabel lblNewLabel = new JLabel("AgreementNo 1");
+		lblNewLabel.setBounds(10, 117, 118, 14);
+		pnlAgreement.add(lblNewLabel);
+		
+		txtAgrNo1 = new JTextField();
+		txtAgrNo1.setEnabled(false);
+		txtAgrNo1.setBounds(138, 114, 118, 20);
+		pnlAgreement.add(txtAgrNo1);
+		txtAgrNo1.setColumns(10);
 		
 		JPanel pnlTargets = new JPanel();
 		pnlTargets.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Targets", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, new Color(0, 0, 0)));
@@ -465,7 +480,7 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 		
 		JPanel pnlRelease = new JPanel();
 		pnlRelease.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Release", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, new Color(0, 0, 0)));
-		pnlRelease.setBounds(10, 277, 336, 156);
+		pnlRelease.setBounds(10, 301, 336, 156);
 		getContentPane().add(pnlRelease);
 		pnlRelease.setLayout(null);
 		
@@ -538,13 +553,13 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 		tblBonusRates.getColumnModel().getColumn(5).setPreferredWidth(30);
 		
 		JPanel pnlResult = new JPanel();
-		pnlResult.setBorder(new TitledBorder(null, "Result", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
-		pnlResult.setBounds(10, 438, 1133, 198);
+		pnlResult.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, new Color(0, 0, 0)));
+		pnlResult.setBounds(10, 468, 1143, 173);
 		getContentPane().add(pnlResult);
 		pnlResult.setLayout(null);
 		
 		JScrollPane scrollResult = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollResult.setBounds(10, 33, 1113, 154);
+		scrollResult.setBounds(10, 11, 1123, 155);
 		pnlResult.add(scrollResult);
 		
 		tableResult = new JTable();
@@ -770,8 +785,10 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 					modelResult.setValueAt(formatAmount(fmtxTotPaySum.getText()), i, 4);
 					modelResult.setValueAt(fmtxPurchasingSum.getText(), i, 5);
 					modelResult.setValueAt(formatAmount(fmtxPurchasingAmount.getText()), i, 6);		
-					modelResult.setValueAt(fmtxSellOutSum.getText(), i, 7);						
-					modelResult.setValueAt(formatAmount(fmtxSellAmountAmount.getText()), i, 8);
+					//modelResult.setValueAt(fmtxSellOutSum.getText(), i, 7);						
+					//modelResult.setValueAt(formatAmount(fmtxSellAmountAmount.getText()), i, 8);
+					modelResult.setValueAt("0", i, 7);						
+					modelResult.setValueAt("0", i, 8);
 					modelResult.setValueAt(dcn.format(paymentDate.getDate()), i, 9);
 					modelResult.setValueAt(txtPaymentOrderNo.getText(), i, 10);
 					modelResult.setValueAt(cmbBoxAdvertisementType.getSelectedItem(), i, 11);
@@ -850,7 +867,7 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 		
 	}
 	private String formatAmount(String amount){			
-		if(amount == null || amount.length()==0){
+		if(amount == null || amount.length()==0 || amount.trim().equalsIgnoreCase("0")){
 			amount = "0";
 		}
 		if(amount.indexOf(" ")>=0){amount = amount.replaceAll(" ", "");}
@@ -929,7 +946,12 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 	
 	private void createTabelTargetModel(ESIBag tempBag) {
 	    try{
-			modelTarget.setColumnIdentifiers(headerTarget);
+	    	DefaultTableModel dtm3 = (DefaultTableModel) tblTarget.getModel();
+		   	 for( int j = dtm3.getRowCount() - 1; j >= 0; j-- ) {
+		   		 dtm3.removeRow(j);
+			 }
+	    	
+	    	modelTarget.setColumnIdentifiers(headerTarget);
 			tblTarget.setModel(modelTarget);
 	    	
 			for (int j = 0; j < tempBag.getSize("TABLETARGET"); j++){
@@ -952,7 +974,12 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 
 	private void createTabelReleaseModel(ESIBag tempBag) {
 	    try{
-			modelRelease.setColumnIdentifiers(headerRelease);
+	    	DefaultTableModel dtm1 = (DefaultTableModel) tblRelease.getModel();
+		   	 for( int j = dtm1.getRowCount() - 1; j >= 0; j-- ) {
+		   		 dtm1.removeRow(j);
+			 }
+	    	
+	    	modelRelease.setColumnIdentifiers(headerRelease);
 			tblRelease.setModel(modelRelease);
 	    	
 			for (int j = 0; j < tempBag.getSize("TABLERELEASE"); j++){
@@ -972,7 +999,13 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 	}
 	private void createTabelPaymentModel(ESIBag tempBag) {
 	    try{
-			modelResult.setColumnIdentifiers(headerResult);
+			
+	    	DefaultTableModel dtm2 = (DefaultTableModel) tableResult.getModel();
+		   	 for( int j = dtm2.getRowCount() - 1; j >= 0; j-- ) {
+		   		 dtm2.removeRow(j);
+			 }
+	    	
+	    	modelResult.setColumnIdentifiers(headerResult);
 			tableResult.setModel(modelResult);
 	    	
 			for (int j = 0; j < tempBag.getSize("TABLERESULT"); j++){
@@ -1001,7 +1034,12 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 	}
 	private void createTabelBonusTypesModel(ESIBag tempBag) {
 	    try{
-			modelBonusTypes.setColumnIdentifiers(headerBonusTypes);
+	    	 DefaultTableModel dtm = (DefaultTableModel) tblBonusRates.getModel();
+		   	 for( int j = dtm.getRowCount() - 1; j >= 0; j-- ) {
+		   		 dtm.removeRow(j);
+		   	 }
+	    	
+	    	modelBonusTypes.setColumnIdentifiers(headerBonusTypes);
 			tblBonusRates.setModel(modelBonusTypes);
 	    	
 			for (int j = 0; j < tempBag.getSize("TABLEBONUSTYPES"); j++){
@@ -1032,6 +1070,7 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 	    	agreementBeginDate.setDate(dcn.parse(tempBag.get("BEGINDATE")!= null ? tempBag.get("BEGINDATE").toString() : ""));
 	    	agreementEndDate.setDate(dcn.parse(tempBag.get("ENDDATE")!= null ? tempBag.get("ENDDATE").toString() : ""));
 	    	txtFixBonus.setText(tempBag.get("BONUSRATE")!= null ? tempBag.get("BONUSRATE").toString() : "");
+	    	txtAgrNo1.setText(tempBag.get("AGREEMENTNO1")!= null ? tempBag.get("AGREEMENTNO1").toString() : "");
 	    		
     	}catch (Exception e) {
 		// simdilik yoksa yok
@@ -1048,6 +1087,7 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 	    	cmbBoxCity_1.setSelectedItem("");
 	    	txtPharmacyCount.setText("");
 	    	txtAgreementNo.setText("");
+	    	txtAgrNo1.setText("");
 	    	agreementBeginDate.setDate(cal.getTime());
 	    	agreementEndDate.setDate(cal.getTime());
 	    	
@@ -1103,10 +1143,11 @@ public class ChainExpsUpdateScreen extends JFrame implements ActionListener,Item
 				fmtxTotPaySum.setText(modelResult.getValueAt(i, 4).toString() != null ? modelResult.getValueAt(i, 4).toString() : "");
 				fmtxPurchasingSum.setText(modelResult.getValueAt(i, 5).toString() != null ? modelResult.getValueAt(i, 5).toString() : "");
 				fmtxPurchasingAmount.setText(modelResult.getValueAt(i, 6).toString() != null ? modelResult.getValueAt(i, 6).toString() : "");
-				fmtxSellOutSum.setText(modelResult.getValueAt(i, 7).toString() != null ? modelResult.getValueAt(i, 7).toString() : "");
+				//fmtxSellOutSum.setText(modelResult.getValueAt(i, 7).toString() != null ? modelResult.getValueAt(i, 7).toString() : "");
 				
-				fmtxSellAmountAmount.setText(modelResult.getValueAt(i, 8).toString() != null ? modelResult.getValueAt(i, 8).toString() : "");
-				if(modelResult.getValueAt(i, 9).toString() != null){paymentDate.setDate(dcn.parse(modelResult.getValueAt(i, 9).toString()));
+				//fmtxSellAmountAmount.setText(modelResult.getValueAt(i, 8).toString() != null ? modelResult.getValueAt(i, 8).toString() : "");
+				if(modelResult.getValueAt(i, 9).toString() != null){
+					paymentDate.setDate(dcn.parse(modelResult.getValueAt(i, 9).toString()));
 				}else{paymentDate.setDateFormatString("");}
 				txtPaymentOrderNo.setText(modelResult.getValueAt(i, 10).toString() != null ? modelResult.getValueAt(i, 10).toString() : "");
 				cmbBoxAdvertisementType.setSelectedItem(modelResult.getValueAt(i, 11).toString() != null ? modelResult.getValueAt(i, 11).toString() : "");

@@ -25,6 +25,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -33,6 +34,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.JComboBox;
 
+import main.ConnectToDb;
 import main.Dispatcher;
 import util.Util;
 
@@ -52,7 +54,6 @@ import java.awt.Font;
 
 	public class PharmacyEntryUpdate extends JFrame implements ActionListener,ItemListener,MouseListener{
 
-		private JPanel contentPane;
 		private static final int FRAME_WIDTH = 1100;
 		private static final int FRAME_HEIGHT = 750;
 		private static final Calendar cal = Calendar.getInstance();
@@ -65,7 +66,7 @@ import java.awt.Font;
 		private String empid="-1";
 		private JTextField txtPharmHeadName,txtPharmacyTel;
 		private JComboBox cmbBoxCountry,cmbBoxArea,
-		cmbBoxRegion,cmbBoxCity,cmbBoxCompanyCode,cmbBoxChain,cmbMonth,cmbYear,cmbBoxDistrict,
+		cmbBoxRegion,cmbBoxCity,cmbBoxCompanyCode,cmbBoxChain,cmbBoxDistrict,
 		cmbBoxSubChain,cmbBoxMrktStaff,cmbBoxPharmCtgry,cmbBoxAssortiment,cmbBoxActiveness,cmbBoxPharmacyType,
 		cmbBoxPromo,cmbBoxMetro;
 		private JDateChooser agreementBeginDate;
@@ -79,8 +80,11 @@ import java.awt.Font;
 		String headerResult[] = new String[] {"Id", "BRAND", "Country", "Area", "Region", "City", "District", "METRO", "GROUP COMPANY", "SUBGROUP COMPANY", "Marketing Staff", 
 				"PHARMACY ADDRESS", "ASSORTMENT","PHARMACY CATEGORY","PHARMACY_TYPE", "PROMO", "Pharmacy Activeness", "Pharmacy Activation Date", "PHARM HEAD NAME", "Pharmacy Tel", "Pharmacy Email", 
 				"Comments", "Full Address", "Building Type", "Country Code", "Administrative Area Name", "Sub Administrative Area Name", "Street", "Home Number", "point_y", "point_x","Pharmacy No","Entry User","Entry Date"};
-		private JTextField txtPharmEmail,txtPointY,txtPointX,txtHomeNumber,txtStreet,txtBuildingType,txtSubArea,txtArea,txtCountryCode,txtOffAddress,txtAdditionalInfo,txtAptekaNo;
+		private JTextField txtPharmEmail,txtPointY,txtPointX,txtHomeNumber,txtStreet,txtBuildingType,
+		txtSubArea,txtArea,txtCountryCode,txtOffAddress,txtAdditionalInfo,txtAptekaNo,txtAptekCount;
 		private JTextField txtid;
+		private String Lang = "RU";
+		private ResourceBundle resourceBundle;
 		/**
 		 * Launch the application.
 		 */
@@ -123,13 +127,16 @@ import java.awt.Font;
 					userArea = inBag.get("AREA").toString();	
 					empid = inBag.get("EMPLOYEEID").toString();
 				}
+				if (inBag.existsBagKey("LANGUAGE")) {
+			    	  Lang = inBag.get("LANGUAGE").toString();
+			      }
+			    resourceBundle = ConnectToDb.readBundleFile(Lang);
 				
 			} catch (Exception e) {
 				// simdilik yoksa yok
 			}
 			
 			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			contentPane = new JPanel();
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			getContentPane().setLayout(null);
 			
@@ -151,19 +158,21 @@ import java.awt.Font;
 			getContentPane().add(pnlAddress);
 			pnlAddress.setLayout(null);
 			
-			JLabel lblCountry = new JLabel("Country");
+			JLabel lblCountry = new JLabel(resourceBundle.getString("Country"));
+			//lblCountry.setOpaque(true);
 			lblCountry.setBounds(10, 56, 69, 14);
 			pnlAddress.add(lblCountry);
 			
-			JLabel lblArea = new JLabel("Area");
-			lblArea.setBounds(10, 81, 46, 14);
+			JLabel lblArea = new JLabel(resourceBundle.getString("Area"));
+			//lblArea.setOpaque(true);
+			lblArea.setBounds(10, 81, 56, 14);
 			pnlAddress.add(lblArea);
 			
-			JLabel lblRegion = new JLabel("Region");
+			JLabel lblRegion = new JLabel(resourceBundle.getString("Region"));
 			lblRegion.setBounds(10, 106, 46, 14);
 			pnlAddress.add(lblRegion);
 			
-			JLabel lblCity = new JLabel("City");
+			JLabel lblCity = new JLabel(resourceBundle.getString("City"));
 			lblCity.setBounds(10, 131, 46, 14);
 			pnlAddress.add(lblCity);
 			
@@ -173,7 +182,7 @@ import java.awt.Font;
 			pnlAddress.add(cmbBoxCountry);
 			
 			cmbBoxArea = new JComboBox( new String[]{});
-			cmbBoxArea.setBounds(59, 81, 130, 17);
+			cmbBoxArea.setBounds(69, 81, 120, 17);
 			cmbBoxArea.setEnabled(false);
 			pnlAddress.add(cmbBoxArea);
 			
@@ -195,7 +204,7 @@ import java.awt.Font;
 				cmbBoxCountry.addItem("Russia");
 				cmbBoxCountry.setSelectedIndex(0);		
 				Util.getPRMDataGroupBy("area", "solgar_prm.prm_sales_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
-				cmbBoxArea.setSelectedIndex(0);
+				cmbBoxArea.setSelectedIndex(-1);
 				cmbBoxArea.setEnabled(true);
 				/*if(userArea.equalsIgnoreCase("ALL")){
 					Util.getPRMDataGroupBy("area", "solgar_prm.prm_sales_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
@@ -220,7 +229,7 @@ import java.awt.Font;
 				cmbBoxCountry.setSelectedIndex(0);
 				if(userArea.equalsIgnoreCase("ALL")){
 					Util.getPRMDataGroupBy("area", "solgar_prm.prm_sales_addresses",cmbBoxArea,"country",cmbBoxCountry.getSelectedItem().toString());
-					cmbBoxArea.setSelectedIndex(0);
+					cmbBoxArea.setSelectedIndex(-1);
 					cmbBoxArea.setEnabled(true);				
 				}else if(userArea.equalsIgnoreCase("Kiev")){
 					cmbBoxArea.addItem("Kiev");
@@ -229,12 +238,12 @@ import java.awt.Font;
 				}
 			}	
 			
-			JLabel lblCompany = new JLabel("Company");
-			lblCompany.setBounds(10, 32, 46, 14);
+			JLabel lblCompany = new JLabel(resourceBundle.getString("Company"));
+			lblCompany.setBounds(10, 32, 66, 14);
 			pnlAddress.add(lblCompany);
 
 			cmbBoxCompanyCode = new JComboBox( new String[]{});			
-			cmbBoxCompanyCode.setBounds(59, 29, 130, 17);
+			cmbBoxCompanyCode.setBounds(79, 29, 110, 17);
 			cmbBoxCompanyCode.setEnabled(false);
 			pnlAddress.add(cmbBoxCompanyCode);
 			
@@ -259,23 +268,23 @@ import java.awt.Font;
 			getContentPane().add(pnlAgreement);
 			pnlAgreement.setLayout(null);
 			
-			JLabel lblChainName = new JLabel("Group Company");
+			JLabel lblChainName = new JLabel(resourceBundle.getString("GroupCompany"));
 			lblChainName.setBounds(10, 26, 120, 17);
 			pnlAgreement.add(lblChainName);
 			
-			JLabel lblPharmTel = new JLabel("Pharmacy Tel");
+			JLabel lblPharmTel = new JLabel(resourceBundle.getString("PharmacyTel"));
 			lblPharmTel.setBounds(292, 98, 120, 17);
 			pnlAgreement.add(lblPharmTel);
 			
-			JLabel lblPharmHeadName = new JLabel("Pharm Head Name");
+			JLabel lblPharmHeadName = new JLabel(resourceBundle.getString("PharmHeadName"));
 			lblPharmHeadName.setBounds(292, 76, 120, 17);
 			pnlAgreement.add(lblPharmHeadName);
 			
-			JLabel lblPharmActivationDate = new JLabel("Pharmacy Activation Date");
+			JLabel lblPharmActivationDate = new JLabel(resourceBundle.getString("PharmacyActivationDate"));
 			lblPharmActivationDate.setBounds(10, 179, 158, 17);
 			pnlAgreement.add(lblPharmActivationDate);
 			
-			JLabel lblPharmEmail = new JLabel("Pharm Email");
+			JLabel lblPharmEmail = new JLabel(resourceBundle.getString("PharmEmail"));
 			lblPharmEmail.setBounds(292, 123, 120, 17);
 			pnlAgreement.add(lblPharmEmail);
 
@@ -302,7 +311,7 @@ import java.awt.Font;
 			agreementBeginDate.setDate(cal.getTime());
 			pnlAgreement.add(agreementBeginDate);
 			
-			JLabel lblChainSub = new JLabel("SubGroup Company");
+			JLabel lblChainSub = new JLabel(resourceBundle.getString("SubGroupCompany"));
 			lblChainSub.setBounds(10, 51, 120, 17);
 			pnlAgreement.add(lblChainSub);
 			
@@ -313,7 +322,7 @@ import java.awt.Font;
 			cmbBoxSubChain.setBounds(138, 48, 140, 17);
 			pnlAgreement.add(cmbBoxSubChain);
 			
-			JLabel lblMarketingStaff = new JLabel("Marketing Staff");
+			JLabel lblMarketingStaff = new JLabel(resourceBundle.getString("MarketingStaff"));
 			lblMarketingStaff.setBounds(10, 76, 120, 17);
 			pnlAgreement.add(lblMarketingStaff);
 			
@@ -330,11 +339,11 @@ import java.awt.Font;
 			cmbBoxPharmCtgry.setBounds(138, 95, 140, 17);
 			pnlAgreement.add(cmbBoxPharmCtgry);
 			
-			JLabel lblPharmCtgry = new JLabel("Pharmacy Category");
+			JLabel lblPharmCtgry = new JLabel(resourceBundle.getString("PharmacyCategory"));
 			lblPharmCtgry.setBounds(10, 101, 120, 17);
 			pnlAgreement.add(lblPharmCtgry);
 			
-			JLabel lblAssortiment = new JLabel("Assortiment");
+			JLabel lblAssortiment = new JLabel(resourceBundle.getString("Assortiment"));
 			lblAssortiment.setBounds(10, 123, 120, 17);
 			pnlAgreement.add(lblAssortiment);
 			
@@ -347,7 +356,7 @@ import java.awt.Font;
 			cmbBoxAssortiment.setBounds(138, 120, 140, 17);
 			pnlAgreement.add(cmbBoxAssortiment);
 			
-			JLabel lblPharmActiveness = new JLabel("Pharmacy Activeness");
+			JLabel lblPharmActiveness = new JLabel(resourceBundle.getString("PharmacyActiveness"));
 			lblPharmActiveness.setBounds(10, 154, 120, 17);
 			pnlAgreement.add(lblPharmActiveness);
 			
@@ -359,7 +368,7 @@ import java.awt.Font;
 			cmbBoxActiveness.setBounds(138, 151, 140, 17);
 			pnlAgreement.add(cmbBoxActiveness);
 			
-			JLabel lblPharmacType = new JLabel("Pharmacy Type");
+			JLabel lblPharmacType = new JLabel(resourceBundle.getString("PharmacyType"));
 			lblPharmacType.setBounds(292, 26, 120, 17);
 			pnlAgreement.add(lblPharmacType);
 			
@@ -370,7 +379,7 @@ import java.awt.Font;
 			cmbBoxPharmacyType.setBounds(408, 23, 130, 17);
 			pnlAgreement.add(cmbBoxPharmacyType);
 			
-			JLabel lblPromo = new JLabel("Promo");
+			JLabel lblPromo = new JLabel(resourceBundle.getString("Promo"));
 			lblPromo.setBounds(292, 51, 120, 17);
 			pnlAgreement.add(lblPromo);
 			
@@ -386,15 +395,27 @@ import java.awt.Font;
 			pnlAgreement.add(txtPharmEmail);
 			txtPharmEmail.setColumns(10);
 			
-			btnListAptek = new JButton("List Apteka");
+			btnListAptek = new JButton(resourceBundle.getString("ListApteka"));
+			btnListAptek.setActionCommand("List Apteka");
+			btnListAptek.setForeground(Color.BLUE);
 			btnListAptek.setBounds(408, 151, 130, 23);
 			pnlAgreement.add(btnListAptek);
 			
 			txtid = new JTextField();
 			txtid.setEnabled(false);
-			txtid.setBounds(410, 177, 86, 20);
+			txtid.setBounds(498, 177, 39, 20);
 			pnlAgreement.add(txtid);
 			txtid.setColumns(10);
+			
+			JLabel lblCount = new JLabel(resourceBundle.getString("Count"));
+			lblCount.setBounds(291, 180, 65, 14);
+			pnlAgreement.add(lblCount);
+			
+			txtAptekCount = new JTextField();
+			txtAptekCount.setEnabled(false);
+			txtAptekCount.setBounds(366, 177, 46, 20);
+			pnlAgreement.add(txtAptekCount);
+			txtAptekCount.setColumns(10);
 			
 			JPanel pnlResult = new JPanel();
 			pnlResult.setBorder(new TitledBorder(null, "Result", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
@@ -427,27 +448,39 @@ import java.awt.Font;
 			getContentPane().add(panelButon);
 			panelButon.setLayout(null);
 			
-			btnAdd = new JButton("ADD APTEKA");
-			btnAdd.setBounds(50, 28, 139, 23);
+			btnAdd = new JButton(resourceBundle.getString("ADDAPTEKA"));
+			btnAdd.setForeground(Color.RED);
+			btnAdd.setActionCommand("ADD APTEKA");
+			btnAdd.setBounds(50, 28, 150, 23);
 			panelButon.add(btnAdd);
 			
-			btnUpdate = new JButton("UPDATE");
+			btnUpdate = new JButton(resourceBundle.getString("UPDATE"));
+			btnUpdate.setForeground(Color.RED);
+			btnUpdate.setActionCommand("UPDATE");
 			btnUpdate.setBounds(221, 28, 132, 23);
 			panelButon.add(btnUpdate);
 			
-			btnDelete = new JButton("DELETE");
+			btnDelete = new JButton(resourceBundle.getString("DELETE"));
+			btnDelete.setForeground(Color.RED);
+			btnDelete.setActionCommand("DELETE");
 			btnDelete.setBounds(377, 28, 132, 23);
 			panelButon.add(btnDelete);
 			
-			btnSave = new JButton("SAVE");
+			btnSave = new JButton(resourceBundle.getString("SAVE"));
+			btnSave.setForeground(Color.RED);
+			btnSave.setActionCommand("SAVE");
 			btnSave.setBounds(537, 28, 139, 23);
 			panelButon.add(btnSave);
 			
-			btnCleanUp = new JButton("CLEANUP");
+			btnCleanUp = new JButton(resourceBundle.getString("CLEANUP"));
+			btnCleanUp.setForeground(Color.RED);
+			btnCleanUp.setActionCommand("CLEANUP");
 			btnCleanUp.setBounds(701, 28, 139, 23);
 			panelButon.add(btnCleanUp);
 			
-			btnExit = new JButton("EXIT");
+			btnExit = new JButton(resourceBundle.getString("EXIT"));
+			btnExit.setForeground(Color.RED);
+			btnExit.setActionCommand("EXIT");
 			btnExit.setBounds(885, 28, 132, 23);
 			panelButon.add(btnExit);
 			
@@ -461,11 +494,11 @@ import java.awt.Font;
 			cmbBoxCity.addItemListener(this);
 			cmbBoxCity.setName("cmbCity");
 			
-			JLabel lblDistrict = new JLabel("District");
+			JLabel lblDistrict = new JLabel(resourceBundle.getString("District"));
 			lblDistrict.setBounds(10, 160, 46, 14);
 			pnlAddress.add(lblDistrict);
 			
-			JLabel lblMetro = new JLabel("Metro");
+			JLabel lblMetro = new JLabel(resourceBundle.getString("Metro"));
 			lblMetro.setBounds(10, 185, 46, 14);
 			pnlAddress.add(lblMetro);
 			
@@ -484,12 +517,12 @@ import java.awt.Font;
 			pnlAddress.add(cmbBoxMetro);
 			
 			JPanel pnlAddr = new JPanel();
-			pnlAddr.setBorder(new TitledBorder(null, "Pharmacy Address Info", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			pnlAddr.setBorder(new TitledBorder(null, resourceBundle.getString("PharmacyAddressInfo"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			pnlAddr.setBounds(773, 12, 301, 207);
 			getContentPane().add(pnlAddr);
 			pnlAddr.setLayout(null);
 			
-			JLabel lblPharmAddress = new JLabel("Pharmacy Address");
+			JLabel lblPharmAddress = new JLabel(resourceBundle.getString("PharmacyAddress"));
 			lblPharmAddress.setBounds(5, 147, 103, 14);
 			pnlAddr.add(lblPharmAddress);
 			
@@ -503,7 +536,7 @@ import java.awt.Font;
 			txtAreaAddress.setLineWrap(true);
 			txtAreaAddress.setRows(2);
 			
-			JLabel lblAptekaNo = new JLabel("Apteka No");
+			JLabel lblAptekaNo = new JLabel(resourceBundle.getString("AptekaNo"));
 			lblAptekaNo.setBounds(5, 25, 103, 14);
 			pnlAddr.add(lblAptekaNo);
 			
@@ -512,7 +545,7 @@ import java.awt.Font;
 			pnlAddr.add(txtAptekaNo);
 			txtAptekaNo.setColumns(10);
 			
-			JLabel lblAdditionalInfo = new JLabel("Additional Info");
+			JLabel lblAdditionalInfo = new JLabel(resourceBundle.getString("AdditionalInfo"));
 			lblAdditionalInfo.setBounds(5, 50, 103, 14);
 			pnlAddr.add(lblAdditionalInfo);
 			
@@ -539,7 +572,7 @@ import java.awt.Font;
 			getContentPane().add(pnlAddOfficial);
 			pnlAddOfficial.setLayout(null);
 			
-			JLabel lblOffAddress = new JLabel("Official Address");
+			JLabel lblOffAddress = new JLabel(resourceBundle.getString("OfficialAddress"));
 			lblOffAddress.setBounds(10, 24, 103, 14);
 			pnlAddOfficial.add(lblOffAddress);
 			
@@ -550,7 +583,7 @@ import java.awt.Font;
 			pnlAddOfficial.add(txtOffAddress);
 			txtOffAddress.setColumns(10);
 			
-			JLabel lblCountryCode = new JLabel("Country Code");
+			JLabel lblCountryCode = new JLabel(resourceBundle.getString("CountryCode"));
 			lblCountryCode.setBounds(10, 49, 103, 14);
 			pnlAddOfficial.add(lblCountryCode);
 			
@@ -561,7 +594,7 @@ import java.awt.Font;
 			pnlAddOfficial.add(txtCountryCode);
 			txtCountryCode.setColumns(10);
 			
-			JLabel lblAdmArea = new JLabel("Area");
+			JLabel lblAdmArea = new JLabel(resourceBundle.getString("Area"));
 			lblAdmArea.setBounds(10, 74, 86, 14);
 			pnlAddOfficial.add(lblAdmArea);
 			
@@ -572,7 +605,7 @@ import java.awt.Font;
 			pnlAddOfficial.add(txtArea);
 			txtArea.setColumns(10);
 			
-			JLabel lblSubArea = new JLabel("Sub Area");
+			JLabel lblSubArea = new JLabel(resourceBundle.getString("SubArea"));
 			lblSubArea.setBounds(10, 99, 103, 14);
 			pnlAddOfficial.add(lblSubArea);
 			
@@ -583,7 +616,7 @@ import java.awt.Font;
 			pnlAddOfficial.add(txtSubArea);
 			txtSubArea.setColumns(10);
 			
-			JLabel lblBuildingType = new JLabel("Building Type");
+			JLabel lblBuildingType = new JLabel(resourceBundle.getString("BuildingType"));
 			lblBuildingType.setBounds(419, 49, 103, 14);
 			pnlAddOfficial.add(lblBuildingType);
 			
@@ -591,7 +624,7 @@ import java.awt.Font;
 			lblStreet.setBounds(419, 74, 78, 14);
 			pnlAddOfficial.add(lblStreet);
 			
-			JLabel lblHomeNo = new JLabel("Home Number");
+			JLabel lblHomeNo = new JLabel(resourceBundle.getString("HomeNumber"));
 			lblHomeNo.setBounds(419, 99, 103, 14);
 			pnlAddOfficial.add(lblHomeNo);
 			
@@ -616,11 +649,11 @@ import java.awt.Font;
 			pnlAddOfficial.add(txtHomeNumber);
 			txtHomeNumber.setColumns(10);
 			
-			JLabel lblPointX = new JLabel("Point_X");
+			JLabel lblPointX = new JLabel(resourceBundle.getString("Point_X"));
 			lblPointX.setBounds(839, 49, 56, 14);
 			pnlAddOfficial.add(lblPointX);
 			
-			JLabel lblPointY = new JLabel("Point_Y");
+			JLabel lblPointY = new JLabel(resourceBundle.getString("Point_Y"));
 			lblPointY.setBounds(839, 74, 56, 14);
 			pnlAddOfficial.add(lblPointY);
 			
@@ -638,7 +671,9 @@ import java.awt.Font;
 			pnlAddOfficial.add(txtPointY);
 			txtPointY.setColumns(10);
 			
-			btnGetAddress = new JButton("Find Address");
+			btnGetAddress = new JButton(resourceBundle.getString("FindAddress"));
+			btnGetAddress.setActionCommand("Find Address");
+			btnGetAddress.setForeground(Color.BLUE);
 			btnGetAddress.setBounds(839, 20, 215, 23);
 			pnlAddOfficial.add(btnGetAddress);
 			cmbBoxRegion.addItemListener(this);
@@ -951,7 +986,7 @@ import java.awt.Font;
 		    	cmbBoxMetro.setSelectedItem("");
 		    	cmbBoxChain.setSelectedItem("");
 		    	cmbBoxSubChain.setSelectedItem("");	    	
-		    	cmbBoxMrktStaff.setSelectedItem("");
+		    	//cmbBoxMrktStaff.setSelectedItem("");
 		    	cmbBoxPharmacyType.setSelectedItem("");
 		    	txtAreaAddress.setText("");
 		    	cmbBoxAssortiment.setSelectedItem("");	    	
@@ -994,8 +1029,8 @@ import java.awt.Font;
 	    	if(!mustEnterCheckOneBy(cmbBoxActiveness)){return false;}
 	    	if(!mustEnterCheckOneBy(cmbBoxPharmacyType)){return false;}
 	    	if(txtPointY.getText().length()==0 && txtPointX.getText().length()==0){
-				JOptionPane.showMessageDialog(pnlInfoMsg, "Please set official address info by Find Address Button", "Error", JOptionPane.ERROR_MESSAGE);
-				return false;
+				//JOptionPane.showMessageDialog(pnlInfoMsg, "Please set official address info by Find Address Button", "Error", JOptionPane.ERROR_MESSAGE);
+				//return false;
 			}
 			return true;
 		}
@@ -1020,6 +1055,15 @@ import java.awt.Font;
 				 if(cmbBoxCity.getSelectedItem() !=null){tempBag.put("CITY", cmbBoxCity.getSelectedItem().toString());} 
 				 if(cmbBoxDistrict.getSelectedItem() !=null){tempBag.put("CITY_REGION", cmbBoxDistrict.getSelectedItem().toString());} 
 				 if(cmbBoxMrktStaff.getSelectedItem() !=null){tempBag.put("MARKETING_STAFF", cmbBoxMrktStaff.getSelectedItem().toString());}
+				 if(cmbBoxChain.getSelectedItem() !=null){tempBag.put("MAIN_GROUP", cmbBoxChain.getSelectedItem().toString());}
+				 if(cmbBoxPharmCtgry.getSelectedItem() !=null){tempBag.put("CATEGORY", cmbBoxPharmCtgry.getSelectedItem().toString());}
+				 
+				 if(cmbBoxSubChain.getSelectedItem() !=null){tempBag.put("SUB_GROUP", cmbBoxSubChain.getSelectedItem().toString());}
+				 if(cmbBoxAssortiment.getSelectedItem() !=null){tempBag.put("ASSORTIMENT", cmbBoxAssortiment.getSelectedItem().toString());}
+				 if(cmbBoxActiveness.getSelectedItem() !=null){tempBag.put("ACTIVENESS", cmbBoxActiveness.getSelectedItem().toString());}
+				 if(cmbBoxPharmacyType.getSelectedItem() !=null){tempBag.put("PHARMACYTYPE", cmbBoxPharmacyType.getSelectedItem().toString());}
+				 if(cmbBoxPromo.getSelectedItem() !=null){tempBag.put("PROMO", cmbBoxPromo.getSelectedItem().toString());}
+				 if(txtAreaAddress.getText() !=null && txtAreaAddress.getText().trim().length()>0){tempBag.put("ADDRESS", txtAreaAddress.getText().trim().toString());}
 				 
 				 DefaultTableModel dtm2 = (DefaultTableModel) tableResult.getModel();
 		    	 for( int j = dtm2.getRowCount() - 1; j >= 0; j-- ) {
@@ -1070,6 +1114,7 @@ import java.awt.Font;
 			        			tempBag.get("TABEL",j,"ENTRY_DATE"),
 			        		});		
 				}
+				txtAptekCount.setText(tempBag.get("COUNT"));
 				
 		    }catch (Exception e) {
 				// simdilik yoksa yok

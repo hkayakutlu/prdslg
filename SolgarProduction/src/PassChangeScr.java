@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import main.ConnectToDb;
+import util.PublicInterface;
 import util.Util;
 
 public class PassChangeScr extends JFrame {
@@ -38,7 +39,7 @@ public class PassChangeScr extends JFrame {
 
 class PassWordDialogA extends JDialog {
 	
-	private final JLabel jlblUsername = new JLabel("Username");
+	private final JLabel jlblUsername = new JLabel(("Username"));
     private final JLabel jlblOldPassword = new JLabel("Old Password");
     private final JLabel jlblNewPassword = new JLabel("New Password");
    

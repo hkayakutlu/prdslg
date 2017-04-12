@@ -20,7 +20,8 @@ public class YandexAddress
     Properties prop = new Properties();
     try
     {
-      prop.load(new FileInputStream("C:\\config.properties"));
+      prop.load(new FileInputStream("C:\\SolgarInternalSysFile\\config.properties"));
+      //prop.load(new FileInputStream("conf/config.properties"));
     } catch (Exception e) {
       e.printStackTrace();
     }

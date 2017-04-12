@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/commons-net-3.0.1.jar"/>
 	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/commons-httpclient-3.0.1.jar"/>
 	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/SMGUtility_classes.jar"/>
+	<classpathentry kind="lib" path="jexcel-api-2.6.8-src/apache-logging-log4j.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

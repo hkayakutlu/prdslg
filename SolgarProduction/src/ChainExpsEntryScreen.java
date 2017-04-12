@@ -75,6 +75,7 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 	String headerTarget[] = new String[] {"Id", "Year", "Month", "Trgt1", "Trgt2", "Trgt3", "Trgt4", "Trgt5"};
 	String headerRelease[] = new String[] {"Id", "Year", "Month", "Box", "Amount"};
 	String headerBonusTypes[] = new String[] {"Id", "Bonus Type", "1", "2", "3", "4"};
+	private JTextField txtAgrNo2;
 	/**
 	* Launch the application.
 	*/
@@ -130,7 +131,7 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
     
 		JPanel pnlStage = new JPanel();
 		pnlStage.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Create Payment Row With Below Data", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, new Color(0, 0, 0)));
-		pnlStage.setBounds(450, 193, 614, 194);
+		pnlStage.setBounds(450, 285, 614, 194);
 		getContentPane().add(pnlStage);
 		pnlStage.setLayout(null);
 		
@@ -142,14 +143,16 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 		cmbBoxStages.setEditable(false);
 		cmbBoxStages.setBounds(137, 25, 167, 22);
 		cmbBoxStages.addItem("");
-		cmbBoxStages.addItem("MARKETING");
+		cmbBoxStages.addItem("FIX MARKETING BUDGET");
+		cmbBoxStages.addItem("FIX BONUS");
 		cmbBoxStages.addItem("CHAIN BONUS");
-		cmbBoxStages.addItem("DISCOUNT");		
-		cmbBoxStages.addItem("BONUS PAYMENT");		
-		cmbBoxStages.addItem("PHARMACANT BONUS");
+		cmbBoxStages.addItem("PHARMACIST BONUS");
 		cmbBoxStages.addItem("PHARM MANAGER BONUS");
 		cmbBoxStages.addItem("ADVERTISEMENT");
 		cmbBoxStages.addItem("TRAINING");
+		cmbBoxStages.addItem("DISCOUNT PAYMENT");		
+		cmbBoxStages.addItem("CAMPAIGN BONUS");			
+		
 		pnlStage.add(cmbBoxStages);
 		
 		JLabel lbltotPaySum = new JLabel("Total Payment Sum");
@@ -319,7 +322,7 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 		
 		JPanel pnlAgreement = new JPanel();
 		pnlAgreement.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Agreement Info", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, new Color(0, 0, 0)));
-		pnlAgreement.setBounds(192, 11, 258, 171);
+		pnlAgreement.setBounds(10, 178, 804, 96);
 		getContentPane().add(pnlAgreement);
 		pnlAgreement.setLayout(null);
 		
@@ -332,15 +335,15 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 		pnlAgreement.add(lblPharmacyCount);
 		
 		JLabel lblAgreementNo = new JLabel("Agreement No");
-		lblAgreementNo.setBounds(10, 97, 106, 14);
+		lblAgreementNo.setBounds(266, 29, 106, 14);
 		pnlAgreement.add(lblAgreementNo);
 		
 		JLabel lblAgreementBeginDate = new JLabel("Agreement Begin Date");
-		lblAgreementBeginDate.setBounds(10, 115, 124, 14);
+		lblAgreementBeginDate.setBounds(519, 26, 124, 14);
 		pnlAgreement.add(lblAgreementBeginDate);
 		
 		JLabel lblAgreementEndDate = new JLabel("Agreement End Date");
-		lblAgreementEndDate.setBounds(10, 140, 124, 14);
+		lblAgreementEndDate.setBounds(519, 51, 124, 14);
 		pnlAgreement.add(lblAgreementEndDate);
 
 		cmbBoxChain = new JComboBox( new String[]{});
@@ -355,18 +358,18 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 		pnlAgreement.add(txtPharmacyCount);
 		
 		txtAgreementNo = new JTextField();
-		txtAgreementNo.setBounds(138, 94, 118, 18);
+		txtAgreementNo.setBounds(394, 26, 118, 18);
 		pnlAgreement.add(txtAgreementNo);
 		txtAgreementNo.setColumns(20);
 		
 		agreementBeginDate = new JDateChooser();
-		agreementBeginDate.setBounds(148, 115, 108, 20);
+		agreementBeginDate.setBounds(657, 26, 108, 20);
 		agreementBeginDate.setDateFormatString("yyyy-MM-dd");		
 		agreementBeginDate.setDate(cal.getTime());
 		pnlAgreement.add(agreementBeginDate);
 		
 		agreementEndDate = new JDateChooser();
-		agreementEndDate.setBounds(148, 140, 108, 20);
+		agreementEndDate.setBounds(657, 51, 108, 20);
 		agreementEndDate.setDateFormatString("yyyy-MM-dd");		
 		agreementEndDate.setDate(cal.getTime());
 		pnlAgreement.add(agreementEndDate);
@@ -380,14 +383,23 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 		txtFixBonus.setBounds(138, 48, 118, 18);
 		pnlAgreement.add(txtFixBonus);
 		
+		JLabel lblAgreement2 = new JLabel("Agreement No 2");
+		lblAgreement2.setBounds(266, 54, 118, 14);
+		pnlAgreement.add(lblAgreement2);
+		
+		txtAgrNo2 = new JTextField();
+		txtAgrNo2.setBounds(394, 51, 118, 15);
+		pnlAgreement.add(txtAgrNo2);
+		txtAgrNo2.setColumns(10);
+		
 		JPanel pnlTargets = new JPanel();
 		pnlTargets.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Targets", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, new Color(0, 0, 0)));
-		pnlTargets.setBounds(450, 11, 306, 156);
+		pnlTargets.setBounds(192, 11, 516, 156);
 		getContentPane().add(pnlTargets);
 		pnlTargets.setLayout(null);
 		
 		JScrollPane scrollTarget = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollTarget.setBounds(10, 29, 288, 116);
+		scrollTarget.setBounds(10, 29, 496, 116);
 		pnlTargets.add(scrollTarget);
 		
 		tblTarget = new JTable();
@@ -451,21 +463,21 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 		
 		JPanel pnlBonusRate = new JPanel();
 		pnlBonusRate.setBorder(new TitledBorder(null, "Bonus Rates", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
-		pnlBonusRate.setBounds(766, 11, 308, 136);
+		pnlBonusRate.setBounds(718, 23, 346, 136);
 		getContentPane().add(pnlBonusRate);
 		pnlBonusRate.setLayout(null);
 
 		JScrollPane scrollBonusRates = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollBonusRates.setBounds(10, 33, 288, 81);
+		scrollBonusRates.setBounds(10, 33, 326, 92);
 		pnlBonusRate.add(scrollBonusRates);
 		
 		tblBonusRates = new JTable();
 		scrollBonusRates.setViewportView(tblBonusRates);
 		tblBonusRates.setModel(new DefaultTableModel(
 			new Object[][] {
-				{null, "CHAIN BONUS", new Double(0.0), new Double(0.0), new Double(0.0), new Double(0.0)},
-				{null, "PHARMACIST BONUS", new Double(0.0), new Double(0.0), new Double(0.0), new Double(0.0)},
-				{null, "PHARMACY MANAGER BONUS", new Double(0.0), new Double(0.0), new Double(0.0), new Double(0.0)},
+				{null, "CHAIN BONUS", new Integer("0"), new Integer("0"), new Integer("0"), new Integer("0")},
+				{null, "PHARMACIST BONUS", new Integer(0), new Integer(0), new Integer(0), new Integer(0)},
+				{null, "PHARMACY MANAGER BONUS", new Integer(0), new Integer(0), new Integer(0), new Integer(0)},
 			},
 			new String[] {
 				"Id", "Bonus Type", "1", "2", "3", "4"
@@ -486,12 +498,12 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 		tblBonusRates.getColumnModel().getColumn(5).setPreferredWidth(30);
 		JPanel pnlResult = new JPanel();
 		pnlResult.setBorder(new TitledBorder(null, "Result", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
-		pnlResult.setBounds(10, 398, 1064, 230);
+		pnlResult.setBounds(10, 472, 1064, 156);
 		getContentPane().add(pnlResult);
 		pnlResult.setLayout(null);
 		
 		JScrollPane scrollResult = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollResult.setBounds(10, 33, 1034, 188);
+		scrollResult.setBounds(10, 33, 1044, 117);
 		pnlResult.add(scrollResult);
 		
 		tableResult = new JTable();
@@ -571,7 +583,7 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 		cmbBoxRegion.setName("cmbRegion");
 		
 		JPanel pnlRelease = new JPanel();
-		pnlRelease.setBounds(10, 193, 440, 194);
+		pnlRelease.setBounds(10, 285, 440, 194);
 		getContentPane().add(pnlRelease);
 		pnlRelease.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Realization", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, new Color(0, 0, 0)));
 		pnlRelease.setLayout(null);
@@ -597,7 +609,7 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 				{"", "", null, null, null},
 			},
 			new String[] {
-				"Year", "Month", "Purchasing", "SellOut", "Amount"
+				"Year", "Month", "SellOut", "Purchasing", "Amount"
 			}
 		) {
 			Class[] columnTypes = new Class[] {
@@ -610,10 +622,10 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 		tblRelease.getColumnModel().getColumn(0).setPreferredWidth(40);
 		tblRelease.getColumnModel().getColumn(1).setPreferredWidth(44);
 		tblRelease.getColumnModel().getColumn(2).setPreferredWidth(64);
-		tblRelease.getColumnModel().getColumn(3).setPreferredWidth(50);
+		tblRelease.getColumnModel().getColumn(3).setPreferredWidth(73);
 		tblRelease.getColumnModel().getColumn(4).setPreferredWidth(59);
-	    this.tblRelease.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(this.cmbYear));
-	    this.tblRelease.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(this.cmbMonth));
+		this.tblRelease.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(this.cmbMonth));
+		this.tblRelease.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(this.cmbYear));
 		scrollRelease.setViewportView(tblRelease);
 		cmbBoxRegion.addItemListener(this);
 		
@@ -679,8 +691,27 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 
 				if(cmbBoxStages.getSelectedItem().toString().equalsIgnoreCase("CHAIN BONUS")){
 					createChainBonusRows();
-				}else if(cmbBoxStages.getSelectedItem().toString().equalsIgnoreCase("MARKETING")){
-					createMarketingBonusRows();
+				}else if(cmbBoxStages.getSelectedItem().toString().equalsIgnoreCase("FIX MARKETING BUDGET")){
+					//createMarketingBonusRows();
+					modelResult.setColumnIdentifiers(headerResult);
+					tableResult.setModel(modelResult);
+					final Object[] row = new Object[15];
+					row[0] = "0";
+					row[1] = cmbBoxCompanyCode.getSelectedItem();
+					row[2] = cmbBoxChain.getSelectedItem();
+					row[3] = cmbBoxStages.getSelectedItem();
+					row[4] = fmtxTotPaySum.getText();//formatAmount(String.valueOf(fmtxTotPaySum.getText()));
+					row[5] = fmtxPurchasingSum.getText();
+					row[6] = fmtxPurchasingAmount.getText();//formatAmount(fmtxPurchasingAmount.getText());
+					row[7] = "0";
+					row[8] = "0";
+					row[9] = dcn.format(paymentDate.getDate());
+					row[10] = txtPaymentOrderNo.getText();
+					row[11] = "";
+					row[12] = cmbBoxDocumentStatus.getSelectedItem();
+					row[13] = "0";
+					row[14] = "0";					
+					modelResult.addRow(row);
 				}else{
 					/*modelResult.setColumnIdentifiers(headerResult);
 					tableResult.setModel(modelResult);
@@ -717,7 +748,7 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 					row[8] = "0";
 					row[9] = dcn.format(paymentDate.getDate());
 					row[10] = txtPaymentOrderNo.getText();
-					row[11] = "";
+					row[11] = cmbBoxAdvertisementType.getSelectedItem();
 					row[12] = cmbBoxDocumentStatus.getSelectedItem();
 					row[13] = "0";
 					row[14] = "0";					
@@ -767,6 +798,7 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 				outBag.put("CITY", cmbBoxCity.getSelectedItem().toString());
 				outBag.put("PHARMACYCOUNT", txtPharmacyCount.getText());
 				outBag.put("AGREEMENTNO", txtAgreementNo.getText());
+				outBag.put("AGREEMENTNO1", txtAgrNo2.getText());
 				outBag.put("AGREEMENTBEGINDATE", dcn.format(agreementBeginDate.getDate()));
 				outBag.put("AGREEMENTENDDATE", dcn.format(agreementEndDate.getDate()));
 				outBag.put("BONUSRATE",  txtFixBonus.getText());
@@ -857,21 +889,30 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 						if(year.equalsIgnoreCase(tblTarget.getValueAt(k, 1).toString())
 								&& month.equalsIgnoreCase(tblTarget.getValueAt(k, 2).toString())){
 						double bonusRate = 0;
+						int target2= 0;
+						int target3= 0;
+						int target4= 0;
 						int target1 = Integer.parseInt(tblTarget.getValueAt(k, 3).toString());
-						int target2 = Integer.parseInt(tblTarget.getValueAt(k, 4).toString());
-						int target3 = Integer.parseInt(tblTarget.getValueAt(k, 5).toString());
-						int target4 = Integer.parseInt(tblTarget.getValueAt(k, 6).toString());
+						if(tblTarget.getValueAt(k, 4) != null){
+							target2 = Integer.parseInt(tblTarget.getValueAt(k, 4).toString());
+						}
+						if(tblTarget.getValueAt(k, 5) != null){
+							target3 = Integer.parseInt(tblTarget.getValueAt(k, 5).toString());
+						}
+						if(tblTarget.getValueAt(k, 6) != null){
+							target4 = Integer.parseInt(tblTarget.getValueAt(k, 6).toString());
+						}
 						//int target5 = Integer.parseInt(tblTarget.getValueAt(j, 7).toString());
 						String strbonusRate = "";
 						
 						if(boxCount<target1){/*0 cek*/}else{//Chain Bonus
-							if(boxCount<target2){
+							if(boxCount<target2||target2 ==0){
 								strbonusRate =tblBonusRates.getValueAt(0, 2).toString().replace(",", ".");
 								bonusRate = Double.parseDouble(strbonusRate);}
 							else{
-								if(boxCount<target3){strbonusRate =tblBonusRates.getValueAt(0, 3).toString().replace(",", ".");bonusRate = Double.parseDouble(strbonusRate);}
+								if(boxCount<target3||target3 ==0){strbonusRate =tblBonusRates.getValueAt(0, 3).toString().replace(",", ".");bonusRate = Double.parseDouble(strbonusRate);}
 								else{	
-									if(boxCount<target4){strbonusRate =tblBonusRates.getValueAt(0, 4).toString().replace(",", ".");bonusRate = Double.parseDouble(strbonusRate);}
+									if(boxCount<target4||target4 ==0){strbonusRate =tblBonusRates.getValueAt(0, 4).toString().replace(",", ".");bonusRate = Double.parseDouble(strbonusRate);}
 									else{
 										strbonusRate =tblBonusRates.getValueAt(0, 5).toString().replace(",", ".");
 										bonusRate = Double.parseDouble(strbonusRate);
@@ -899,12 +940,12 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 						
 						if(bonusRate1>0||bonusRate2>0||bonusRate3>0||bonusRate4>0){//Pharmacist Bonus					
 							if(boxCount<target1){/*0 cek*/}else{//Chain Bonus
-								if(boxCount<target2){
+								if(boxCount<target2||target2 ==0){
 									bonusRate = bonusRate1;}
 								else{
-									if(boxCount<target3){bonusRate = bonusRate2;}
+									if(boxCount<target3||target3 ==0){bonusRate = bonusRate2;}
 									else{	
-										if(boxCount<target4){bonusRate =bonusRate3;}
+										if(boxCount<target4||target4 ==0){bonusRate =bonusRate3;}
 										else{
 											bonusRate = bonusRate4;
 											/*if(boxCount<target5){bonusRate = Integer.parseInt(tblBonusRates.getValueAt(0, 5).toString());}
@@ -918,7 +959,7 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 							
 							double paymentSumPharmacistBonus = (amountDbl*bonusRate)/100;
 							System.out.println(paymentSumPharmacistBonus);						
-							createPaymentRow(j, year, boxCount, amount, paymentSumPharmacistBonus,montNum,"PHARMACANT BONUS",String.valueOf(j+11));
+							createPaymentRow(j, year, boxCount, amount, paymentSumPharmacistBonus,montNum,"PHARMACIST BONUS",String.valueOf(j+11));
 						}
 						 strbonusRate1 = tblBonusRates.getValueAt(2, 2).toString();
 						 strbonusRate2 = tblBonusRates.getValueAt(2, 3).toString();
@@ -932,12 +973,12 @@ public class ChainExpsEntryScreen extends JFrame implements ActionListener,ItemL
 						if(bonusRate1>0||bonusRate2>0||bonusRate3>0||bonusRate4>0){//Pharmacy Manager Bonus					
 							if(bonusRate1>0||bonusRate2>0||bonusRate3>0){//Pharmacist Bonus					
 								if(boxCount<target1){/*0 cek*/}else{//Chain Bonus
-									if(boxCount<target2){
+									if(boxCount<target2||target2 ==0){
 										bonusRate = bonusRate1;}
 									else{
-										if(boxCount<target3){bonusRate = bonusRate2;}
+										if(boxCount<target3||target3 ==0){bonusRate = bonusRate2;}
 										else{	
-											if(boxCount<target4){bonusRate =bonusRate3;}
+											if(boxCount<target4||target4 ==0){bonusRate =bonusRate3;}
 											else{
 												bonusRate = bonusRate4;
 												/*if(boxCount<target5){bonusRate = Integer.parseInt(tblBonusRates.getValueAt(0, 5).toString());}
@@ -1113,6 +1154,7 @@ private void createMarketingBonusRows() {
 	   	cmbBoxCity.setSelectedItem("");
 	   	txtPharmacyCount.setText("");
 	   	txtAgreementNo.setText("");
+	   	txtAgrNo2.setText("");
 	   	agreementBeginDate.setDate(cal.getTime());
 	   	agreementEndDate.setDate(cal.getTime());
 	   	

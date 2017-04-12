@@ -85,6 +85,41 @@ public class Util {
 		}
 
     }
+	public static void getPRMDataGrpBy(String columnName,String tableName,JComboBox cmbBox) throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;       
+
+        try{
+        	conn = (Connection) DriverManager.getConnection(prop.getProperty("DB_URL"), prop.getProperty("USER"), prop.getProperty("PASS"));             
+            String sorgu  = "select "+columnName+" from " +tableName + " group by "+columnName +" order by "+columnName;
+            stmt = (Statement) conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sorgu);
+
+            while (rs.next()){
+            	cmbBox.addItem(rs.getString(columnName));
+            }           
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException sqle){
+            System.out.println("SQL Exception: " + sqle.getMessage());
+            if (stmt != null)
+				stmt.close();
+			if (conn != null)
+				conn.close();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				conn.rollback();
+				throw se;
+			} 
+		}
+
+    }
 	public static void getPRMDataGroupBy(String columnName,String tableName,JComboBox cmbBox,String conditionColumn,String conditionValue) throws SQLException {
 		 Connection conn = null;
 	        Statement stmt = null;
@@ -137,7 +172,7 @@ public class Util {
 
         try{
         	conn = (Connection) DriverManager.getConnection(prop.getProperty("DB_URL"), prop.getProperty("USER"), prop.getProperty("PASS"));            
-            if(conditionValue.length()>0 && conditionValue1.length()>0){
+        	if(conditionValue.length()>0 && conditionValue1.length()>0){
             	sorgu  = "select "+columnName+" from " +tableName + " where " + conditionColumn+ "='"+conditionValue+ "' and " + conditionColumn1+ "='"+conditionValue1+ "' group by "+columnName +" order by "+columnName;
             }else if(conditionValue.length()>0){
             	sorgu  = "select "+columnName+" from " +tableName + " where " + conditionColumn+ "='"+conditionValue+ "' group by "+columnName +" order by "+columnName;
@@ -145,6 +180,53 @@ public class Util {
             	sorgu  = "select "+columnName+" from " +tableName + " group by "+columnName +" order by "+columnName;
             }
             
+            stmt = (Statement) conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sorgu);
+            
+            cmbBox.removeAllItems();
+
+            while (rs.next()){
+            	cmbBox.addItem(rs.getString(columnName));
+            }
+            
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException sqle){
+            System.out.println("SQL Exception: " + sqle.getMessage());
+            if (stmt != null)
+				stmt.close();
+			if (conn != null)
+				conn.close();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				conn.rollback();
+				throw se;
+			} 
+		}
+	}
+	public static void getPRMDataThreeConditionsGroupBy(String columnName,String tableName,JComboBox cmbBox,
+			String conditionColumn,String conditionValue,String conditionColumn1,String conditionValue1,String conditionColumn2,String conditionValue2) throws SQLException {
+		Connection conn = null;
+	    Statement stmt = null;
+        String sorgu="";
+        try{
+            Class.forName(prop.getProperty("JDBC_DRIVER"));
+        }
+        catch(java.lang.ClassNotFoundException cnfe){
+            System.out.println("Class Not Found - " + cnfe.getMessage());
+        }       
+
+        try{
+        	conn = (Connection) DriverManager.getConnection(prop.getProperty("DB_URL"), prop.getProperty("USER"), prop.getProperty("PASS"));            
+            sorgu  = "select "+columnName+" from " +tableName + " where " + 
+        	conditionColumn+ "='"+conditionValue+ "' and " + conditionColumn1+ "='"+conditionValue1+"' and " + conditionColumn2+ "='"+conditionValue2+
+        	"' group by "+columnName +" order by "+columnName;          
             stmt = (Statement) conn.createStatement();
             ResultSet rs = stmt.executeQuery(sorgu);
             
@@ -251,6 +333,10 @@ public class Util {
                 outBag.put("STAFFASSOBSERVATION", rs.getString("staff_assesment_observation"));
                 outBag.put("PHARMDATADEFINITION", rs.getString("pharm_data_definition"));
                 outBag.put("DOCTORDATADEFINITION", rs.getString("doctor_data_definition"));
+                outBag.put("EXECUTIVEMRKTEXPENSE", rs.getString("executive_mrkt_expense"));
+                outBag.put("EXECUTIVEPHARMACY", rs.getString("executive_pharmacy"));
+                outBag.put("EXECUTIVEDOCTOR", rs.getString("executive_doctor"));
+                outBag.put("EXECUTIVECHAINEXPENSE", rs.getString("executive_chain_expense"));
             } 
 
         }

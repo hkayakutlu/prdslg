@@ -11,11 +11,9 @@ import java.sql.Date;
 import javax.swing.JTable;
 
 import util.Util;
-import cb.esi.esiclient.util.ESIBag;
 
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.Statement;
 
 import jxl.write.DateTime;
 
@@ -33,10 +31,14 @@ public class StoragesInfo {
    private Date rep_begin_date;
    private Date rep_end_date;
    private DateTime uploadDate;
+   private String client;
+   private String legalAddress;
+   private String actualAddress;
+   private String INN;
+   private String segment;
    
    Properties prop = ConnectToDb.readConfFile();
-   private static final DecimalFormat DF = new DecimalFormat();
-   
+   private static final DecimalFormat DF = new DecimalFormat();  
 
    public StoragesInfo() {
 	// TODO Auto-generated constructor stub
@@ -59,13 +61,13 @@ public class StoragesInfo {
 			      int row = resultTable.getRowCount();
 					for (int j = 0; j  < row; j++) {
 					   stmt = (PreparedStatement) conn.prepareStatement( "INSERT INTO solgar_stk.stock_sales_table(`status`,`distributor`,`optype`,`city`,`product`,"
-						   		+ "`product_type`,`count`,`amount`,`rep_begin_date`,`rep_end_date`,`uploadDate`)"
-						   		+ " VALUES(?,?,?,?,?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);				   
+						   		+ "`product_type`,`count`,`amount`,`rep_begin_date`,`rep_end_date`,`client`,`legalAddress`,`actualAddress`,`INN`,`segment`,`uploadDate`)"
+						   		+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS);				   
 					   
 					   setData(resultTable, j);					   
 					   stmt.setInt(1,1);//Status
 					   setDataToStatement(stmt);					   											   
-					   stmt.setTimestamp(11,Timestamp.valueOf(Util.getCurrentDateTime()));//Startd date				   
+					   stmt.setTimestamp(16,Timestamp.valueOf(Util.getCurrentDateTime()));//Startd date				   
 					   stmt.executeUpdate();
 					   stmt.close(); 
 					    
@@ -161,9 +163,7 @@ public class StoragesInfo {
         return false;
         
     }
-
-
-
+	
 	private void setDataToStatement(PreparedStatement stmt) throws SQLException {
 		stmt.setString(2,getDistributor());
 		   stmt.setString(3,getOptype());
@@ -174,6 +174,11 @@ public class StoragesInfo {
 		   stmt.setString(8,getAmount());
 		   stmt.setDate(9,getBeginDate());
 		   stmt.setDate(10,getEndDate());
+		   stmt.setString(11,getClient());
+		   stmt.setString(12,getLegalAddress());
+		   stmt.setString(13,getActualAddress());
+		   stmt.setString(14,getINN());
+		   stmt.setString(15,getSegment());
 	}
 
 
@@ -215,6 +220,34 @@ public class StoragesInfo {
 	   }	   
 	   setBeginDate(Date.valueOf(resultTable.getValueAt(j, 8).toString()));
 	   setEndDate(Date.valueOf(resultTable.getValueAt(j, 9).toString()));
+	  	   
+	   
+	   if(resultTable.getValueAt(j, 10) != null && resultTable.getValueAt(j, 10).toString().length()>0){
+		   setClient(resultTable.getValueAt(j, 10).toString());
+	   }else{
+		   setClient("");
+	   }
+	   if(resultTable.getValueAt(j, 11) != null && resultTable.getValueAt(j, 11).toString().length()>0){
+		   setLegalAddress(resultTable.getValueAt(j, 11).toString());
+	   }else{
+		   setLegalAddress("");
+	   }
+	   if(resultTable.getValueAt(j, 12) != null && resultTable.getValueAt(j, 12).toString().length()>0){
+		   setActualAddress(resultTable.getValueAt(j, 12).toString());
+	   }else{
+		   setActualAddress("");
+	   }
+	   if(resultTable.getValueAt(j, 13) != null && resultTable.getValueAt(j, 13).toString().length()>0){
+		   setINN(resultTable.getValueAt(j, 13).toString());
+	   }else{
+		   setINN("");
+	   }
+	   if(resultTable.getValueAt(j, 14) != null && resultTable.getValueAt(j, 14).toString().length()>0){
+		   setSegment(resultTable.getValueAt(j, 14).toString());
+	   }else{
+		   setSegment("");
+	   }
+	   
 	}
 
    public int getID()  {
@@ -334,5 +367,54 @@ public class StoragesInfo {
    public void setUploadDate(DateTime uploadDate)  {
        this.uploadDate = uploadDate;
    }
- 
+   public String getClient()  {
+       return client;
+   }
+   public void setClient(String client)  {      
+       if(client != null & client.length() > 0){
+    	   this.client = client;
+	   }else{
+		   this.client = "";
+	   }
+   }
+   public String getLegalAddress()  {
+       return legalAddress;
+   }
+   public void setLegalAddress(String legalAddress)  {      
+       if(legalAddress != null & legalAddress.length() > 0){
+    	   this.legalAddress = legalAddress;
+	   }else{
+		   this.legalAddress = "";
+	   }
+   }
+   public String getActualAddress()  {
+       return actualAddress;
+   }
+   public void setActualAddress(String actualAddress)  {      
+       if(actualAddress != null & actualAddress.length() > 0){
+    	   this.actualAddress = actualAddress;
+	   }else{
+		   this.actualAddress = "";
+	   }
+   }
+   public String getINN()  {
+       return INN;
+   }
+   public void setINN(String INN)  {      
+       if(INN != null & INN.length() > 0){
+    	   this.INN = INN;
+	   }else{
+		   this.INN = "";
+	   }
+   }
+   public String getSegment()  {
+       return segment;
+   }
+   public void setSegment(String segment)  {      
+       if(segment != null & segment.length() > 0){
+    	   this.segment = segment;
+	   }else{
+		   this.segment = "";
+	   }
+   }
 }
